@@ -34,10 +34,10 @@ jobs:
           
       - name: Download ROMs
         run: |
-          curl -# -L -o firmwareport.zip "https://gauss-componentotamanual.allawnofs.com/remove-8444de2415cf32887e5bfb33299faf80/component-ota/25/10/06/44431fa082f0456ba78ac797c96e3a28.zip"
-          curl -# -L -o firmwarebase.zip "https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMIXM_df17e3fabf_12.0.zip"
+          curl -# -L -o op11r.zip "https://gauss-componentotamanual.allawnofs.com/remove-8444de2415cf32887e5bfb33299faf80/component-ota/25/10/06/44431fa082f0456ba78ac797c96e3a28.zip"
+          curl -# -L -o joyeuse.zip "https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMIXM_df17e3fabf_12.0.zip"
 
       - name: Build
         run: |
           chmod +x port.sh
-          ./port.sh firmwarebase.zip firmwareport.zip
+          ./port.sh joyeuse.zip op11r.zip
