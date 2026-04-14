@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# Device configuration for <deviceName> (<deviceCodeName>
+# Maintainer: <maintainerName>
+#
+
+# Make sure you delete commented <> lines. Also this line too.
+
+# Device configuration
+TARGET_DEVICE="joyeuse" # <device codename>
+TARGET_ARCH="arm64" # <device arch>
+TARGET_SOC="SM7125" # <device SoC>
+
+# Filesystem configuration
+TARGET_FS="ext4" # <device fs type>
+
+# Hardware-related configuration
+TARGET_HAS_SIDEFP=true # <device side fingerprint>
+TARGET_HAVE_QUADCAM=true # <device quad camera setup>
+TARGET_HAS_NFC=true # <device nfc feature>
+TARGET_HAS_IR=false # <device ir blaster feature>
+TARGET_HAS_WARP_CHARGE=false # <warp charge, if you don't know make it false>
+TARGET_HAS_VOOC_CHARGE=false # <vooc charge, if you don't know make it false>
+
+# OS-related configuration
+TARGET_NEEDS_IMPORT=true # <needs import my_xxx or not>
+TARGET_IMPORT_PARTITIONS="my_manifest my_heytap my_engineering my_bigball. my_carrier my_stock my_region my_product"
+
+# Partition-related configurations
+TARGET_IS_AB=false
+TARGET_HAS_VIRTUAL_AB=false
+TARGET_SUPER_SIZE=8589934592
+TARGET_SUPER_GROUP="qti_dynamic_partitions"
+TARGET_SUPER_METADATA_SIZE=67108864
+TARGET_SUPER_METADATA_SLOTS=2
+
+# Base ROM ~ Port ROM File Types
+TARGET_BASEROM_TYPE="dat.br"
+TARGET_PORTROM_TYPE="payload"
+
+# Out ZIP Name
+TARGET_OUTPUT_ZIP="XIAOMI_DEVKEYS_ATOLL_AB,INC."
