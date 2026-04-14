@@ -14,6 +14,9 @@ PADDING=3
 
 source functions.sh
 
+chmod +x *
+chmod +x bin/*
+
 log_info()  { echo -e "\033[1;34m[$(date +%H:%M:%S)] $*\033[0m"; }
 log_ok()    { echo -e "\033[1;32m[$(date +%H:%M:%S)] $*\033[0m"; }
 log_warn()  { echo -e "\033[1;33m[$(date +%H:%M:%S)] $*\033[0m"; }
