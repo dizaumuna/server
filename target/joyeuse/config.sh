@@ -22,7 +22,7 @@ TARGET_HAS_VOOC_CHARGE=false
 
 # OS-related configuration
 TARGET_NEEDS_IMPORT=true
-TARGET_IMPORT_PARTITIONS="my_manifest my_heytap my_engineering my_bigball. my_carrier my_stock my_region my_product"
+TARGET_IMPORT_PARTITIONS="my_manifest my_heytap my_engineering my_bigball my_carrier my_stock my_region my_product"
 
 # Partition-related configurations
 TARGET_IS_AB=false
