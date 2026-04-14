@@ -39,5 +39,6 @@ jobs:
 
       - name: Build
         run: |
+          chmod +x bin/
           chmod +x port.sh
           ./port.sh joyeuse.zip op11r.zip
