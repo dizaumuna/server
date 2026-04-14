@@ -56,7 +56,7 @@ detect_device() {
     if [[ "$name" =~ ^([a-zA-Z0-9_]+)_ ]]; then
         echo "${BASH_REMATCH[1]}"
     else
-        echo "unknown"
+        echo "joyeuse"
     fi
 }
 
