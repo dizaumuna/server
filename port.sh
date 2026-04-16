@@ -56,8 +56,14 @@ detect_device() {
     local zip="$1"
     local name
     name=$(basename "$zip")
-    if [[ "$name" =~ ^([a-zA-Z0-9_]+)_ ]]; then
-        echo "${BASH_REMATCH[1]}"
+    # miui_JOYEUSEGlobal_... → joyeuse
+    # joyeuse_base.zip → joyeuse
+    if [[ "$name" =~ [Mm][Ii][Uu][Ii]_([A-Za-z0-9]+)[Gg]lobal ]]; then
+        echo "${BASH_REMATCH[1],,}"
+    elif [[ "$name" =~ [Mm][Ii][Uu][Ii]_([A-Za-z0-9]+)_ ]]; then
+        echo "${BASH_REMATCH[1],,}"
+    elif [[ "$name" =~ ^([a-zA-Z0-9_]+)_ ]]; then
+        echo "${BASH_REMATCH[1],,}"
     else
         echo "joyeuse"
     fi
@@ -132,7 +138,7 @@ extract_portrom() {
     if [[ "$type" == "payload" ]]; then
         unzip -q "$zip" payload.bin -d portrom/
         local parts="system,system_ext,vendor,product"
-        for part in my_manifest my_heytap my_engineering my_bigball. my_carrier my_stock my_region my_product; do
+        for part in my_manifest my_heytap my_engineering my_bigball my_carrier my_stock my_region my_product; do
             parts="${parts},${part}"
         done
         log_info "Dumping partitions: $parts"
@@ -163,7 +169,7 @@ mount_ext_img() {
     name=$(basename "$img" .img)
     mkdir -p "$outdir/$name" "$outdir/config"
     log_info "Extracting [ext] $name"
-    python3 tools/extractor.py "$img" "$outdir/$name/"
+    python3 bin/extractor.py "$img" "$outdir/$name/"
     log_ok "$name extracted"
 }
 
@@ -201,17 +207,17 @@ inject_imports() {
     local odm_buildprop="baserom/vendor/odm/etc/build.prop"
 
     for part in $partitions; do
-        local import_line="import /mnt/vendor/${part}/etc/build.prop"
+        local import_line="import /${part}/build.prop"
 
         if [[ -f "$vendor_buildprop" ]]; then
-            if ! grep -q "^${import_line}" "$vendor_buildprop"; then
+            if ! grep -qF "$import_line" "$vendor_buildprop"; then
                 echo "$import_line" >> "$vendor_buildprop"
                 log_ok "Added to vendor/build.prop: $import_line"
             fi
         fi
 
         if [[ -f "$odm_buildprop" ]]; then
-            if ! grep -q "^${import_line}" "$odm_buildprop"; then
+            if ! grep -qF "$import_line" "$odm_buildprop"; then
                 echo "$import_line" >> "$odm_buildprop"
                 log_ok "Added to vendor/odm/etc/build.prop: $import_line"
             fi
@@ -411,115 +417,115 @@ package_zip() {
 }
 
 debloat() {
-    # Copyright (C) 2026 diza u muna 
     # my_bigball/app
-    rm -rf port/my_bigball/my_bigball/app/Facebook-appmanager
-    rm -rf port/my_bigball/my_bigball/app/GoogleContacts
-    rm -rf port/my_bigball/my_bigball/app/GPay3
-    rm -rf port/my_bigball/my_bigball/app/LatinImeGoogle
-    rm -rf port/my_bigball/my_bigball/app/Meet
-    rm -rf port/my_bigball/my_bigball/app/Photos
-    
+    rm -rf portrom/my_bigball/my_bigball/app/Facebook-appmanager
+    rm -rf portrom/my_bigball/my_bigball/app/GoogleContacts
+    rm -rf portrom/my_bigball/my_bigball/app/GPay3
+    rm -rf portrom/my_bigball/my_bigball/app/LatinImeGoogle
+    rm -rf portrom/my_bigball/my_bigball/app/Meet
+    rm -rf portrom/my_bigball/my_bigball/app/Photos
+
     # my_bigball/del-app-pre
-    rm -rf port/my_bigball/my_bigball/del-app-pre/Drive_del
-    rm -rf port/my_bigball/my_bigball/del-app-pre/Facebook
-    rm -rf port/my_bigball/my_bigball/del-app-pre/GoogleFindMyDevice
-    rm -rf port/my_bigball/my_bigball/del-app-pre/GoogleHome
-    rm -rf port/my_bigball/my_bigball/del-app-pre/GoogleOne
-    rm -rf port/my_bigball/my_bigball/del-app-pre/Videos_del
-    rm -rf port/my_bigball/my_bigball/del-app-pre/YTMusic_del
+    rm -rf portrom/my_bigball/my_bigball/del-app-pre/Drive_del
+    rm -rf portrom/my_bigball/my_bigball/del-app-pre/Facebook
+    rm -rf portrom/my_bigball/my_bigball/del-app-pre/GoogleFindMyDevice
+    rm -rf portrom/my_bigball/my_bigball/del-app-pre/GoogleHome
+    rm -rf portrom/my_bigball/my_bigball/del-app-pre/GoogleOne
+    rm -rf portrom/my_bigball/my_bigball/del-app-pre/Videos_del
+    rm -rf portrom/my_bigball/my_bigball/del-app-pre/YTMusic_del
 
     # my_bigball/etc/sysconfig
-    rm -rf port/my_bigball/my_bigball/etc/sysconfig/com.google.android.dialer.support.xml
-        
+    rm -rf portrom/my_bigball/my_bigball/etc/sysconfig/com.google.android.dialer.support.xml
+
     # my_bigball/framework
-    rm -rf port/my_bigball/my_bigball/framework/com.google.android.dialer.support.jar
+    rm -rf portrom/my_bigball/my_bigball/framework/com.google.android.dialer.support.jar
 
     # my_bigball/overlay
-    rm -rf port/my_bigball/my_bigball/overlay/GmsConfigOverlayASI
-    rm -rf port/my_bigball/my_bigball/overlay/GmsConfigOverlayCommonCN
-    rm -rf port/my_bigball/my_bigball/overlay/GmsConfigOverlayCommonEx
-    rm -rf port/my_bigball/my_bigball/overlay/GmsConfigOverlayComms
-    rm -rf port/my_bigball/my_bigball/overlay/OplusConfigOverlayComms
+    rm -rf portrom/my_bigball/my_bigball/overlay/GmsConfigOverlayASI
+    rm -rf portrom/my_bigball/my_bigball/overlay/GmsConfigOverlayCommonCN
+    rm -rf portrom/my_bigball/my_bigball/overlay/GmsConfigOverlayCommonEx
+    rm -rf portrom/my_bigball/my_bigball/overlay/GmsConfigOverlayComms
+    rm -rf portrom/my_bigball/my_bigball/overlay/OplusConfigOverlayComms
 
     # my_bigball/priv-app
-    rm -rf port/my_bigball/my_bigball/priv-app/Facebook-installer
-    rm -rf port/my_bigball/my_bigball/priv-app/Facebook-services
-    rm -rf port/my_bigball/my_bigball/priv-app/GoogleDialer
-    rm -rf port/my_bigball/my_bigball/priv-app/Messages
-    rm -rf port/my_bigball/my_bigball/priv-app/PlayAutoInstallConfig_OnePlus
-    rm -rf port/my_bigball/my_bigball/priv-app/SearchSelector
+    rm -rf portrom/my_bigball/my_bigball/priv-app/Facebook-installer
+    rm -rf portrom/my_bigball/my_bigball/priv-app/Facebook-services
+    rm -rf portrom/my_bigball/my_bigball/priv-app/GoogleDialer
+    rm -rf portrom/my_bigball/my_bigball/priv-app/Messages
+    rm -rf portrom/my_bigball/my_bigball/priv-app/PlayAutoInstallConfig_OnePlus
+    rm -rf portrom/my_bigball/my_bigball/priv-app/SearchSelector
 
     # my_product/app
-    rm -rf port/my_product/my_product/app/CalendarGoogle
-    rm -rf port/my_product/my_product/app/Chrome64
-    rm -rf port/my_product/my_product/app/Gmail2
-    rm -rf port/my_product/my_product/app/GoogleLens
-    rm -rf port/my_product/my_product/app/GoogleLocationHistory
-    rm -rf port/my_product/my_product/app/Maps
-    rm -rf port/my_product/my_product/app/OplusCamera
-    rm -rf port/my_product/my_product/app/talkback
-    rm -rf port/my_product/my_product/app/YouTube
-    rm -rf port/my_product/my_product/app/WebViewGoogle64
-    rm -rf port/my_product/my_product/app/TrichromeLibrary64
+    rm -rf portrom/my_product/my_product/app/CalendarGoogle
+    rm -rf portrom/my_product/my_product/app/Chrome64
+    rm -rf portrom/my_product/my_product/app/Gmail2
+    rm -rf portrom/my_product/my_product/app/GoogleLens
+    rm -rf portrom/my_product/my_product/app/GoogleLocationHistory
+    rm -rf portrom/my_product/my_product/app/Maps
+    rm -rf portrom/my_product/my_product/app/OplusCamera
+    rm -rf portrom/my_product/my_product/app/talkback
+    rm -rf portrom/my_product/my_product/app/YouTube
+    rm -rf portrom/my_product/my_product/app/WebViewGoogle64
+    rm -rf portrom/my_product/my_product/app/TrichromeLibrary64
 
     # my_product/del-app
-    rm -rf port/my_product/my_product/del-app/ConsumerIRApp
+    rm -rf portrom/my_product/my_product/del-app/ConsumerIRApp
 
     # my_product/priv-app
-    rm -rf port/my_product/my_product/priv-app/GoogleFiles
-    rm -rf port/my_product/my_product/priv-app/GoogleVelvet_CTS
-    rm -rf port/my_product/my_product/priv-app/Phonesky
-    rm -rf port/my_product/my_product/priv-app/Wellbeing
-    rm -rf port/my_product/my_product/priv-app/SOSHelper
+    rm -rf portrom/my_product/my_product/priv-app/GoogleFiles
+    rm -rf portrom/my_product/my_product/priv-app/GoogleVelvet_CTS
+    rm -rf portrom/my_product/my_product/priv-app/Phonesky
+    rm -rf portrom/my_product/my_product/priv-app/Wellbeing
+    rm -rf portrom/my_product/my_product/priv-app/SOSHelper
 
     # my_product/overlay
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_COSMOS.apk
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_FIREWORKS.apk
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_FY.apk
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_NONE.apk
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_QY.apk
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_RIPPLE.apk
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_STRIPE.apk
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_SW.apk
-    rm -rf port/my_product/my_product/overlay/SystemUIFingerprintRes_Halo.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_COSMOS.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_FIREWORKS.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_FY.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_NONE.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_QY.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_RIPPLE.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_STRIPE.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_13_0_SW.apk
+    rm -rf portrom/my_product/my_product/overlay/SystemUIFingerprintRes_Halo.apk
 
     # my_stock/app
-    rm -rf port/my_product/my_stock/app/BeaconLink
-    rm -rf port/my_product/my_stock/app/Browser
-    rm -rf port/my_product/my_stock/app/ChildrenSpace
-    rm -rf port/my_product/my_stock/app/CloudService
-    rm -rf port/my_product/my_stock/app/FloatAssistant
-    rm -rf port/my_product/my_stock/app/  KeKePay
-    rm -rf port/my_product/my_stock/app/OplusOperationManual
-    rm -rf port/my_product/my_stock/app/OplusSecurityKeyboard
-    rm -rf port/my_product/my_stock/app/PhoneNOAreaInquireProvider
-    rm -rf port/my_product/my_stock/app/Portrait
-    rm -rf port/my_product/my_stock/app/SceneMode
-    rm -rf port/my_product/my_stock/app/SecurePay
-    rm -rf port/my_product/my_stock/app/SoftsimRedteaRoaming
-    rm -rf port/my_product/my_stock/app/  SmartSideBar
-    rm -rf port/my_product/my_stock/app/Calculator2
-    rm -rf port/my_product/my_stock/app/FileManager
+    rm -rf portrom/my_stock/my_stock/app/BeaconLink
+    rm -rf portrom/my_stock/my_stock/app/Browser
+    rm -rf portrom/my_stock/my_stock/app/ChildrenSpace
+    rm -rf portrom/my_stock/my_stock/app/CloudService
+    rm -rf portrom/my_stock/my_stock/app/FloatAssistant
+    rm -rf portrom/my_stock/my_stock/app/KeKePay
+    rm -rf portrom/my_stock/my_stock/app/OplusOperationManual
+    rm -rf portrom/my_stock/my_stock/app/OplusSecurityKeyboard
+    rm -rf portrom/my_stock/my_stock/app/PhoneNOAreaInquireProvider
+    rm -rf portrom/my_stock/my_stock/app/Portrait
+    rm -rf portrom/my_stock/my_stock/app/SceneMode
+    rm -rf portrom/my_stock/my_stock/app/SecurePay
+    rm -rf portrom/my_stock/my_stock/app/SoftsimRedteaRoaming
+    rm -rf portrom/my_stock/my_stock/app/SmartSideBar
+    rm -rf portrom/my_stock/my_stock/app/Calculator2
+    rm -rf portrom/my_stock/my_stock/app/FileManager
 
     # my_stock/del-app
-    rm -rf port/my_product/my_stock/del-app/BackupAndRestore
-    rm -rf port/my_product/my_stock/del-app/INOnePlusStore
-    rm -rf port/my_product/my_stock/del-app/OPBreathMode
-    rm -rf port/my_product/my_stock/del-app/OPForum
-    rm -rf port/my_product/my_stock/del-app/Pictorial
-    rm -rf port/my_product/my_stock/del-app/NewSoundRecorder
-    rm -rf port/my_product/my_stock/del-app/OppoNote2
-    rm -rf port/my_product/my_stock/del-app/OppoTranslation
+    rm -rf portrom/my_stock/my_stock/del-app/BackupAndRestore
+    rm -rf portrom/my_stock/my_stock/del-app/INOnePlusStore
+    rm -rf portrom/my_stock/my_stock/del-app/OPBreathMode
+    rm -rf portrom/my_stock/my_stock/del-app/OPForum
+    rm -rf portrom/my_stock/my_stock/del-app/Pictorial
+    rm -rf portrom/my_stock/my_stock/del-app/NewSoundRecorder
+    rm -rf portrom/my_stock/my_stock/del-app/OppoNote2
+    rm -rf portrom/my_stock/my_stock/del-app/OppoTranslation
 
     # my_stock/priv-app
-    rm -rf port/my_product/my_stock/priv-app/BlackListApp
-    rm -rf port/my_product/my_stock/priv-app/dmp
-    rm -rf port/my_product/my_stock/priv-app/HeyCast
-    rm -rf port/my_product/my_stock/priv-app/KeKeMarket
-    rm -rf port/my_product/my_stock/priv-app/LinktoWindows
-    rm -rf port/my_product/my_stock/priv-app/NumberRecognition
-    log_ok "Debloated system successfully."
+    rm -rf portrom/my_stock/my_stock/priv-app/BlackListApp
+    rm -rf portrom/my_stock/my_stock/priv-app/dmp
+    rm -rf portrom/my_stock/my_stock/priv-app/HeyCast
+    rm -rf portrom/my_stock/my_stock/priv-app/KeKeMarket
+    rm -rf portrom/my_stock/my_stock/priv-app/LinktoWindows
+    rm -rf portrom/my_stock/my_stock/priv-app/NumberRecognition
+
+    log_ok "Debloated successfully."
 }
 
 main() {
@@ -548,7 +554,7 @@ main() {
         [[ -f "$img" ]] && extract_img "$img" portrom || log_warn "$img not found"
     done
 
-    for part in my_manifest my_product my_stock my_region my_company my_preload; do
+    for part in my_manifest my_heytap my_engineering my_bigball my_carrier my_stock my_region my_product; do
         local img="portrom/${part}.img"
         [[ -f "$img" ]] && extract_img "$img" portrom || true
     done
