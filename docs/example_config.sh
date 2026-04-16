@@ -27,16 +27,16 @@ TARGET_NEEDS_IMPORT=true # <needs import my_xxx or not>
 TARGET_IMPORT_PARTITIONS="my_manifest my_heytap my_engineering my_bigball. my_carrier my_stock my_region my_product"
 
 # Partition-related configurations
-TARGET_IS_AB=false
-TARGET_HAS_VIRTUAL_AB=false
-TARGET_SUPER_SIZE=8589934592
-TARGET_SUPER_GROUP="qti_dynamic_partitions"
-TARGET_SUPER_METADATA_SIZE=67108864
-TARGET_SUPER_METADATA_SLOTS=2
+TARGET_IS_AB=false # <a/b partition style, you can check it with fastboot getvar all>
+TARGET_HAS_VIRTUAL_AB=false # <virtual a/b partition style, you can check it on orangefox>
+TARGET_SUPER_SIZE=8589934592 # <super partition size>
+TARGET_SUPER_GROUP="qti_dynamic_partitions" # <cluster name, if you don't know and porting to snapdragon use default, for mssi (mtk) use "main">
+TARGET_SUPER_METADATA_SIZE=67108864 # <super metadata size>
+TARGET_SUPER_METADATA_SLOTS=2 # <super metadata slots>
 
 # Base ROM ~ Port ROM File Types
-TARGET_BASEROM_TYPE="dat.br"
-TARGET_PORTROM_TYPE="payload"
+TARGET_BASEROM_TYPE="dat.br" # <base rom type, you can check it by extracting zip, only payload, dat.br and dat supported>
+TARGET_PORTROM_TYPE="payload" # <port rom type, you can check it by extracting zip, only payload, dat.b and dat supported>
 
 # Out ZIP Name
-TARGET_OUTPUT_ZIP="XIAOMI_DEVKEYS_ATOLL_AB,INC."
+TARGET_OUTPUT_ZIP="XIAOMI_DEVKEYS_ATOLL_AB,INC." # <output zip name>
