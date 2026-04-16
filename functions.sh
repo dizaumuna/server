@@ -66,7 +66,7 @@ extract_partition() {
     name=$(basename "$img" .img)
 
     if [[ ! -f "$img" ]]; then
-        log_warn "extract_partition: $img not found, skipping"
+        log_warn "extract_partition: $img not found, skipping."
         return
     fi
 
@@ -108,7 +108,7 @@ disable_avb_verify() {
         sed -i 's/,avb$//g' "$fstab"
     done <<< "$fstabs"
 
-    log_ok "AVB disabled under $target"
+    log_ok "Android Verified Boot disabled under $target"
 }
 
 #spoof_bootimg() {

@@ -65,6 +65,8 @@ detect_device() {
     else
     # if none of them are matched, use joyeuse
     # you need to change this if you are porting another device
+
+    # TOOD: Fix this thing (?)
         echo "joyeuse"
     fi
 }
@@ -102,37 +104,37 @@ extract_baserom_datbr() {
         python3 bin/sdat2img_brotli.py \
             -d baserom/raw/vendor.new.dat.br \
             -t baserom/raw/vendor.transfer.list \
-            -o baserom/vendor.img
+            -o baserom/vendor.img    
         log_ok "vendor.img created"
     else
-        log_err "vendor.new.dat.br not found in base ROM"
+        log_err "vendor.new.dat.br not found in base ROM."
         exit 1
     fi
 }
 
 extract_baserom_payload() {
     local zip="$1"
-    log_info "Extracting base ROM [payload format]"
+    log_info "Extracting base ROM [payload format]..."
     mkdir -p baserom/raw
     unzip -q "$zip" payload.bin -d baserom/raw
     bin/payload-dumper-go -p vendor -o baserom/ baserom/raw/payload.bin > /dev/null
-    log_ok "vendor.img extracted from payload"
+    log_ok "vendor.img extracted from payload."
 }
 
 extract_baserom_img() {
     local zip="$1"
-    log_info "Extracting base ROM [img format]"
+    log_info "Extracting base ROM [img format]..."
     mkdir -p baserom/raw
     unzip -q "$zip" "vendor.img" -d baserom/raw 2>/dev/null || \
     unzip -q "$zip" "vendor_a.img" -d baserom/raw 2>/dev/null || true
     find baserom/raw -name "vendor*.img" -exec mv -f {} baserom/vendor.img \;
-    log_ok "vendor.img extracted"
+    log_ok "vendor.img extracted."
 }
 
 extract_portrom() {
     local zip="$1"
     local type="$2"
-    log_info "Extracting port ROM [$type format]"
+    log_info "Extracting port ROM [$type format]..."
     mkdir -p portrom
 
     if [[ "$type" == "payload" ]]; then
@@ -144,7 +146,7 @@ extract_portrom() {
         log_info "Dumping partitions: $parts"
         bin/payload-dumper-go -p "$parts" -o portrom/ portrom/payload.bin > /dev/null
         rm -f portrom/payload.bin
-        log_ok "Port ROM partitions extracted"
+        log_ok "Port ROM partitions extracted."
     elif [[ "$type" == "img" ]]; then
         local targets=()
         for part in system system_ext vendor product my_manifest my_product my_stock my_region my_company my_preload; do
@@ -155,7 +157,7 @@ extract_portrom() {
             base=$(basename "$f" _a.img)
             mv -f "$f" "portrom/${base}.img"
         done
-        log_ok "Port ROM img files extracted"
+        log_ok "Port ROM img files extracted."
     else
         log_err "Unknown portrom type: $type"
         exit 1
@@ -170,7 +172,7 @@ mount_ext_img() {
     mkdir -p "$outdir/$name" "$outdir/config"
     log_info "Extracting [ext] $name"
     python3 bin/extractor.py "$img" "$outdir/$name/"
-    log_ok "$name extracted"
+    log_ok "$name extracted."
 }
 
 mount_erofs_img() {
@@ -181,14 +183,14 @@ mount_erofs_img() {
     mkdir -p "$outdir/$name"
     log_info "Extracting [erofs] $name"
     bin/extract.erofs -i "$img" -o "$outdir/$name" -x > /dev/null 2>&1
-    log_ok "$name extracted"
+    log_ok "$name extracted."
 }
 
 extract_img() {
     local img="$1"
     local outdir="$2"
     if [[ ! -f "$img" ]]; then
-        log_warn "$img not found, skipping"
+        log_warn "$img not found, skipping."
         return
     fi
     local fstype
@@ -209,17 +211,10 @@ inject_imports() {
     for part in $partitions; do
         local import_line="import /${part}/build.prop"
 
-        if [[ -f "$vendor_buildprop" ]]; then
-            if ! grep -qF "$import_line" "$vendor_buildprop"; then
-                echo "$import_line" >> "$vendor_buildprop"
-                log_ok "Added to vendor/build.prop: $import_line"
-            fi
-        fi
-
         if [[ -f "$odm_buildprop" ]]; then
             if ! grep -qF "$import_line" "$odm_buildprop"; then
                 echo "$import_line" >> "$odm_buildprop"
-                log_ok "Added to vendor/odm/etc/build.prop: $import_line"
+                log_ok "Added to build.prop: $import_line"
             fi
         fi
     done
@@ -227,7 +222,7 @@ inject_imports() {
 
 move_my_partitions_to_system() {
     local partitions="$1"
-    local system_dir="portrom/system/system"
+    local system_dir="portrom/system/system/"
 
     for part in $partitions; do
         local src="portrom/${part}"
@@ -236,15 +231,15 @@ move_my_partitions_to_system() {
             mkdir -p "$system_dir/$part"
             cp -rf "$src/." "$system_dir/$part/"
             rm -rf "$src"
-            log_ok "$part moved"
+            log_ok "$part moved."
         else
-            log_warn "$src not found, skipping"
+            log_warn "$src not found, skipping."
         fi
     done
 }
 
 patch_file_contexts() {
-    log_info "Patching file contexts"
+    log_info "Patching file contexts..."
 
     if [[ -f baserom/config/vendor_fsconfig.txt ]]; then
         mv baserom/config/vendor_fsconfig.txt baserom/config/vendor_fs_config
@@ -254,7 +249,7 @@ patch_file_contexts() {
     fi
 
     [[ -f baserom/config/vendor_file_contexts ]] && \
-        python3 bin/fspatch.py baserom/config/vendor_file_contexts
+        python3 bin/fspatch.py baserom/config/ baserom/config/vendor_file_contexts 
 
     for part in system system_ext product; do
         local ctx="portrom/${part}/config/${part}_file_contexts"
@@ -266,7 +261,64 @@ patch_file_contexts() {
         sed -i 's|^\(/system/my_[^ ]*\) u:object_r:system_file:s0|\1(/.*)?    u:object_r:system_file:s0|' "$sys_ctx"
     fi
 
-    log_ok "File contexts patched"
+    log_ok "File contexts patched."
+}
+
+patch_semi_vendor() {
+    log_info "Semi-patching vendor for FP..."
+
+    rm -rf baserom/vendor/etc/group
+    rm -rf baserom/vendor/etc/passwd
+
+    # move port group & passwd to stock one
+    # if this part disabled, you might encounter issues like "userCreateProcess: failed"
+    mv portrom/vendor/vendor/etc/group baserom/vendor/etc/group
+    mv portrom/vendor/vendor/etc/passwd baserom/vendor/etc/passwd
+    log_ok "Patching finished."
+}
+
+decompile_settings_apk() {
+    log_info "Decompiling Settings.apk with apktool..."
+
+    # first move settings.apk to tmp
+    mkdir -p tmp
+    mv portrom/system_ext/system_ext/priv-app/Settings/Settings.apk tmp/
+    cd tmp/
+
+    # download latest apktool
+    log_info "Downloading apktool..."
+    curl -# -L -o apktool.jar "https://github.com/iBotPeaches/Apktool/releases/download/v3.0.1/apktool_3.0.1.jar"
+    java -jar apktool.jar d Settings.apk
+    cd Settings/res/xml
+
+    # time for patching
+    sed -i '/<com.oplus.settings.widget.preference.SettingsPreferenceCategory>/,/<\/PreferenceScreen>/c\
+        </com.oplus.settings.widget.preference.SettingsPreferenceCategory>\
+        <com.oplus.settings.widget.preference.SettingsPreferenceCategory>\
+            <Preference android:title="Brought to you by @dizaumuna" android:summary="Thanks to miatoll community for helping.">\
+                <intent android:action="android.intent.action.VIEW" android:data="https://github.com/dizaumuna" />\
+            </Preference>\
+        </com.oplus.settings.widget.preference.SettingsPreferenceCategory>\
+    </PreferenceScreen>' device_version_info.xml
+
+    # recompile
+    cd ../../
+    log_info "Building APK..."
+    java -jar ../apktool.jar b -o Settings_patched.apk
+    mv Settings_patched.apk ../
+    cd ..
+    keytool -genkey -v -keystore signkey.keystore -alias signkey \
+    -keyalg RSA -keysize 2048 -validity 10000
+
+    jarsigner -keystore testkey.keystore Settings_patched.apk signkey
+
+    # finally, move to system
+    mv Settings_patched.apk portrom/system_ext/system_ext/priv-app/Settings/Settings.apk
+    log_ok "Patched Settings.apk successfully."
+
+
+    rm -rf baserom/vendor/etc/group
+    rm -rf baserom/vendor/etc/passwd
 }
 
 build_image() {
@@ -276,7 +328,7 @@ build_image() {
     local fs="$4"
 
     if [[ ! -d "$rootfs" ]]; then
-        log_warn "$name has no rootfs ($rootfs), skipping"
+        log_warn "$name has no rootfs ($rootfs), skipping."
         return
     fi
 
@@ -348,7 +400,7 @@ patch_build_props() {
         sed -i "s|ro.build.date.utc=.*|ro.build.date.utc=${build_utc}|g" "$prop_file" || true
     done < <(find portrom/ -name "build.prop")
 
-    log_ok "Build props patched"
+    log_ok "build.prop patched successfully."
 }
 
 disable_avb() {
@@ -360,7 +412,7 @@ disable_avb() {
         sed -i 's/,avb=vbmeta//g' "$fstab"
         sed -i 's/,avb//g' "$fstab"
     done < <(find baserom/ portrom/ -name "fstab.*" 2>/dev/null)
-    log_ok "AVB disabled"
+    log_ok "Android Verified Boot disabled on fstab successfully."
 }
 
 build_super() {
@@ -374,10 +426,10 @@ build_super() {
 
     local lpargs
     lpargs="--metadata-size=${meta_size} \
---metadata-slots=${meta_slots} \
---device-size=${super_size} \
---super-name=super \
---group ${group}:${super_size}"
+    --metadata-slots=${meta_slots} \
+    --device-size=${super_size} \
+    --super-name=super \
+    --group ${group}:${super_size}"
 
     for part in system system_ext vendor product; do
         local img="${part}.img"
@@ -396,7 +448,6 @@ build_super() {
     done
 
     eval bin/lpmake $lpargs -o super.img
-    log_ok "super.img built"
 }
 
 package_zip() {
@@ -404,7 +455,8 @@ package_zip() {
     log_info "Packaging: $zipname"
 
     rm -rf repack
-    mkdir -p repack out
+    mkdir -p repack 
+    mkdir -p out
 
     cp -f super.img repack/
 
@@ -413,7 +465,7 @@ package_zip() {
     cd "$WORK_DIR"
 
     mv -f "repack/$zipname" "out/$zipname"
-    log_ok "Output: out/$zipname"
+    log_ok "OTA ZIP is in here: out/$zipname"
 }
 
 debloat() {
@@ -533,9 +585,8 @@ main() {
     device=$(detect_device "$BASEROM")
     load_config "$device"
 
-    log_info "Cleaning up"
+    log_info "Cleaning up before processing porting..."
     rm -rf baserom portrom repack *.img *.size
-    log_ok "Clean"
 
     case "$TARGET_BASEROM_TYPE" in
         dat.br)  extract_baserom_datbr "$BASEROM" ;;
@@ -546,7 +597,7 @@ main() {
 
     extract_portrom "$PORTROM" "$TARGET_PORTROM_TYPE"
 
-    log_info "Extracting partition images"
+    log_info "Extracting partition images..."
     extract_img baserom/vendor.img baserom
 
     for part in system system_ext product; do
@@ -560,7 +611,7 @@ main() {
     done
 
     if [[ "$TARGET_NEEDS_IMPORT" == "true" ]]; then
-        log_info "Injecting import lines"
+        log_info "Adding import lines..."
         move_my_partitions_to_system "$TARGET_IMPORT_PARTITIONS"
         inject_imports "$TARGET_IMPORT_PARTITIONS"
     fi
@@ -570,7 +621,7 @@ main() {
     patch_file_contexts
     debloat
 
-    log_info "Building images"
+    log_info "Building images..."
 
     build_image "system"     "portrom/system/system"         "portrom/system/config"     "$TARGET_FS"
     build_image "system_ext" "portrom/system_ext/system_ext" "portrom/system_ext/config" "$TARGET_FS"
