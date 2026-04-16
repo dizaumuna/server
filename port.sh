@@ -249,11 +249,11 @@ patch_file_contexts() {
     fi
 
     [[ -f baserom/config/vendor_file_contexts ]] && \
-        python3 bin/fspatch.py baserom/vendor baserom/config/vendor_file_contexts
+        python3 bin/fspatch.py baserom/vendor baserom/config/vendor_fs_config
 
-    python3 bin/fspatch.py portrom/system/system portrom/system/config/system_file_contexts
-    python3 bin/fspatch.py portrom/system_ext/system_ext portrom/system_ext/config/system_ext_file_contexts
-    python3 bin/fspatch.py portrom/product/product portrom/product/config/product_file_contexts
+    python3 bin/fspatch.py portrom/system/system portrom/system/config/system_fs_config
+    python3 bin/fspatch.py portrom/system_ext/system_ext portrom/system_ext/config/system_ext_fs_config
+    python3 bin/fspatch.py portrom/product/product portrom/product/config/product_fs_config
     
 
     local sys_ctx="portrom/system/config/system_file_contexts"
