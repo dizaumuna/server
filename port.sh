@@ -56,8 +56,6 @@ detect_device() {
     local zip="$1"
     local name
     name=$(basename "$zip")
-    # miui_JOYEUSEGlobal_... → joyeuse
-    # joyeuse_base.zip → joyeuse
     if [[ "$name" =~ [Mm][Ii][Uu][Ii]_([A-Za-z0-9]+)[Gg]lobal ]]; then
         echo "${BASH_REMATCH[1],,}"
     elif [[ "$name" =~ [Mm][Ii][Uu][Ii]_([A-Za-z0-9]+)_ ]]; then
@@ -65,6 +63,8 @@ detect_device() {
     elif [[ "$name" =~ ^([a-zA-Z0-9_]+)_ ]]; then
         echo "${BASH_REMATCH[1],,}"
     else
+    # if none of them are matched, use joyeuse
+    # you need to change this if you are porting another device
         echo "joyeuse"
     fi
 }

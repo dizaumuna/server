@@ -111,29 +111,29 @@ disable_avb_verify() {
     log_ok "AVB disabled under $target"
 }
 
-spoof_bootimg() {
-    local bootimg="$1"
-    local workdir
-    workdir=$(mktemp -d)
-
-    cp "$bootimg" "$workdir/boot.img"
-    pushd "$workdir" > /dev/null
-
-    set +e
-    bin/magiskboot unpack -h boot.img > /dev/null 2>&1
-    if [[ -f header ]]; then
-        sed -i '/^cmdline=/ s/$/ androidboot.vbmeta.device_state=unlocked/' header
-        bin/magiskboot repack boot.img new-boot.img > /dev/null 2>&1
-        cp new-boot.img "$bootimg"
-        log_ok "boot.img spoofed (unlocked state)"
-    else
-        log_warn "spoof_bootimg: no header found, skipping"
-    fi
-    set -e
-
-    popd > /dev/null
-    rm -rf "$workdir"
-}
+#spoof_bootimg() {
+#    local bootimg="$1"
+#    local workdir
+#    workdir=$(mktemp -d)
+#
+#    cp "$bootimg" "$workdir/boot.img"
+#    pushd "$workdir" > /dev/null
+#
+#    set +e
+#    bin/magiskboot unpack -h boot.img > /dev/null 2>&1
+#    if [[ -f header ]]; then
+#        sed -i '/^cmdline=/ s/$/ androidboot.vbmeta.device_state=unlocked/' header
+#        bin/magiskboot repack boot.img new-boot.img > /dev/null 2>&1
+#        cp new-boot.img "$bootimg"
+#        log_ok "boot.img spoofed (unlocked state)"
+#    else
+#        log_warn "spoof_bootimg: no header found, skipping"
+#    fi
+#    set -e
+#
+#    popd > /dev/null
+#    rm -rf "$workdir"
+#}
 
 check_tools() {
     local missing=()
