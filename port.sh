@@ -249,7 +249,7 @@ patch_file_contexts() {
     fi
 
     [[ -f baserom/config/vendor_file_contexts ]] && \
-        python3 bin/fspatch.py baserom/vendor/ baserom/config/vendor_file_contexts 
+        python3 bin/fspatch.py baserom/vendor baserom/config/vendor_fs_config
 
     for part in system system_ext product; do
         local ctx="portrom/${part}/config/${part}_file_contexts"
