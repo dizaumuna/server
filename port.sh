@@ -10,7 +10,7 @@ trap 'echo "[ERROR] Line $LINENO: $BASH_COMMAND" >&2' ERR
 
 WORK_DIR=$(pwd)
 BUILD_START=${SECONDS}
-PADDING=3
+PADDING=4
 
 source functions.sh
 
