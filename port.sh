@@ -495,7 +495,7 @@ patch_aod_apk() {
     apk=$(find portrom/ -name "Aod.apk" | head -n1)
     [[ -f "$apk" ]] || { log_warn "Aod.apk not found, skipping."; return; }
  
-    log_info "Patching Aod.apk (force AOD always-on)..."
+    log_info "Patching AOD.apk (force AOD always-on)..."
     mkdir -p tmp
     cp -f "$apk" tmp/Aod.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Aod
@@ -749,6 +749,12 @@ debloat() {
     rm -rf portrom/system/system/my_product/app/WebViewGoogle64
     rm -rf portrom/system/system/my_product/app/YouTube
 
+    # my_product/del-app
+    rm -rf portrom/system/system/my_product/del-app/ConsumerIRApp
+
+    my_product/del-app-pre
+    rm -rf portrom/system/system/my_product/del-app-pre/*
+
     # my_product/priv-app
     rm -rf portrom/system/system/my_product/priv-app/Facebook-installer
     rm -rf portrom/system/system/my_product/priv-app/Facebook-services
@@ -768,7 +774,6 @@ debloat() {
     # my_stock/priv-app
     rm -rf portrom/system/system/my_stock/priv-app/Games
     rm -rf portrom/system/system/my_stock/priv-app/LinktoWindows
-    rm -rf portrom/system/system/my_stock/priv-app/OppoGallery2
     log_ok "Removed useless system apps successfully."
 }
  
