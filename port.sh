@@ -836,6 +836,7 @@ main() {
     patch_semi_vendor
     debloat
     add_apex30
+    patch_apex_cfg
  
     log_info "Patching APKs and framework JARs..."
     mkdir -p tmp
@@ -849,7 +850,6 @@ main() {
     patch_aod_apk
     patch_gallery_apk
     patch_battery_apk
-    patch_apex_cfg
  
     rm -rf tmp
     log_ok "APK/smali patching complete."
