@@ -752,7 +752,7 @@ debloat() {
     # my_product/del-app
     rm -rf portrom/system/system/my_product/del-app/ConsumerIRApp
 
-    my_product/del-app-pre
+    # my_product/del-app-pre
     rm -rf portrom/system/system/my_product/del-app-pre/*
 
     # my_product/priv-app
