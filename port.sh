@@ -247,7 +247,6 @@ patch_file_contexts() {
     python3 bin/fspatch.py portrom/system/system portrom/system/config/system_fs_config
     python3 bin/fspatch.py portrom/system_ext/system_ext portrom/system_ext/config/system_ext_fs_config
     python3 bin/fspatch.py portrom/product/product portrom/product/config/product_fs_config
-    echo "/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0" >> portrom/system_ext/config/system_ext_file_contexts
  
     local sys_ctx="portrom/system/config/system_file_contexts"
     if [[ -f "$sys_ctx" ]]; then
@@ -846,6 +845,7 @@ main() {
     patch_aod_apk
     patch_gallery_apk
     patch_battery_apk
+    echo "/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0" >> portrom/system_ext/config/system_ext_file_contexts
  
     rm -rf tmp
     log_ok "APK/smali patching complete."
