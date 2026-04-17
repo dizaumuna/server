@@ -206,8 +206,6 @@ extract_img() {
  
 inject_imports() {
     local partitions="$1"
- 
-    local vendor_buildprop="baserom/vendor/build.prop"
     local odm_buildprop="baserom/vendor/odm/etc/build.prop"
  
     for part in $partitions; do
@@ -249,6 +247,7 @@ patch_file_contexts() {
     python3 bin/fspatch.py portrom/system/system portrom/system/config/system_fs_config
     python3 bin/fspatch.py portrom/system_ext/system_ext portrom/system_ext/config/system_ext_fs_config
     python3 bin/fspatch.py portrom/product/product portrom/product/config/product_fs_config
+    echo "/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0" >> portrom/system_ext/config/system_ext_file_contexts
  
     local sys_ctx="portrom/system/config/system_file_contexts"
     if [[ -f "$sys_ctx" ]]; then
@@ -711,28 +710,36 @@ build_super() {
  
     eval bin/lpmake $lpargs -o super.img
 }
+
+add_apex30() {
+    log_info "Downloading Android VNDK 30..."
+    curl -# -L -o com.android.vndk.v30.apex "https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex"
+    mv com.android.vndk.v30.apex portrom/system_ext/system_ext/apex
+    log_ok "Finished successfully."
  
 package_zip() {
-    local zipname="${TARGET_OUTPUT_ZIP}.zip"
-    log_info "Packaging: $zipname"
- 
-    rm -rf repack
-    mkdir -p repack
-    mkdir -p out
- 
-    cp -f super.img repack/
- 
-    cd repack
-    zip -r "$zipname" . > /dev/null
-    cd "$WORK_DIR"
- 
-    mv -f "repack/$zipname" "out/$zipname"
-    log_ok "OTA ZIP is in here: out/$zipname"
+    mkdir -p out/
+    mv super.img out/
+    log_info "Downloading miatoll-binaries..."
+    cd out/
+    
+    curl -# -L -o miatoll.zip "https://github.com/dizaumuna/server/releases/download/resources/miatoll.zip"
+    unzip miatoll.zip
+    rm miatoll.zip
+
+    log_info "Downloading custom kernel for miatoll..."
+    curl -# -L -o boot.img "https://github.com/dizaumuna/server/releases/download/resources/boot.img"
+
+    while true; do s=$(tr -dc 'a-z0-9' </dev/urandom | head -c 12); [[ $(grep -o '[0-9]' <<<"$s" | wc -l) -ge 3 ]] && file="miatoll_eu_global-ota_full-oxygenos-user-15.0-$s.zip" && zip -r "$file" * && mv "$file" ../ && echo "$file" > output.txt && break; done
+
+    log_ok "Done creating OTA ZIP! Cleaning-up temporary files..."
+    cd ..
+    rm -rf out/
 }
  
 debloat() {
     # my_product/app
-    rm -rf portrom/system/system/my_product/app/CalendarGoogle
+    rm -rf portrom/system/system/my_product/app/CalendarGooglemi
     rm -rf portrom/system/system/my_product/app/Chrome64
     rm -rf portrom/system/system/my_product/app/Facebook-appmanager
     rm -rf portrom/system/system/my_product/app/Gemini
@@ -745,6 +752,7 @@ debloat() {
     rm -rf portrom/system/system/my_product/app/Meet
     rm -rf portrom/system/system/my_product/app/OplusCamera
     rm -rf portrom/system/system/my_product/app/Photos
+    rm -rf portrom/system/system/my_product/app/talkback
     rm -rf portrom/system/system/my_product/app/TrichromeLibrary64
     rm -rf portrom/system/system/my_product/app/WebViewGoogle64
     rm -rf portrom/system/system/my_product/app/YouTube
@@ -766,6 +774,11 @@ debloat() {
 
     # my_stock/app
     rm -rf portrom/system/system/my_stock/app/Clock
+    rm -rf portrom/system/system/my_stock/app/FileManager
+    m -rf portrom/system/system/my_stock/app/Browser
+    m -rf portrom/system/system/my_stock/app/OcrScanner
+    m -rf portrom/system/system/my_stock/app/OppoWeather2
+    m -rf portrom/system/system/my_stock/app/SceneMode
 
     # my_stock/del-app
     rm -rf portrom/system/system/my_stock/del-app/EAOnePlusStore
