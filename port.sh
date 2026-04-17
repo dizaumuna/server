@@ -184,7 +184,7 @@ mount_erofs_img() {
 
     mkdir -p "$outdir/vendor"
     log_info "Extracting [erofs] vendor"
-    bin/extract.erofs -i portrom/vendor.img -o "$outdir/vendor" -x /dev/null 2>&1
+    bin/extract.erofs -i portrom/vendor.img -o "$outdir/vendor" -x > /dev/null 2>&1
     log_ok "vendor extracted."
 }
  
@@ -609,7 +609,7 @@ build_image() {
   [ -f "$FS_CONFIG" ] && ARGS="$ARGS -C $FS_CONFIG"
   [ -f "$CONTEXTS" ] && ARGS="$ARGS -S $CONTEXTS"
 
-  ./tools/make_ext4fs \
+  ./bin/make_ext4fs \
     -s \
     -L $NAME \
     -a $NAME \
