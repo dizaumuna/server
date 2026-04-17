@@ -181,6 +181,11 @@ mount_erofs_img() {
     log_info "Extracting [erofs] $name"
     bin/extract.erofs -i "$img" -o "$outdir/$name" -x > /dev/null 2>&1
     log_ok "$name extracted."
+
+    mkdir -p "$outdir/vendor"
+    log_info "Extracting [erofs] vendor"
+    bin/extract.erofs -i portrom/vendor.img -o "$outdir/vendor" -x /dev/null 2>&1
+    log_ok "vendor extracted."
 }
  
 extract_img() {
