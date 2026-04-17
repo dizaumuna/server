@@ -539,7 +539,7 @@ patch_settings_apk() {
     keytool -genkey -v -keystore signkey.keystore -alias signkey \
     -keyalg RSA -keysize 2048 -validity 10000
 
-    jarsigner -keystore testkey.keystore Settings_patched.apk signkey
+    jarsigner -keystore signkey.keystore Settings_patched.apk signkey
 
     mv Settings_patched.apk portrom/system_ext/system_ext/priv-app/Settings/Settings.apk
     log_ok "Patched Settings.apk successfully."
@@ -716,6 +716,7 @@ add_apex30() {
     curl -# -L -o com.android.vndk.v30.apex "https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex"
     mv com.android.vndk.v30.apex portrom/system_ext/system_ext/apex
     log_ok "Finished successfully."
+}
  
 package_zip() {
     mkdir -p out/
@@ -775,10 +776,10 @@ debloat() {
     # my_stock/app
     rm -rf portrom/system/system/my_stock/app/Clock
     rm -rf portrom/system/system/my_stock/app/FileManager
-    m -rf portrom/system/system/my_stock/app/Browser
-    m -rf portrom/system/system/my_stock/app/OcrScanner
-    m -rf portrom/system/system/my_stock/app/OppoWeather2
-    m -rf portrom/system/system/my_stock/app/SceneMode
+    rm -rf portrom/system/system/my_stock/app/Browser
+    rm -rf portrom/system/system/my_stock/app/OcrScanner
+    rm -rf portrom/system/system/my_stock/app/OppoWeather2
+    rm -rf portrom/system/system/my_stock/app/SceneMode
 
     # my_stock/del-app
     rm -rf portrom/system/system/my_stock/del-app/EAOnePlusStore
@@ -831,6 +832,7 @@ main() {
     patch_file_contexts
     patch_semi_vendor
     debloat
+    add_apex30
  
     log_info "Patching APKs and framework JARs..."
     mkdir -p tmp
