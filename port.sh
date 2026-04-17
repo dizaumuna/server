@@ -906,23 +906,23 @@ main() {
  
     build_image \
       "system" \
-      "workdir/port/system/system" \
-      "workdir/port/system/config"
+      "portrom/system/system" \
+      "portrom/system/config"
     
     build_image \
       "system_ext" \
-      "workdir/port/system_ext/system_ext" \
-      "workdir/port/system_ext/config"
+      "portrom/system_ext/system_ext" \
+      "portrom/system_ext/config"
     
     build_image \
       "product" \
-      "workdir/port/product/product" \
-      "workdir/port/product/config"
+      "portrom/product/product" \
+      "portrom/product/config"
     
     build_image \
       "vendor" \
-      "workdir/basevendor/vendor" \
-      "workdir/basevendor/config"
+      "baserom/vendor" \
+      "baserom/config"
  
     build_super
     package_zip
