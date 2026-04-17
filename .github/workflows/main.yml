@@ -1,4 +1,4 @@
-name: Build
+name: Build ROM
 
 on:
   workflow_dispatch:
@@ -37,8 +37,20 @@ jobs:
           curl -# -L -o op11r.zip "https://gauss-componentotamanual.allawnofs.com/remove-8444de2415cf32887e5bfb33299faf80/component-ota/25/10/06/44431fa082f0456ba78ac797c96e3a28.zip"
           curl -# -L -o joyeuse.zip "https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMIXM_df17e3fabf_12.0.zip"
 
-      - name: Build
+      - name: Build ROM
         run: |
           chmod +x bin/
           chmod +x port.sh
           ./port.sh joyeuse.zip op11r.zip
+
+      - name: Get OTA ZIP file name
+        id: getfile
+        run: echo "FILE=$(cat output.txt)" >> $GITHUB_ENV
+
+      - name: Upload OTA file to PixelDrain
+        run: |
+          curl -X POST "https://pixeldrain.com/api/file" \
+          -u":$PD_API_KEY" \
+          -F "file=@$FILE"
+        env:
+          PD_API_KEY: ${{ secrets.PD_API_KEY }}
