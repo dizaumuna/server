@@ -714,11 +714,8 @@ add_apex30() {
     log_info "Downloading Android VNDK 30..."
     curl -# -L -o com.android.vndk.v30.apex "https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex"
     mv com.android.vndk.v30.apex portrom/system_ext/system_ext/apex/
-    log_ok "Finished successfully."
-}
-
-path_apex_cfg() {
     echo "/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0" >> portrom/system_ext/config/system_ext_file_contexts
+    log_ok "Finished successfully."
 }
  
 package_zip() {
@@ -836,7 +833,6 @@ main() {
     patch_semi_vendor
     debloat
     add_apex30
-    patch_apex_cfg
  
     log_info "Patching APKs and framework JARs..."
     mkdir -p tmp
