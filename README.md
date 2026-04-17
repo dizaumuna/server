@@ -2,7 +2,7 @@
 
 # ColorOS / OxygenOS 移植项目
 
-简体中文&nbsp;&nbsp;|&nbsp;&nbsp;Written by humans btw <3
+English&nbsp;&nbsp;|&nbsp;&nbsp;Written by humans btw <3
 
 </div>
 
@@ -18,6 +18,13 @@
 - Build images and create super.img (checks target's super byte before building)
 - LCD & Density patching in my_product/
 - OnePlus ROM Display fixes in my_manifest/
+- Patch Gallery for AI features
+- Force AOD always-on
+- Patch OplusLauncher for RAM showage
+- AI Editor Unlocking
+- Device spoof to PLG110
+- Circle To Search and AOD Panoramic patch
+- Battery SOH unlocking
 
 # How to use?
 - Prepare your base ROM and port ROM. Make sure base ROM filename includes your device's codename (e.g if codename is joyeuse then baserom filename should include joyeuse or JOYEUSE.)
@@ -39,7 +46,6 @@ sudo ./port.sh <baseROM.zip> <portROM.zip>
 - [「BypassSignCheck」by Weverses](https://github.com/Weverses/BypassSignCheck)
 - [「contextpatch」 by ColdWindScholar](https://github.com/ColdWindScholar/TIK)
 - [「fspatch」by affggh](https://github.com/affggh/fspatch)
-- [「gettype」by affggh](https://github.com/affggh/gettype)
 - [「lpunpack」by unix3dgforce](https://github.com/unix3dgforce/lpunpack)
 - [「miui_port」by ljc-fight](https://github.com/ljc-fight/miui_port)
 
