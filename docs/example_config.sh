@@ -37,6 +37,3 @@ TARGET_SUPER_METADATA_SLOTS=2 # <super metadata slots>
 # Base ROM ~ Port ROM File Types
 TARGET_BASEROM_TYPE="dat.br" # <base rom type, you can check it by extracting zip, only payload, dat.br and dat supported>
 TARGET_PORTROM_TYPE="payload" # <port rom type, you can check it by extracting zip, only payload, dat.b and dat supported>
-
-# Out ZIP Name
-TARGET_OUTPUT_ZIP="XIAOMI_DEVKEYS_ATOLL_AB,INC." # <output zip name>
