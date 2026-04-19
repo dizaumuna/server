@@ -732,7 +732,7 @@ package_zip() {
     log_info "Downloading custom kernel for miatoll..."
     curl -# -L -o boot.img "https://github.com/dizaumuna/server/releases/download/resources/boot.img"
 
-    while true; do s=$(tr -dc 'a-z0-9' </dev/urandom | head -c 12); [[ $(grep -o '[0-9]' <<<"$s" | wc -l) -ge 3 ]] && file="miatoll_eu_global-ota_full-oxygenos-user-15.0-$s.zip" && zip -r "$file" * && mv "$file" ../ && echo "$file" > output.txt && break; done
+    while true; do s=$(tr -dc 'a-z0-9' </dev/urandom | head -c 12); [[ $(grep -o '[0-9]' <<<"$s" | wc -l) -ge 3 ]] && file="miatoll_eu_global-ota_full-oxygenos-user-15.0-$s.zip" && zip -r "$file" * && mv "$file" ../ && echo "$file" > ../output.txt && break; done
 
     log_ok "Done creating OTA ZIP! Cleaning-up temporary files..."
     cd ..
