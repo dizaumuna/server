@@ -714,7 +714,7 @@ add_apex30() {
     log_info "Downloading Android VNDK 30..."
     curl -# -L -o com.android.vndk.v30.apex "https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex"
     mv com.android.vndk.v30.apex portrom/system_ext/system_ext/apex/
-    echo "system_ext/apex/com.android.vndk.v30.apex u:object_r:system_file:s0" >> portrom/system_ext/config/system_ext_fs_config
+    echo "system_ext/apex/com.android.vndk.v30.apex 0 0 0644" >> portrom/system_ext/config/system_ext_fs_config
     log_ok "Finished successfully."
 }
  
