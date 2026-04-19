@@ -710,13 +710,13 @@ build_super() {
     eval bin/lpmake $lpargs -o super.img
 }
 
-add_apex30() {
-    log_info "Downloading Android VNDK 30..."
-    curl -# -L -o com.android.vndk.v30.apex "https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex"
-    mv com.android.vndk.v30.apex portrom/system_ext/system_ext/apex/
-    echo "/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0" >> portrom/system_ext/config/system_ext_fs_config
-    log_ok "Finished successfully."
-}
+#add_apex30() {
+#    log_info "Downloading Android VNDK 30..."
+#    curl -# -L -o com.android.vndk.v30.apex "https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex"
+#    mv com.android.vndk.v30.apex portrom/system_ext/system_ext/apex/
+#    echo "/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0" >> portrom/system_ext/config/system_ext_fs_config
+#    log_ok "Finished successfully."
+#}
  
 package_zip() {
     mkdir -p out/
@@ -832,7 +832,7 @@ main() {
     patch_file_contexts
     patch_semi_vendor
     debloat
-    add_apex30
+    #add_apex30
  
     log_info "Patching APKs and framework JARs..."
     mkdir -p tmp
