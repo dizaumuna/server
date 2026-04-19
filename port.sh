@@ -851,6 +851,13 @@ main() {
     log_ok "APK/smali patching complete."
  
     log_info "Building images..."
+
+   echo "=== system_ext size ===" && du -sb portrom/system_ext/system_ext
+   echo "=== fs_config lines ===" && wc -l portrom/system_ext/config/system_ext_fs_config 2>/dev/null || echo "MISSING"
+   echo "=== file_contexts lines ===" && wc -l portrom/system_ext/config/system_ext_file_contexts 2>/dev/null || echo "MISSING"
+   echo "=== PAD_SIZE calc ===" 
+   SIZE=$(du -sb portrom/system_ext/system_ext | cut -f1)
+   echo "SIZE=$SIZE PAD=$(( SIZE + SIZE * 3 / 100 + 10485760 ))"
  
     build_image \
       "system" \
