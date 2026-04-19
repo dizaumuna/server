@@ -715,6 +715,7 @@ add_apex30() {
     curl -# -L -o com.android.vndk.v30.apex "https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex"
     mv com.android.vndk.v30.apex portrom/system_ext/system_ext/apex/
     echo "system_ext/apex/com.android.vndk.v30.apex 0 0 0644" >> portrom/system_ext/config/system_ext_fs_config
+    echo "/system_ext/apex/com\.android\.vndk\.v30\.apex u:object_r:system_file:s0" >> portrom/system_ext/config/system_ext_fs_config
     log_ok "Finished successfully."
 }
  
@@ -853,16 +854,9 @@ main() {
     patch_battery_apk
  
     rm -rf tmp
-    log_ok "APK/smali patching complete."
+    log_ok "APK/smali patching completed."
  
     log_info "Building images..."
-
-   echo "=== system_ext size ===" && du -sb portrom/system_ext/system_ext
-   echo "=== fs_config lines ===" && wc -l portrom/system_ext/config/system_ext_fs_config 2>/dev/null || echo "MISSING"
-   echo "=== file_contexts lines ===" && wc -l portrom/system_ext/config/system_ext_file_contexts 2>/dev/null || echo "MISSING"
-   echo "=== PAD_SIZE calc ===" 
-   SIZE=$(du -sb portrom/system_ext/system_ext | cut -f1)
-   echo "SIZE=$SIZE PAD=$(( SIZE + SIZE * 3 / 100 + 10485760 ))"
  
     build_image \
       "system" \
