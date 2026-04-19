@@ -633,14 +633,14 @@ patch_build_props() {
         my_manifest_prop="portrom/system/system/my_manifest/build.prop"
     fi
  
-    base_device_code=$(get_prop baserom/vendor/build.prop "ro.product.device" || true)
-    port_device_code=$(get_prop "$my_manifest_prop" "ro.oplus.version.my_manifest" 2>/dev/null | cut -d'_' -f1 || true)
+    base_device_code=$(get_prop baserom/vendor/build.prop "ro.product.board" || true)
+    port_device_code=$(get_prop "$my_manifest_prop" "ro.product.vendor.name" 2>/dev/null | cut -d'_' -f1 || true)
     [[ -z "$port_device_code" ]] && port_device_code=$(get_prop "$my_manifest_prop" "ro.product.model" || true)
  
-    base_product_model=$(get_prop baserom/vendor/build.prop "ro.product.model" || true)
+    base_product_model=$(get_prop baserom/vendor/build.prop "ro.product.vendor.device" || true)
     port_product_model=$(get_prop "$my_manifest_prop" "ro.product.model" || true)
-    base_product_name=$(get_prop baserom/vendor/build.prop "ro.product.name" || true)
-    port_product_name=$(get_prop "$my_manifest_prop" "ro.product.name" || true)
+    base_product_name=$(get_prop baserom/vendor/build.prop "ro.product.vendor.model " || true)
+    port_product_name=$(get_prop "$my_manifest_prop" "ro.vendor.oplus.market.name" || true)
  
     log_info "Base device: $base_device_code / $base_product_model"
     log_info "Port device: $port_device_code / $port_product_model"
@@ -664,7 +664,7 @@ patch_build_props() {
 }
  
 disable_avb() {
-    log_info "Disabling AVB verification"
+    log_info "Disabling Android Verified Boot..."
     while IFS= read -r fstab; do
         sed -i 's/,avb_keys=[^ ]*//g' "$fstab"
         sed -i 's/,avb=vbmeta_system//g' "$fstab"
