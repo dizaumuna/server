@@ -5,7 +5,7 @@
 # Author: dizaumuna
 #
  
-set -euo pipefail
+set -e
 trap 'echo "[ERROR] Line $LINENO: $BASH_COMMAND" >&2' ERR
  
 WORK_DIR=$(pwd)
