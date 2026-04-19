@@ -690,10 +690,10 @@ build_recovery() {
 
     git clone https://gitlab.com/OrangeFox/sync.git -b master
     cd sync
-    ./orangefox_sync.sh --branch fox_12.1 --path ../fox_12.1
+    ./orangefox_sync.sh --branch 12.1 --path ../fox_12.1
     cd ..
 
-    cd fox_11.0
+    cd fox_12.1
     git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
 
     set +e
