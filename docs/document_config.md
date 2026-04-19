@@ -75,9 +75,3 @@ This file is sourced by `port.sh` at startup to configure device-specific behavi
 | `TARGET_PORTROM_TYPE` | `payload` / `img` | Format of the port ROM archive. |
 
 ---
-
-### Output
-
-| Variable | Type | Description |
-|---|---|---|
-| `TARGET_OUTPUT_ZIP` | string | Base name of the output zip file (without `.zip`). |
