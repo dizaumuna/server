@@ -690,11 +690,11 @@ build_recovery() {
 
     git clone https://gitlab.com/OrangeFox/sync.git -b master
     cd sync
-    ./orangefox_sync.sh --branch fox_11.0 --path ../fox_11.0
+    ./orangefox_sync.sh --branch fox_12.1 --path ../fox_12.1
     cd ..
 
     cd fox_11.0
-    git clone https://github.com/OrangeFoxRecovery/device_xiaomi_miatoll -b fox_11.0 ./device/xiaomi/miatoll
+    git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
 
     set +e
     source build/envsetup.sh
@@ -712,7 +712,7 @@ build_recovery() {
 
     mv "$recovery_img" "$WORK_DIR/out/"
     cd "$WORK_DIR"
-    rm -rf fox_11.0 sync scripts
+    rm -rf fox_12.1 sync scripts
     log_ok "OrangeFox recovery built successfully."
 }
 
