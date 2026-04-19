@@ -1,8 +1,7 @@
 <div align="center">
 
-# ColorOS / OxygenOS 移植项目
-
-English&nbsp;&nbsp;|&nbsp;&nbsp;Written by humans btw <3
+# ColorOS / OxygenOS on joyeuse
+<img width="279" height="600" alt="image" align="right" src="https://github.com/user-attachments/assets/6ca68203-85f1-4368-b81a-e74f1e77c51d" />
 
 </div>
 
@@ -31,7 +30,6 @@ English&nbsp;&nbsp;|&nbsp;&nbsp;Written by humans btw <3
 
 # How to use?
 - Prepare your base ROM and port ROM. Make sure base ROM filename includes your device's codename (e.g if codename is joyeuse then baserom or portrom filename should include joyeuse or JOYEUSE.)
-
   
 Install dependencies
 ```shell
