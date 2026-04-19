@@ -6,28 +6,31 @@ English&nbsp;&nbsp;|&nbsp;&nbsp;Written by humans btw <3
 
 </div>
 
+# Currently supported versions
+- OxygenOS 15 (OnePlus 13)
+## Planned upcoming versions:
+- OxygenOS 14 (OnePlus 8T)
+- OxygenOS 16 (OnePlus 11R)
+
 # Features
-- Automatically move my_xxx partitions to system/
 - Decompile Settings.apk, patch, recompile and signing APK.
 - Auto ROM extraction.
-- Anyone can maintain a device, so multiple devices supported.
 - OTA ZIP generate and upload to PixelDrain with your API Key.
 - Disable Android Verified Boot in fstab.
-- Set device state locked in boot.img with magiskboot.
+- Set device state locked in boot.img with magiskboot. / currently unavailable
 - .dat.br & payload.bin & .dat extraction support.
 - Build images and create super.img (checks target's super byte before building)
-- LCD & Density patching in my_product/
-- OnePlus ROM Display fixes in my_manifest/
-- Patch Gallery for AI features
-- Force AOD always-on
-- Patch OplusLauncher for RAM showage
-- AI Editor Unlocking
-- Device spoof to PLG110
-- Circle To Search and AOD Panoramic patch
-- Battery SOH unlocking
+- LCD & Density patching in my_product
+- OnePlus ROM Display fixes in my_manifest
+- Patch Gallery for AI features with patching Gallery.apk
+- Force AOD always-on with patching AOD.apk
+- Patch OplusLauncher for RAM showage with patching OplusLauncher.apk
+- Device spoof to PLG110 on my_manifest
+- Circle To Search and AOD Panoramic patch on SystemUI.apk
+- Battery SOH unlocking on Battery.apk
 
 # How to use?
-- Prepare your base ROM and port ROM. Make sure base ROM filename includes your device's codename (e.g if codename is joyeuse then baserom filename should include joyeuse or JOYEUSE.)
+- Prepare your base ROM and port ROM. Make sure base ROM filename includes your device's codename (e.g if codename is joyeuse then baserom or portrom filename should include joyeuse or JOYEUSE.)
 
   
 Install dependencies
@@ -43,10 +46,11 @@ sudo ./port.sh <baseROM.zip> <portROM.zip>
 ```
 
 # Credits & thanks to:
-- [「BypassSignCheck」by Weverses](https://github.com/Weverses/BypassSignCheck)
-- [「contextpatch」 by ColdWindScholar](https://github.com/ColdWindScholar/TIK)
-- [「fspatch」by affggh](https://github.com/affggh/fspatch)
-- [「lpunpack」by unix3dgforce](https://github.com/unix3dgforce/lpunpack)
-- [「miui_port」by ljc-fight](https://github.com/ljc-fight/miui_port)
+- [magiskboot](https://github.com/svoboda18/magiskboot) by svoboda18
+- [payload-dumper-go](https://github.com/ssut/payload-dumper-go) by ssut
+- [Google] for lpunpack, lpmake.
+- [toraidl](https://github.com/toraidl) for scripts, project idea. This project based on his/her OxygenOS-Port repository.
+- [ozyern](https://github.com/ozyern) for patchmethod.py and apkeditor.jar
+- [affggh](https://github.com/affggh/fspatch) for fspatch.py
+- [ColdWindScholar](https://github.com/ColdWindScholar/TIK) for ContextPatch
 
-- Also many of people that I forgot. Sorry for that.
