@@ -740,7 +740,7 @@ package_zip() {
  
 debloat() {
     # my_product/app
-    rm -rf portrom/system/system/my_product/app/CalendarGooglemi
+    rm -rf portrom/system/system/my_product/app/CalendarGoogle
     rm -rf portrom/system/system/my_product/app/Chrome64
     rm -rf portrom/system/system/my_product/app/Facebook-appmanager
     rm -rf portrom/system/system/my_product/app/Gemini
@@ -772,6 +772,11 @@ debloat() {
     rm -rf portrom/system/system/my_product/priv-app/GoogleFiles
     rm -rf portrom/system/system/my_product/priv-app/GoogleVelvet_CTS
     rm -rf portrom/system/system/my_product/priv-app/Messages
+    rm -rf portrom/system/system/my_product/priv-app/GmsCore
+    rm -rf portrom/system/system/my_product/priv-app/Phonesky
+    rm -rf portrom/system/system/my_product/priv-app/Wellbeing
+    rm -rf portrom/system/system/my_product/priv-app/GoogleRestore
+    
 
     # my_stock/app
     rm -rf portrom/system/system/my_stock/app/Clock
