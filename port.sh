@@ -125,7 +125,7 @@ extract_baserom_img() {
     unzip -q "$zip" "vendor.img" -d baserom/raw 2>/dev/null || \
     unzip -q "$zip" "vendor_a.img" -d baserom/raw 2>/dev/null || true
     find baserom/raw -name "vendor*.img" -exec mv -f {} baserom/vendor.img \;
-    log_ok "vendor.img extracted."
+    log_ok "vendor.img extracted successfully."
 }
  
 extract_portrom() {
@@ -178,14 +178,12 @@ mount_erofs_img() {
     local name
     name=$(basename "$img" .img)
     mkdir -p "$outdir/$name"
-    log_info "Extracting [erofs] $name"
+    log_info "Extracting [erofs] image $name"
     bin/extract.erofs -i "$img" -o "$outdir/$name" -x > /dev/null 2>&1
-    log_ok "$name extracted."
 
     mkdir -p "$outdir/vendor"
     log_info "Extracting [erofs] vendor"
     bin/extract.erofs -i portrom/vendor.img -o "$outdir/vendor" -x > /dev/null 2>&1
-    log_ok "vendor extracted."
 }
  
 extract_img() {
@@ -732,7 +730,8 @@ package_zip() {
     log_info "Downloading custom kernel for miatoll..."
     curl -# -L -o boot.img "https://github.com/dizaumuna/server/releases/download/resources/boot.img"
 
-    while true; do s=$(tr -dc 'a-z0-9' </dev/urandom | head -c 12); [[ $(grep -o '[0-9]' <<<"$s" | wc -l) -ge 3 ]] && file="miatoll_eu_global-ota_full-oxygenos-user-15.0-$s.zip" && zip -r "$file" * && mv "$file" ../ && echo "$file" > ../output.txt && break; done
+    while true; do s=$(tr -dc 'a-z0-9' </dev/urandom | head -c 12); [[ $(grep -o '[0-9]' <<<"$s" | wc -l) -ge 3 ]] && file="miatoll_eu_global-ota_full-oxygenos-user-15.0-$s.zip" && zip -r "$file" * && mv "$file" ../../ && echo "$file" > ../../output.txt && break; done
+    mv  
 
     log_ok "Done creating OTA ZIP! Cleaning-up temporary files..."
     cd ..
@@ -795,6 +794,14 @@ debloat() {
     rm -rf portrom/system/system/my_stock/priv-app/Games
     rm -rf portrom/system/system/my_stock/priv-app/LinktoWindows
     log_ok "Removed useless system apps successfully."
+}
+
+build_recovery() {
+    git clone 
+}
+
+cleanup_after_build() {
+    mv 
 }
  
 main() {
