@@ -141,7 +141,7 @@ check_tools() {
         command -v "$tool" > /dev/null 2>&1 || missing+=("$tool")
     done
     if [[ ${#missing[@]} -gt 0 ]]; then
-        log_err "Missing tools: ${missing[*]}"
+        log_err "Missing package: ${missing[*]}"
         log_err "Run bin/install_dependencies.sh first."
         exit 1
     fi
