@@ -121,11 +121,6 @@ def convert_rom_files(br_file_name, transfer_list_name, output_img_name):
     Files must be in the same directory as the script, or paths provided.
     """
     
-    print("----------------------------------------")
-    print(f"Processing files: '{br_file_name}' and '{transfer_list_name}'")
-    print(f"Output image will be: '{output_img_name}'")
-    print("----------------------------------------")
-
     if not os.path.exists(br_file_name):
         print(f"Error: '{br_file_name}' not found. Please ensure the path is correct.")
         return False
@@ -148,7 +143,6 @@ def convert_rom_files(br_file_name, transfer_list_name, output_img_name):
             dat_file_path = br_file_name + ".dat"
 
 
-    print(f"\nStep 1/2: Decompressing '{br_file_name}' to '{dat_file_path}'...")
     try:
         with open(br_file_name, 'rb') as f_in:
             decompressed_data = brotli.decompress(f_in.read())
@@ -161,8 +155,6 @@ def convert_rom_files(br_file_name, transfer_list_name, output_img_name):
     except Exception as e:
         print(f"Unknown error during decompression: {e}")
         return False
-
-    print(f"\nStep 2/2: Converting '{dat_file_path}' to '{output_img_name}'...")
     
     success = False
     try:
@@ -219,21 +211,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Display the parameters being used
-    print("\n----------------------------------------")
-    print(" Command-line arguments set:")
-    print(f"  .dat.br file: {args.datbr}")
-    print(f"  .transfer.list file: {args.transferlist}")
-    print(f"  Output .img file: {args.outputimg}")
-    print("----------------------------------------\n")
-
     overall_success = convert_rom_files(args.datbr, args.transferlist, args.outputimg)
 
-    print("\n----------------------------------------")
     if overall_success:
-        print("Conversion completed successfully!")
-        print("You can now use tools like DiskGenius, 7-Zip, or Linux Reader to explore the .img file.")
+        print("Conversion successfully finished.")
     else:
         print("Conversion failed. Please check the error messages above!")
-    print("----------------------------------------")
 
