@@ -686,14 +686,15 @@ build_recovery() {
     git clone https://gitlab.com/OrangeFox/misc/scripts.git -b master
     cd scripts
     sudo bash setup/android_build_env.sh
-    cd ..
+    cd "$WORK_DIR"
 
+    mkdir -p "$WORK_DIR/OrangeFox"
+    cd "$WORK_DIR/OrangeFox"
     git clone https://gitlab.com/OrangeFox/sync.git -b master
     cd sync
-    ./orangefox_sync.sh --branch 12.1 --path ../fox_12.1
-    cd ..
+    ./orangefox_sync.sh --branch 12.1 --path "$WORK_DIR/OrangeFox/fox_12.1"
+    cd "$WORK_DIR/OrangeFox/fox_12.1"
 
-    cd fox_12.1
     git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
 
     set +e
@@ -704,7 +705,9 @@ build_recovery() {
     lunch twrp_miatoll-eng && make clean && mka adbd recoveryimage
 
     local recovery_img
-    recovery_img=$(find out/target/product/miatoll -name "recovery.img" | head -n1)
+    recovery_img=$(find out/target/product/miatoll -name "OrangeFox*.img" | head -n1)
+    [[ -z "$recovery_img" ]] && recovery_img=$(find out/target/product/miatoll -name "recovery.img" | head -n1)
+
     if [[ -z "$recovery_img" ]]; then
         log_err "recovery.img not found after build!"
         exit 1
@@ -712,7 +715,7 @@ build_recovery() {
 
     mv "$recovery_img" "$WORK_DIR/out/"
     cd "$WORK_DIR"
-    rm -rf fox_12.1 sync scripts
+    rm -rf OrangeFox scripts
     log_ok "OrangeFox recovery built successfully."
 }
 
