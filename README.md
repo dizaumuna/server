@@ -27,6 +27,7 @@
 - Device spoof to PLG110 on my_manifest
 - Circle To Search and AOD Panoramic patch on SystemUI.apk
 - Battery SOH unlocking on Battery.apk
+- Auto build OrangeFox Recovery.
 
 # How to use?
 - Prepare your base ROM and port ROM. Make sure base ROM filename includes your device's codename (e.g if codename is joyeuse then baserom or portrom filename should include joyeuse or JOYEUSE.)
