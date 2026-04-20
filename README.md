@@ -29,6 +29,12 @@
 - Battery SOH unlocking on Battery.apk
 - Auto build OrangeFox Recovery.
 
+# System requirements
+- 16 GB of RAM (8GB will work but build will be so slow, not recommended.)
+- 150GB+ of Storage (NVMe SSD recommended, mostly it's needed for OrangeFox.)
+- Intel Core i5 11th generation or newer.
+- A lot of time, and also a brain.
+
 # How to use?
 - Prepare your base ROM and port ROM. Make sure base ROM filename includes your device's codename (e.g if codename is joyeuse then baserom or portrom filename should include joyeuse or JOYEUSE.)
   
