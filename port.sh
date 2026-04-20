@@ -202,31 +202,15 @@ extract_img() {
     fi
 }
 
-inject_imports() {
-    local partitions="$1"
-    local odm_buildprop="baserom/vendor/odm/etc/build.prop"
-
-    for part in $partitions; do
-        local import_line="import /${part}/build.prop"
-
-        if [[ -f "$odm_buildprop" ]]; then
-            if ! grep -qF "$import_line" "$odm_buildprop"; then
-                echo "$import_line" >> "$odm_buildprop"
-                log_ok "Added to build.prop: $import_line"
-            fi
-        fi
-    done
-}
-
 move_my_partitions_to_system() {
-    mv portrom/my_bigball/my_bigball portrom/system/system/
-    mv portrom/my_carrier/my_carrier portrom/system/system/
-    mv portrom/my_engineering/my_engineering portrom/system/system/
-    mv portrom/my_heytap/my_heytap portrom/system/system/
+    mv portrom/my_product/my_product   portrom/system/system/
     mv portrom/my_manifest/my_manifest portrom/system/system/
-    mv portrom/my_product/my_product portrom/system/system/
-    mv portrom/my_region/my_region portrom/system/system/
-    mv portrom/my_stock/my_stock portrom/system/system/
+    mv portrom/my_bigball/my_bigball   portrom/system/system/
+    mv portrom/my_carrier/my_carrier   portrom/system/system/
+    mv portrom/my_heytap/my_heytap     portrom/system/system/
+    mv portrom/my_stock/my_stock       portrom/system/system/
+    mv portrom/my_engineering/my_engineering portrom/system/system/
+    mv portrom/my_region/my_region     portrom/system/system/
 }
 
 patch_file_contexts() {
@@ -254,15 +238,164 @@ patch_file_contexts() {
     log_ok "File contexts patched."
 }
 
-patch_semi_vendor() {
-    log_info "Semi-patching vendor for FP..."
+patch_port_buildprops() {
+    log_info "Patching my_product build.prop..."
+    local my_product_prop="portrom/system/system/my_product/build.prop"
+    sed -i 's/ro.sf.lcd_density=560/ro.sf.lcd_density=440/' "$my_product_prop"
+    sed -i 's/ro.oplus.display.screenhole.positon=596,40:668,112/# ro.oplus.display.screenhole.positon=596,40:668,112\nro.oplus.display.screenhole.positon=519,36:569,86/' "$my_product_prop"
+    sed -i 's/ro.vendor.display.sensortype=2/# ro.vendor.display.sensortype=2/' "$my_product_prop"
+    sed -i 's/^persist.oplus.display.vrr=1$/# persist.oplus.display.vrr=1/' "$my_product_prop"
+    sed -i 's/^persist.oplus.display.vrr.adfr=2$/# persist.oplus.display.vrr.adfr=2/' "$my_product_prop"
+    sed -i 's/^persist.oplus.display.vrr.adfr.scale=129$/# persist.oplus.display.vrr.adfr.scale=129/' "$my_product_prop"
+    sed -i 's/^vendor.display.use_layer_ext=1$/# vendor.display.use_layer_ext=1/' "$my_product_prop"
+    sed -i 's/ro.oplus.density.fhd_default=480/ro.oplus.density.fhd_default=440/' "$my_product_prop"
+    sed -i 's/ro.oplus.resolution.low=1080,2376/ro.oplus.resolution.low=1080,2400/' "$my_product_prop"
+    sed -i '/ro.oplus.gaussianlevel=3/d' "$my_product_prop"
+    echo "debug.sf.disable_client_composition_cache=0" >> "$my_product_prop"
+    log_ok "my_product build.prop patched."
 
+    log_info "Patching my_product permissions..."
+    local allnet="portrom/system/system/my_product/etc/permissions/com.oppo.features_allnet_android.xml"
+    local display_feat="portrom/system/system/my_product/etc/permissions/oplus.product.display_features.xml"
+    local video_feat="portrom/system/system/my_product/etc/permissions/oplus.product.feature_video_unique.xml"
+    sed -i 's/<feature name="android.hardware.biometrics.face" \/>$/<!-- <feature name="android.hardware.biometrics.face" \/>  -->/' "$allnet"
+    sed -i 's/<feature name="oppo.common.support.curved.display" \/>$/<!-- <feature name="oppo.common.support.curved.display" \/> -->/' "$allnet"
+    sed -i 's/<oplus-feature name="oplus.software.fingeprint_optical_enabled"\/>$/<!-- <oplus-feature name="oplus.software.fingeprint_optical_enabled"\/> -->/' "$display_feat"
+    sed -i 's/<feature name="oplus.software.video.sr_support"\/>$/<!-- <feature name="oplus.software.video.sr_support"\/> -->/' "$video_feat"
+    sed -i 's/<feature name="oplus.software.video.osie_support"\/>$/<!-- <feature name="oplus.software.video.osie_support"\/> -->/' "$video_feat"
+    log_ok "my_product permissions patched."
+
+    log_info "Patching system build.prop..."
+    local sys_prop="portrom/system/system/system/build.prop"
+    sed -i 's/dalvik.vm.minidebuginfo=true/dalvik.vm.minidebuginfo=false/' "$sys_prop"
+    sed -i 's/dalvik.vm.dex2oat-minidebuginfo=true/dalvik.vm.dex2oat-minidebuginfo=false/' "$sys_prop"
+    log_ok "system build.prop patched."
+}
+
+patch_port_init() {
+    log_info "Patching init.rc..."
+    sed -i 's/write \/proc\/sys\/kernel\/panic_on_oops 1/write \/proc\/sys\/kernel\/panic_on_oops 0/' \
+        portrom/system/system/system/etc/init/hw/init.rc
+
+    log_info "Patching init.usb.rc..."
+    sed -i '/vendor.sys.usb.adb.disabled/d' portrom/system/system/system/etc/init/hw/init.usb.rc
+    sed -i '/persist.vendor.usb.config/d' portrom/system/system/system/etc/init/hw/init.usb.rc
+    sed -i '/persist.sys.usb.config.*persist.vendor/d' portrom/system/system/system/etc/init/hw/init.usb.rc
+
+    log_info "Patching init.usb.configfs.rc..."
+    local configfs_rc="portrom/system/system/system/etc/init/hw/init.usb.configfs.rc"
+    sed -i '/setusbconfig to/d' "$configfs_rc"
+    sed -i '/sys.usb.config=\* && property:sys.usb.configfs=1/d' "$configfs_rc"
+    sed -i '/rmdir.*rndis.gs4/d' "$configfs_rc"
+
+    cat >> "$configfs_rc" << 'EOF'
+
+on property:sys.usb.config=rndis && property:sys.usb.configfs=1
+    mkdir /config/usb_gadget/g1/functions/rndis.gs4
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis"
+    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1
+    start adbd
+
+on property:sys.usb.ffs.ready=1 && property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1
+    mkdir /config/usb_gadget/g1/functions/rndis.gs4
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis_adb"
+    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1
+    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f2
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+EOF
+
+    log_ok "init files patched."
+}
+
+patch_port_vendor() {
+    log_info "Patching vendor build.prop..."
+    local vendor_prop="baserom/vendor/build.prop"
+    sed -i '/sys.thermal.data.path/d' "$vendor_prop"
+    sed -i 's/ro.control_privapp_permissions=$/ro.control_privapp_permissions=enforce/' "$vendor_prop"
+    sed -i 's/#ro.frp.pst/ro.frp.pst/' "$vendor_prop"
+    sed -i '/persist.vendor.radio.manual_nw_rej_ct/d' "$vendor_prop"
+    cat >> "$vendor_prop" << 'EOF'
+persist.vendor.radio.manual_nw_rej_ct=1
+ro.product.mod_device=joyeuse_global
+ro.vendor.se.type=HCE,UICC
+persist.sys.fw.bg_apps_limit=48
+ro.vendor.qti.sys.fw.bservice_enable=true
+persist.sys.fw.empty_app_percent=50
+persist.sys.fw.use_trim_settings=true
+persist.sys.fw.trim_empty_percent=100
+persist.sys.fw.trim_enable_memory=2147483648
+persist.sys.fw.trim_cache_percent=100
+persist.sys.fw.bservice_age=120000
+persist.sys.fw.bservice_limit=6
+persist.sys.fw.bservice_enable=true
+
+# ro.surface_flinger.use_color_management=true
+# ro.surface_flinger.protected_contents=true
+# ro.surface_flinger.use_content_detection_for_refresh_rate=true
+# ro.surface_flinger.set_touch_timer_ms=200
+# ro.surface_flinger.force_hwc_copy_for_virtual_displays=true
+# ro.surface_flinger.max_frame_buffer_acquired_buffers=3
+# ro.surface_flinger.max_virtual_display_dimension=4096
+# ro.surface_flinger.supports_background_blur=1
+# ro.surface_flinger.has_wide_color_display=true
+# ro.surface_flinger.has_HDR_display=true
+# ro.surface_flinger.wcg_composition_dataspace=143261696
+# ro.surface_flinger.enable_frame_rate_override=false
+EOF
+    log_ok "vendor build.prop patched."
+
+    log_info "Patching ODM build.prop..."
+    cat >> baserom/vendor/odm/etc/build.prop << 'EOF'
+ro.soc.model=SDM720G
+ro.oplus.display.screenSizeInches.primary=6.67
+ro.build.device_family=OPSM8550
+ro.product.oplus.cpuinfo=SDM720G
+ro.vendor.qti.va_odm.support=1
+import /my_bigball/build.prop
+import /my_carrier/build.prop
+import /my_engineering/build.prop
+import /my_heytap/build.prop
+import /my_region/build.prop
+import /my_stock/build.prop
+import /my_manifest/build.prop
+EOF
+    log_ok "ODM build.prop patched."
+}
+
+disable_encryption() {
+    log_info "Removing file encryption from fstab..."
+    for fstab in baserom/vendor/etc/fstab.default baserom/vendor/etc/fstab.emmc; do
+        [[ -f "$fstab" ]] || continue
+        sed -i 's/,inlinecrypt\b//g; s/,fileencryption=ice,wrappedkey\b//g' "$fstab"
+    done
+    log_ok "File encryption removed."
+}
+
+disable_avb() {
+    log_info "Disabling Android Verified Boot..."
+    while IFS= read -r fstab; do
+        sed -i 's/,avb_keys=[^ ]*//g' "$fstab"
+        sed -i 's/,avb=vbmeta_system//g' "$fstab"
+        sed -i 's/,avb=vbmeta_vendor//g' "$fstab"
+        sed -i 's/,avb=vbmeta//g' "$fstab"
+        sed -i 's/,avb//g' "$fstab"
+    done < <(find baserom/ portrom/ -name "fstab.*" 2>/dev/null)
+    log_ok "AVB disabled."
+}
+
+patch_semi_vendor() {
+    log_info "Semi-patching vendor..."
     rm -rf baserom/vendor/etc/group
     rm -rf baserom/vendor/etc/passwd
-
-    mv portrom/vendor/vendor/etc/group baserom/vendor/etc/group
-    mv portrom/vendor/vendor/etc/passwd baserom/vendor/etc/passwd
-    log_ok "Patching finished."
+    cp -r portrom/vendor/vendor/etc/group baserom/vendor/etc/
+    cp -r portrom/vendor/vendor/etc/passwd baserom/vendor/etc/
+    cp -rf portrom/vendor/vendor/overlay/* baserom/vendor/overlay/
+    log_ok "Vendor semi-patched."
 }
 
 patch_apk() {
@@ -587,57 +720,6 @@ build_image() {
     echo
 }
 
-patch_build_props() {
-    local base_device_code port_device_code
-    local base_product_model port_product_model
-    local base_product_name port_product_name
-
-    local my_manifest_prop="portrom/my_manifest/build.prop"
-    [[ -f portrom/system/system/my_manifest/build.prop ]] && \
-        my_manifest_prop="portrom/system/system/my_manifest/build.prop"
-
-    base_device_code=$(get_prop baserom/vendor/build.prop "ro.product.board" || true)
-    port_device_code=$(get_prop "$my_manifest_prop" "ro.product.vendor.name" 2>/dev/null | cut -d'_' -f1 || true)
-    [[ -z "$port_device_code" ]] && port_device_code=$(get_prop "$my_manifest_prop" "ro.product.model" || true)
-
-    base_product_model=$(get_prop baserom/vendor/build.prop "ro.product.vendor.device" || true)
-    port_product_model=$(get_prop "$my_manifest_prop" "ro.product.model" || true)
-    base_product_name=$(get_prop baserom/vendor/build.prop "ro.product.vendor.model" || true)
-    port_product_name=$(get_prop "$my_manifest_prop" "ro.vendor.oplus.market.name" || true)
-
-    log_info "Base device: $base_device_code / $base_product_model"
-    log_info "Port device: $port_device_code / $port_product_model"
-
-    local build_date build_utc
-    build_date=$(date -u +"%a %b %d %H:%M:%S UTC %Y")
-    build_utc=$(date +%s)
-
-    while IFS= read -r prop_file; do
-        [[ -n "$port_device_code" && -n "$base_device_code" ]] && \
-            sed -i "s|${port_device_code}|${base_device_code}|g" "$prop_file" || true
-        [[ -n "$port_product_model" && -n "$base_product_model" ]] && \
-            sed -i "s|${port_product_model}|${base_product_model}|g" "$prop_file" || true
-        [[ -n "$port_product_name" && -n "$base_product_name" ]] && \
-            sed -i "s|${port_product_name}|${base_product_name}|g" "$prop_file" || true
-        sed -i "s|ro.build.date=.*|ro.build.date=${build_date}|g" "$prop_file" || true
-        sed -i "s|ro.build.date.utc=.*|ro.build.date.utc=${build_utc}|g" "$prop_file" || true
-    done < <(find portrom/ -name "build.prop")
-
-    log_ok "build.prop patched successfully."
-}
-
-disable_avb() {
-    log_info "Disabling Android Verified Boot..."
-    while IFS= read -r fstab; do
-        sed -i 's/,avb_keys=[^ ]*//g' "$fstab"
-        sed -i 's/,avb=vbmeta_system//g' "$fstab"
-        sed -i 's/,avb=vbmeta_vendor//g' "$fstab"
-        sed -i 's/,avb=vbmeta//g' "$fstab"
-        sed -i 's/,avb//g' "$fstab"
-    done < <(find baserom/ portrom/ -name "fstab.*" 2>/dev/null)
-    log_ok "Android Verified Boot disabled on fstab successfully."
-}
-
 build_super() {
     local group="$TARGET_SUPER_GROUP"
     local super_size="$TARGET_SUPER_SIZE"
@@ -819,14 +901,12 @@ main() {
         [[ -f "$img" ]] && extract_img "$img" portrom || true
     done
 
-    if [[ "$TARGET_NEEDS_IMPORT" == "true" ]]; then
-        log_info "Adding import lines..."
-        move_my_partitions_to_system "$TARGET_IMPORT_PARTITIONS"
-        inject_imports "$TARGET_IMPORT_PARTITIONS"
-    fi
-
-    patch_build_props
+    move_my_partitions_to_system
+    patch_port_buildprops
+    patch_port_init
+    patch_port_vendor
     disable_avb
+    disable_encryption
     patch_file_contexts
     patch_semi_vendor
     debloat
