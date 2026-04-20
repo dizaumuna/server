@@ -713,7 +713,7 @@ build_recovery() {
         exit 1
     fi
 
-    mv "$recovery_img" "$WORK_DIR/out/"
+    mv "$recovery_img" "$WORK_DIR/out/recovery.img"
     cd "$WORK_DIR"
     rm -rf OrangeFox scripts
     log_ok "OrangeFox recovery built successfully."
