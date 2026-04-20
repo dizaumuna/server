@@ -45,7 +45,7 @@ jobs:
 
       - name: Get OTA ZIP file name
         id: getfile
-        run: echo "FILE=$(sudo cat /home/runner/work/work/output.txt)" >> $GITHUB_ENV
+        run: echo "FILE=$(cat $GITHUB_WORKSPACE/output.txt)" >> $GITHUB_ENV
 
       - name: Upload OTA file to PixelDrain
         run: |
