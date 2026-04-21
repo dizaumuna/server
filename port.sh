@@ -211,7 +211,7 @@ extract_portrom() {
     if [[ "$type" == "payload" ]]; then
         unzip -q "$zip" payload.bin -d portrom/
         local parts="system,system_ext,vendor,product"
-        for part in my_manifest my_heytap my_engineering my_bigball my_carrier my_stock my_region my_product; do
+        for part in my_manifest my_heytap my_engineering my_bigball my_carrier my_stock my_region my_product vendor; do
             parts="${parts},${part}"
         done
         bin/payload-dumper-go -p "$parts" -o portrom/ portrom/payload.bin > /dev/null
