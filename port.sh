@@ -815,7 +815,7 @@ package_zip() {
     while true; do
         s=$(tr -dc 'a-z0-9' </dev/urandom | head -c 12)
         [[ $(grep -o '[0-9]' <<<"$s" | wc -l) -ge 3 ]] || continue
-        file="miatoll_eu_global-ota_full-oxygenos-user-15.0-$s.zip"
+        file="miatoll_eu_global-ota_full-OS15.0.0.CPH2685-user-15.0-$s.zip"
         zip -r "$file" *
         mv "$file" "$WORK_DIR/"
         echo "$file" > "$WORK_DIR/output.txt"
