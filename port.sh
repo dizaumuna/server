@@ -145,6 +145,8 @@ extract_img() {
     if [[ "$fstype" == "erofs" ]]; then
         log_info_in "Extracting $name.img"
         bin/extract.erofs -i "$img" -o "$outdir/$name" -x > /dev/null 2>&1 \
+        mkdir -p "$outdir/vendor"
+        bin/extract.erofs -i portrom/vendor.img -o "$outdir/vendor" -x > /dev/null 2>&1
             || { log_info "extract.erofs failed on $img"; exit 1; }
     else
         log_info_in "Extracting $name.img"
@@ -211,7 +213,7 @@ extract_portrom() {
     if [[ "$type" == "payload" ]]; then
         unzip -q "$zip" payload.bin -d portrom/
         local parts="system,system_ext,vendor,product"
-        for part in my_manifest my_heytap my_engineering my_bigball my_carrier my_stock my_region my_product vendor; do
+        for part in my_manifest my_heytap my_engineering my_bigball my_carrier my_stock my_region my_product; do
             parts="${parts},${part}"
         done
         bin/payload-dumper-go -p "$parts" -o portrom/ portrom/payload.bin > /dev/null
