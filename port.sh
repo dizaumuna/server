@@ -762,44 +762,44 @@ add_apex30() {
     log_ok "Finished successfully."
 }
 
-build_recovery() {
-    log_info "Building OrangeFox Recovery for miatoll..."
+#build_recovery() {
+#    log_info "Building OrangeFox Recovery for miatoll..."
 
-    git clone https://gitlab.com/OrangeFox/misc/scripts.git -b master
-    cd scripts
-    sudo bash setup/android_build_env.sh
-    cd "$WORK_DIR"
+#    git clone https://gitlab.com/OrangeFox/misc/scripts.git -b master
+#    cd scripts
+#    sudo bash setup/android_build_env.sh
+#    cd "$WORK_DIR"
 
-    mkdir -p "$WORK_DIR/OrangeFox"
-    cd "$WORK_DIR/OrangeFox"
-    git clone https://gitlab.com/OrangeFox/sync.git -b master
-    cd sync
-    ./orangefox_sync.sh --branch 12.1 --path "$WORK_DIR/OrangeFox/fox_12.1"
-    cd "$WORK_DIR/OrangeFox/fox_12.1"
+#    mkdir -p "$WORK_DIR/OrangeFox"
+#    cd "$WORK_DIR/OrangeFox"
+#    git clone https://gitlab.com/OrangeFox/sync.git -b master
+#    cd sync
+#    ./orangefox_sync.sh --branch 12.1 --path "$WORK_DIR/OrangeFox/fox_12.1"
+#    cd "$WORK_DIR/OrangeFox/fox_12.1"
 
-    git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
+#    git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
 
-    set +e
-    source build/envsetup.sh
-    export ALLOW_MISSING_DEPENDENCIES=true
-    set -e
+#    set +e
+#    source build/envsetup.sh
+#    export ALLOW_MISSING_DEPENDENCIES=true
+#    set -e
 
-    lunch twrp_miatoll-eng && make clean && mka adbd recoveryimage
+#    lunch twrp_miatoll-eng && make clean && mka adbd recoveryimage
 
-    local recovery_img
-    recovery_img=$(find out/target/product/miatoll -name "OrangeFox*.img" | head -n1)
-    [[ -z "$recovery_img" ]] && recovery_img=$(find out/target/product/miatoll -name "recovery.img" | head -n1)
+#    local recovery_img
+#    recovery_img=$(find out/target/product/miatoll -name "OrangeFox*.img" | head -n1)
+#    [[ -z "$recovery_img" ]] && recovery_img=$(find out/target/product/miatoll -name "recovery.img" | head -n1)
 
-    if [[ -z "$recovery_img" ]]; then
-        log_err "recovery.img not found after build!"
-        exit 1
-    fi
+#    if [[ -z "$recovery_img" ]]; then
+#        log_err "recovery.img not found after build!"
+#        exit 1
+#    fi
 
-    mv "$recovery_img" "$WORK_DIR/out/recovery.img"
-    cd "$WORK_DIR"
-    rm -rf OrangeFox scripts
-    log_ok "OrangeFox recovery built successfully."
-}
+#    mv "$recovery_img" "$WORK_DIR/out/recovery.img"
+#    cd "$WORK_DIR"
+#    rm -rf OrangeFox scripts
+#    log_ok "OrangeFox recovery built successfully."
+#}
 
 package_zip() {
     log_info "Downloading miatoll-binaries..."
@@ -936,7 +936,7 @@ main() {
     build_image "vendor"     "baserom/vendor"                 "baserom/config"
 
     mkdir -p out
-    build_recovery
+#    build_recovery
     build_super
     package_zip
 
