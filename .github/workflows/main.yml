@@ -41,7 +41,7 @@ jobs:
         run: |
           chmod +x bin/
           chmod +x port.sh
-          ./port.sh joyeuse.zip op11r.zip
+          ./port.sh joyeuse.zip op12r.zip
 
       - name: Get OTA ZIP file name
         id: getfile
