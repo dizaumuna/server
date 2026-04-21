@@ -94,18 +94,36 @@ load_config() {
  
 detect_img_type() {
     local img="$1"
-    local magic
-    magic=$(xxd -l 4 "$img" 2>/dev/null | awk '{print $2$3}' | head -1 || true)
-    case "$magic" in
-        e2fd*|e2f9*) echo "ext" ;;
-        *)
-            if strings "$img" 2>/dev/null | grep -q "EROFS"; then
-                echo "erofs"
-            else
-                echo "ext"
-            fi
-            ;;
-    esac
+
+    if command -v file >/dev/null 2>&1; then
+        local info
+        info=$(file -b "$img")
+
+        if echo "$info" | grep -qi "erofs"; then
+            echo "erofs"
+            return
+        fi
+
+        if echo "$info" | grep -qi "ext4"; then
+            echo "ext"
+            return
+        fi
+    fi
+
+    local name
+    name=$(basename "$img")
+
+    if [[ "$name" == *my_manifest* || "$name" == *my_heytap* || "$name" == *my_engineering* ]]; then
+        echo "erofs"
+        return
+    fi
+    
+    if hexdump -C "$img" 2>/dev/null | head -n 20 | grep -qi "EROFS"; then
+        echo "erofs"
+        return
+    fi
+
+    echo "ext"
 }
  
 extract_img() {
