@@ -13,7 +13,6 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
     Executes the core logic of sdat2img.py.
     This function processes the .dat and .transfer.list files to generate a .img file.
     """
-    print(f"sdat2img module: Starting conversion from '{new_dat_file}' to '{output_image_file}'")
 
     BLOCK_SIZE = 4096
 
@@ -65,7 +64,6 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
         output_img = open(output_image_file, 'wb')
     except IOError as e:
         if e.errno == errno.EEXIST:
-            print(f'sdat2img module: Error: Output file "{e.filename}" already exists.', file=sys.stderr)
             return False
         else:
             raise
@@ -73,13 +71,11 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
     try:
         new_data_file = open(new_dat_file, 'rb')
     except FileNotFoundError:
-        print(f"sdat2img module: Error: Data file '{new_dat_file}' not found.", file=sys.stderr)
         output_img.close()
         return False
 
     all_block_sets = [i for command in commands for i in command[1]]
     if not all_block_sets:
-        print("sdat2img module: No block operation commands found.", file=sys.stderr)
         output_img.close()
         new_data_file.close()
         return False
@@ -95,7 +91,6 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
                 while block_count > 0:
                     data_read = new_data_file.read(BLOCK_SIZE)
                     if not data_read:
-                        print(f"sdat2img module: Error: Unexpected end of data file '{new_dat_file}'.", file=sys.stderr)
                         output_img.close()
                         new_data_file.close()
                         return False
@@ -109,7 +104,6 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
 
     output_img.close()
     new_data_file.close()
-    print(f'sdat2img module: Conversion completed. Output image: {os.path.realpath(output_img.name)}')
     return True
 
 
@@ -148,7 +142,6 @@ def convert_rom_files(br_file_name, transfer_list_name, output_img_name):
             decompressed_data = brotli.decompress(f_in.read())
             with open(dat_file_path, 'wb') as f_out:
                 f_out.write(decompressed_data)
-        print("Decompression completed.")
     except brotli.error as e:
         print(f"Brotli decompression failed: {e}")
         return False
@@ -163,9 +156,7 @@ def convert_rom_files(br_file_name, transfer_list_name, output_img_name):
         print(f"Error during conversion: {e}")
     finally:
         if os.path.exists(dat_file_path):
-            print(f"\nCleaning up temporary file '{dat_file_path}'...")
             os.remove(dat_file_path)
-            print("Cleanup done.")
             
     return success
 
@@ -214,7 +205,7 @@ if __name__ == "__main__":
     overall_success = convert_rom_files(args.datbr, args.transferlist, args.outputimg)
 
     if overall_success:
-        print("Conversion successfully finished.")
+        print("")
     else:
         print("Conversion failed. Please check the error messages above!")
 

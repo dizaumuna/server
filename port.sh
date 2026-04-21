@@ -1,6 +1,3 @@
-
-Copy
-
 #!/bin/bash
 # SPDX-License-Identifier: GPL-3.0-only
 #
@@ -26,7 +23,6 @@ chmod +x bin/*
  
 log_info()    { echo -e "  - $1"; }
 log_info_in() { echo -e "    - $1"; }
-log_err()     { echo -e "[ERROR] $1" >&2; }
  
 BASEROM="${1:-}"
 PORTROM="${2:-}"
@@ -44,8 +40,8 @@ check_tools() {
         command -v "$tool" > /dev/null 2>&1 || missing+=("$tool")
     done
     if [[ ${#missing[@]} -gt 0 ]]; then
-        log_err "Missing tools: ${missing[*]}"
-        log_err "Run bin/install_dependencies.sh first."
+        log_info "Missing tools: ${missing[*]}"
+        log_info "Run bin/install_dependencies.sh first."
         exit 1
     fi
 }
@@ -89,7 +85,7 @@ load_config() {
     local device="$1"
     local cfg="target/${device}/config.sh"
     if [[ ! -f "$cfg" ]]; then
-        log_err "Target config not found: $cfg"
+        log_info "Target config not found: $cfg"
         exit 1
     fi
     source "$cfg"
@@ -129,14 +125,14 @@ extract_img() {
     mkdir -p "$outdir/$name"
  
     if [[ "$fstype" == "erofs" ]]; then
-        log_info_in "Extracting $name.img [erofs]"
+        log_info_in "Extracting $name.img"
         bin/extract.erofs -i "$img" -o "$outdir/$name" -x > /dev/null 2>&1 \
-            || { log_err "extract.erofs failed on $img"; exit 1; }
+            || { log_info "extract.erofs failed on $img"; exit 1; }
     else
-        log_info_in "Extracting $name.img [ext4]"
+        log_info_in "Extracting $name.img"
         mkdir -p "$outdir/config"
         python3 bin/extractor.py "$img" "$outdir/$name/" \
-            || { log_err "extractor.py failed on $img"; exit 1; }
+            || { log_info "extractor.py failed on $img"; exit 1; }
     fi
  
     rm -f "$img"
@@ -166,7 +162,7 @@ extract_baserom_datbr() {
             -t baserom/raw/vendor.transfer.list \
             -o baserom/vendor.img
     else
-        log_err "vendor.new.dat.br not found!"
+        log_info "vendor.new.dat.br not found!"
         exit 1
     fi
 }
@@ -213,7 +209,7 @@ extract_portrom() {
             mv -f "$f" "portrom/${base}.img"
         done
     else
-        log_err "Unknown portrom type: $type"
+        log_info "Unknown portrom type: $type"
         exit 1
     fi
 }
@@ -700,10 +696,10 @@ build_image() {
  
 compress_images() {
     log_info "Compressing images"
-    python3 bin/img2sdat.py system.img     -o outimages -v 4 -p system
-    python3 bin/img2sdat.py system_ext.img -o outimages -v 4 -p system_ext
-    python3 bin/img2sdat.py product.img    -o outimages -v 4 -p product
-    python3 bin/img2sdat.py vendor.img     -o outimages -v 4 -p vendor
+    python3 bin/img2sdat.py system.img     -o outimages -v 4 -p system > /dev/null
+    python3 bin/img2sdat.py system_ext.img -o outimages -v 4 -p system_ext > /dev/null
+    python3 bin/img2sdat.py product.img    -o outimages -v 4 -p product > /dev/null
+    python3 bin/img2sdat.py vendor.img     -o outimages -v 4 -p vendor > /dev/null
     rm -rf system.img system_ext.img product.img vendor.img
     mv outimages/* .
 }
@@ -854,7 +850,7 @@ main() {
         dat.br)  extract_baserom_datbr "$BASEROM" ;;
         payload) extract_baserom_payload "$BASEROM" ;;
         img)     extract_baserom_img "$BASEROM" ;;
-        *) log_err "Unknown TARGET_BASEROM_TYPE: $TARGET_BASEROM_TYPE"; exit 1 ;;
+        *) log_info "Unknown TARGET_BASEROM_TYPE: $TARGET_BASEROM_TYPE"; exit 1 ;;
     esac
  
     extract_portrom "$PORTROM" "$TARGET_PORTROM_TYPE"
