@@ -145,9 +145,9 @@ extract_img() {
     if [[ "$fstype" == "erofs" ]]; then
         log_info_in "Extracting $name.img"
         bin/extract.erofs -i "$img" -o "$outdir/$name" -x > /dev/null 2>&1 \
-        mkdir -p "$outdir/vendor"
-        bin/extract.erofs -i portrom/vendor.img -o "$outdir/vendor" -x > /dev/null 2>&1
             || { log_info "extract.erofs failed on $img"; exit 1; }
+        mkdir -p portrom/vendor/
+        bin/extract.erofs -i portrom/vendor.img -o portrom/vendor -x > /dev/null 2>&1
     else
         log_info_in "Extracting $name.img"
         mkdir -p "$outdir/config"
