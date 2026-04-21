@@ -11,6 +11,7 @@ This file is sourced by `port.sh` at startup to configure device-specific behavi
 
 | Variable | Type | Description |
 |---|---|---|
+| `TARGET_DEVICE_NAME` | string | Device name (e.g. `Redmi Note 9 Pro`) |
 | `TARGET_DEVICE` | string | Device codename (e.g. `joyeuse`) |
 | `TARGET_ARCH` | string | CPU architecture (`arm64`, `arm`) |
 | `TARGET_SOC` | string | SoC model string (e.g. `SM7125`) |
