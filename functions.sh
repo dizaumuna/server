@@ -17,10 +17,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     alias date=gdate
 fi
 
-log_info() { echo -e "\033[1;34m[$(date +%H:%M:%S)] $*\033[0m"; }
-log_ok()   { echo -e "\033[1;32m[$(date +%H:%M:%S)] $*\033[0m"; }
-log_warn() { echo -e "\033[1;33m[$(date +%H:%M:%S)] $*\033[0m"; }
-log_err()  { echo -e "\033[1;31m[$(date +%H:%M:%S)] $*\033[0m"; }
+log_info()  { echo -e "  - $1" }
+log_info_in() { echo -e "    - $1" }
 
 get_prop() {
     local file="$1" key="$2"
@@ -66,7 +64,7 @@ extract_partition() {
     name=$(basename "$img" .img)
 
     if [[ ! -f "$img" ]]; then
-        log_warn "extract_partition: $img not found, skipping."
+        log_info "extract_partition: $img not found, skipping."
         return
     fi
 
@@ -86,7 +84,7 @@ extract_partition() {
     fi
 
     rm -f "$img"
-    log_ok "$name extracted"
+
 }
 
 disable_avb_verify() {
@@ -95,7 +93,7 @@ disable_avb_verify() {
     fstabs=$(find "$target" -name "fstab.*" 2>/dev/null || true)
 
     if [[ -z "$fstabs" ]]; then
-        log_warn "disable_avb_verify: no fstab found under $target"
+        log_info "disable_avb_verify: no fstab found under $target"
         return
     fi
 
@@ -108,32 +106,7 @@ disable_avb_verify() {
         sed -i 's/,avb$//g' "$fstab"
     done <<< "$fstabs"
 
-    log_ok "Android Verified Boot disabled under $target"
 }
-
-#spoof_bootimg() {
-#    local bootimg="$1"
-#    local workdir
-#    workdir=$(mktemp -d)
-#
-#    cp "$bootimg" "$workdir/boot.img"
-#    pushd "$workdir" > /dev/null
-#
-#    set +e
-#    bin/magiskboot unpack -h boot.img > /dev/null 2>&1
-#    if [[ -f header ]]; then
-#        sed -i '/^cmdline=/ s/$/ androidboot.vbmeta.device_state=unlocked/' header
-#        bin/magiskboot repack boot.img new-boot.img > /dev/null 2>&1
-#        cp new-boot.img "$bootimg"
-#        log_ok "boot.img spoofed (unlocked state)"
-#    else
-#        log_warn "spoof_bootimg: no header found, skipping"
-#    fi
-#    set -e
-#
-#    popd > /dev/null
-#    rm -rf "$workdir"
-#}
 
 check_tools() {
     local missing=()
@@ -141,8 +114,8 @@ check_tools() {
         command -v "$tool" > /dev/null 2>&1 || missing+=("$tool")
     done
     if [[ ${#missing[@]} -gt 0 ]]; then
-        log_err "Missing package: ${missing[*]}"
-        log_err "Run bin/install_dependencies.sh first."
+        log_info "Missing package: ${missing[*]}"
+        log_info "Run bin/install_dependencies.sh first."
         exit 1
     fi
 }
