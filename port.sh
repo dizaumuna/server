@@ -828,46 +828,118 @@ package_zip() {
 }
 
 debloat() {
+    rm -rf portrom/system/system/my_bigball/app/Facebook-appmanager
+    rm -rf portrom/system/system/my_bigball/app/GoogleContacts
+    rm -rf portrom/system/system/my_bigball/app/GPay3
+    rm -rf portrom/system/system/my_bigball/app/LatinImeGoogle
+    rm -rf portrom/system/system/my_bigball/app/Meet
+    rm -rf portrom/system/system/my_bigball/app/Photos
+    
+    # my_bigball/del-app-pre
+    rm -rf portrom/system/system/my_bigball/del-app-pre/Drive_del
+    rm -rf portrom/system/system/my_bigball/del-app-pre/Facebook
+    rm -rf portrom/system/system/my_bigball/del-app-pre/GoogleFindMyDevice
+    rm -rf portrom/system/system/my_bigball/del-app-pre/GoogleHome
+    rm -rf portrom/system/system/my_bigball/del-app-pre/GoogleOne
+    rm -rf portrom/system/system/my_bigball/del-app-pre/Videos_del
+    rm -rf portrom/system/system/my_bigball/del-app-pre/YTMusic_del
+    
+    # my_bigball/etc/sysconfig
+    rm -rf portrom/system/system/my_bigball/etc/sysconfig/com.google.android.dialer.support.xml
+    
+    # my_bigball/framework
+    rm -rf portrom/system/system/my_bigball/framework/com.google.android.dialer.support.jar
+    
+    # my_bigball/overlay
+    rm -rf portrom/system/system/my_bigball/overlay/GmsConfigOverlayASI
+    rm -rf portrom/system/system/my_bigball/overlay/GmsConfigOverlayCommonCN
+    rm -rf portrom/system/system/my_bigball/overlay/GmsConfigOverlayCommonEx
+    rm -rf portrom/system/system/my_bigball/overlay/GmsConfigOverlayComms
+    rm -rf portrom/system/system/my_bigball/overlay/OplusConfigOverlayComms
+    
+    # my_bigball/priv-app
+    rm -rf portrom/system/system/my_bigball/priv-app/Facebook-installer
+    rm -rf portrom/system/system/my_bigball/priv-app/Facebook-services
+    rm -rf portrom/system/system/my_bigball/priv-app/GoogleDialer
+    rm -rf portrom/system/system/my_bigball/priv-app/Messages
+    rm -rf portrom/system/system/my_bigball/priv-app/PlayAutoInstallConfig_OnePlus
+    rm -rf portrom/system/system/my_bigball/priv-app/SearchSelector
+    
+    # my_product/app
     rm -rf portrom/system/system/my_product/app/CalendarGoogle
     rm -rf portrom/system/system/my_product/app/Chrome64
-    rm -rf portrom/system/system/my_product/app/Facebook-appmanager
-    rm -rf portrom/system/system/my_product/app/Gemini
     rm -rf portrom/system/system/my_product/app/Gmail2
-    rm -rf portrom/system/system/my_product/app/GoogleContacts
     rm -rf portrom/system/system/my_product/app/GoogleLens
-    rm -rf portrom/system/system/my_product/app/GoogleWallet
-    rm -rf portrom/system/system/my_product/app/GPay3
+    rm -rf portrom/system/system/my_product/app/GoogleLocationHistory
     rm -rf portrom/system/system/my_product/app/Maps
-    rm -rf portrom/system/system/my_product/app/Meet
     rm -rf portrom/system/system/my_product/app/OplusCamera
-    rm -rf portrom/system/system/my_product/app/Photos
     rm -rf portrom/system/system/my_product/app/talkback
-    rm -rf portrom/system/system/my_product/app/TrichromeLibrary64
-    rm -rf portrom/system/system/my_product/app/WebViewGoogle64
     rm -rf portrom/system/system/my_product/app/YouTube
+    rm -rf portrom/system/system/my_product/app/WebViewGoogle64
+    rm -rf portrom/system/system/my_product/app/TrichromeLibrary64
+    
+    # my_product/del-app
     rm -rf portrom/system/system/my_product/del-app/ConsumerIRApp
-    rm -rf portrom/system/system/my_product/del-app-pre/*
-    rm -rf portrom/system/system/my_product/priv-app/Facebook-installer
-    rm -rf portrom/system/system/my_product/priv-app/Facebook-services
-    rm -rf portrom/system/system/my_product/priv-app/FamilyLinkParentalControls
-    rm -rf portrom/system/system/my_product/priv-app/GoogleDialer
+    
+    # my_product/priv-app
     rm -rf portrom/system/system/my_product/priv-app/GoogleFiles
     rm -rf portrom/system/system/my_product/priv-app/GoogleVelvet_CTS
-    rm -rf portrom/system/system/my_product/priv-app/Messages
-    rm -rf portrom/system/system/my_product/priv-app/GmsCore
     rm -rf portrom/system/system/my_product/priv-app/Phonesky
     rm -rf portrom/system/system/my_product/priv-app/Wellbeing
-    rm -rf portrom/system/system/my_product/priv-app/GoogleRestore
-    rm -rf portrom/system/system/my_stock/app/Clock
-    rm -rf portrom/system/system/my_stock/app/FileManager
+    rm -rf portrom/system/system/my_product/priv-app/SOSHelper
+    
+    # my_product/overlay
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_13_0_COSMOS.apk
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_13_0_FIREWORKS.apk
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_13_0_FY.apk
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_13_0_NONE.apk
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_13_0_QY.apk
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_13_0_RIPPLE.apk
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_13_0_STRIPE.apk
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_13_0_SW.apk
+    rm -rf portrom/system/system/my_product/overlay/SystemUIFingerprintRes_Halo.apk
+    
+    # my_stock/app
+    rm -rf portrom/system/system/my_stock/app/BeaconLink
     rm -rf portrom/system/system/my_stock/app/Browser
-    rm -rf portrom/system/system/my_stock/app/OcrScanner
-    rm -rf portrom/system/system/my_stock/app/OppoWeather2
+    rm -rf portrom/system/system/my_stock/app/ChildrenSpace
+    rm -rf portrom/system/system/my_stock/app/CloudService
+    rm -rf portrom/system/system/my_stock/app/FloatAssistant
+    rm -rf portrom/system/system/my_stock/app/KeKePay
+    rm -rf portrom/system/system/my_stock/app/OplusOperationManual
+    rm -rf portrom/system/system/my_stock/app/OplusSecurityKeyboard
+    rm -rf portrom/system/system/my_stock/app/PhoneNOAreaInquireProvider
+    rm -rf portrom/system/system/my_stock/app/Portrait
     rm -rf portrom/system/system/my_stock/app/SceneMode
-    rm -rf portrom/system/system/my_stock/del-app/EAOnePlusStore
+    rm -rf portrom/system/system/my_stock/app/SecurePay
+    rm -rf portrom/system/system/my_stock/app/SoftsimRedteaRoaming
+    rm -rf portrom/system/system/my_stock/app/SmartSideBar
+    rm -rf portrom/system/system/my_stock/app/Calculator2
+    rm -rf portrom/system/system/my_stock/app/FileManager
+    
+    # my_stock/del-app
+    rm -rf portrom/system/system/my_stock/del-app/BackupAndRestore
+    rm -rf portrom/system/system/my_stock/del-app/INOnePlusStore
+    rm -rf portrom/system/system/my_stock/del-app/OPBreathMode
+    rm -rf portrom/system/system/my_stock/del-app/OPForum
+    rm -rf portrom/system/system/my_stock/del-app/Pictorial
+    rm -rf portrom/system/system/my_stock/del-app/NewSoundRecorder
     rm -rf portrom/system/system/my_stock/del-app/OppoNote2
-    rm -rf portrom/system/system/my_stock/priv-app/Games
+    rm -rf portrom/system/system/my_stock/del-app/OppoTranslation
+    
+    # my_stock/priv-app
+    rm -rf portrom/system/system/my_stock/priv-app/BlackListApp
+    rm -rf portrom/system/system/my_stock/priv-app/dmp
+    rm -rf portrom/system/system/my_stock/priv-app/HeyCast
+    rm -rf portrom/system/system/my_stock/priv-app/KeKeMarket
     rm -rf portrom/system/system/my_stock/priv-app/LinktoWindows
+    rm -rf portrom/system/system/my_stock/priv-app/NumberRecognition
+    
+    # APEX
+    rm -rf workdir/port/system_ext/system_ext/apex/com.android.vndk.v33.apex
+    
+    # Fonts
+    rm -rf portrom/system/system/system/fonts/Noto*
     log_ok "Removed useless system apps successfully."
 }
 
