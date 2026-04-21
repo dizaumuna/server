@@ -5,6 +5,7 @@
 #
 
 # Device configuration
+TARGET_DEVICE_NAME="Redmi Note 9 Pro"
 TARGET_DEVICE="joyeuse"
 TARGET_ARCH="arm64"
 TARGET_SOC="SM7125"
