@@ -7,6 +7,7 @@
 # Make sure you delete commented <> lines. Also this line too.
 
 # Device configuration
+TARGET_DEVICE_NAME="Redmi Note 9 Pro" # <device name>
 TARGET_DEVICE="joyeuse" # <device codename>
 TARGET_ARCH="arm64" # <device arch>
 TARGET_SOC="SM7125" # <device SoC>
