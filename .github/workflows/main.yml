@@ -34,7 +34,7 @@ jobs:
           
       - name: Download ROMs
         run: |
-          curl -# -L -o op11r.zip "https://gauss-componentotamanual.allawnofs.com/remove-8444de2415cf32887e5bfb33299faf80/component-ota/25/10/06/44431fa082f0456ba78ac797c96e3a28.zip"
+          curl -# -L -o op12r.zip "https://gauss-componentotacostmanual-sg.allawnofs.com/remove-3a493f9e2bd2d23ead206e225ebd375d/component-ota/25/01/14/b1af1c4ffeba481a84b04848935a58d5.zip"
           curl -# -L -o joyeuse.zip "https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMIXM_df17e3fabf_12.0.zip"
 
       - name: Build ROM
