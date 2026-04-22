@@ -741,8 +741,6 @@ build_image() {
     local ROOTFS="$2"
     local CONFIG_DIR="$3"
  
-    log_info "Building OS images"
- 
     local SIZE PAD_SIZE FS_CONFIG CONTEXTS ARGS
     SIZE=$(du -sb "$ROOTFS" | cut -f1)
     PAD_SIZE=$((SIZE + SIZE * PADDING / 100 + EXTRA))
@@ -759,12 +757,11 @@ build_image() {
  
 compress_images() {
     log_info "Compressing images"
-    python3 bin/img2sdat/img2sdat.py system.img     -o outimages -v 4 -p system > /dev/null
-    python3 bin/img2sdat/img2sdat.py system_ext.img -o outimages -v 4 -p system_ext > /dev/null
-    python3 bin/img2sdat/img2sdat.py product.img    -o outimages -v 4 -p product > /dev/null
-    python3 bin/img2sdat/img2sdat.py vendor.img     -o outimages -v 4 -p vendor > /dev/null
+    python3 bin/img2sdat/img2sdat.py system.img     -o out -v 4 -p system > /dev/null
+    python3 bin/img2sdat/img2sdat.py system_ext.img -o out -v 4 -p system_ext > /dev/null
+    python3 bin/img2sdat/img2sdat.py product.img    -o out -v 4 -p product > /dev/null
+    python3 bin/img2sdat/img2sdat.py vendor.img     -o out -v 4 -p vendor > /dev/null
     rm -rf system.img system_ext.img product.img vendor.img
-    mv outimages/* .
 }
  
 add_apex30() {
@@ -778,7 +775,6 @@ add_apex30() {
 package_zip() {
     log_info "Downloading miatoll-binaries"
     cd out/
- 
     curl -# -L -o miatoll.zip "https://github.com/dizaumuna/server/releases/download/resources/miatoll.zip"
     unzip miatoll.zip
     rm miatoll.zip
@@ -796,8 +792,7 @@ package_zip() {
         echo "$file" > "$WORK_DIR/output.txt"
         break
     done
- 
-    log_info "Done! Cleaning up..."
+
     cd "$WORK_DIR"
     rm -rf out/
 }
@@ -991,7 +986,7 @@ main() {
  
     rm -rf tmp
  
-    log_info "Building images"
+    log_info "Building OS images"
     build_image "system"     "portrom/system/system"          "portrom/system/config"
     build_image "system_ext" "portrom/system_ext/system_ext"  "portrom/system_ext/config"
     build_image "product"    "portrom/product/product"         "portrom/product/config"
