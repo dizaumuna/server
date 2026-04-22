@@ -470,13 +470,13 @@ patch_services_jar() {
     log_info "Decompiling services.jar"
     mkdir -p tmp/services
     cp -f "$jar" tmp/services.jar
-    java -jar bin/apktool/APKEditor.jar d -f -i tmp/services.jar -o tmp/services > /dev/null
+    java -jar bin/apktool/APKEditor.jar d -f -i tmp/services.jar -o tmp/services 2> /dev/null
  
     local scan_pkg
     scan_pkg=$(find tmp/services -type f -name "ScanPackageUtils.smali")
     if [[ -f "$scan_pkg" ]]; then
         log_info "Patching method "assertMinSignatureSchemeIsValid" in smali" 
-        python3 bin/patchmethod_v2.py "$scan_pkg" assertMinSignatureSchemeIsValid > /dev/null
+        python3 bin/patchmethod_v2.py "$scan_pkg" assertMinSignatureSchemeIsValid 2> /dev/null
     fi
  
     while IFS= read -r smali_file; do
@@ -528,12 +528,12 @@ patch_heytap_speech_assist() {
     local smali
     smali=$(find tmp/HeyTapSpeechAssist -type f -name "AiCallCommonBean.smali")
     log_info "Patching method "getSupportAiCall" with true in smali"
-    [[ -f "$smali" ]] && python3 bin/patchmethod_v2.py "$smali" getSupportAiCall -return true > /dev/null
+    [[ -f "$smali" ]] && python3 bin/patchmethod_v2.py "$smali" getSupportAiCall -return true 2> /dev/null
  
     find tmp/HeyTapSpeechAssist -type f -name "*.smali" -exec \
         sed -i "s/sget-object \([vp][0-9]\+\), Landroid\/os\/Build;->MODEL:Ljava\/lang\/String;/const-string \1, \"PLG110\"/g" {} +
  
-    java -jar bin/apktool/APKEditor.jar b -f -i tmp/HeyTapSpeechAssist -o "$apk" > /dev/null
+    java -jar bin/apktool/APKEditor.jar b -f -i tmp/HeyTapSpeechAssist -o "$apk" 2> /dev/null
 }
  
 patch_ota_apk() {
@@ -544,10 +544,10 @@ patch_ota_apk() {
     log_info "Decompiling OTA"
     mkdir -p tmp
     cp -f "$apk" tmp/OTA.bak
-    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/OTA > /dev/null
+    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/OTA 2> /dev/null
     log_info "Patching method "ro.boot.vbmeta.device_state" with locked in baksmali"
     python3 bin/patchmethod_v2.py -d tmp/OTA -k ro.boot.vbmeta.device_state -k locked -return false > /dev/null
-    java -jar bin/apktool/APKEditor.jar b -f -i tmp/OTA -o "$apk" > /dev/null
+    java -jar bin/apktool/APKEditor.jar b -f -i tmp/OTA -o "$apk" 2> /dev/null
 }
  
 patch_aiunit_apk() {
@@ -560,7 +560,7 @@ patch_aiunit_apk() {
     log_info "Decompiling AIUnit"
     mkdir -p tmp
     cp -f "$apk" tmp/AIUnit.bak
-    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/AIUnit > /dev/null
+    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/AIUnit 2> /dev/null
  
     find tmp/AIUnit -type f -name "*.smali" -exec \
         sed -i "s/sget-object \([vp][0-9]\+\), Landroid\/os\/Build;->MODEL:Ljava\/lang\/String;/const-string \1, \"${MODEL}\"/g" {} +
@@ -598,7 +598,7 @@ patch_aiunit_apk() {
         ' "$unit_json" > "${unit_json}.bak" && mv "${unit_json}.bak" "$unit_json"
     fi
  
-    java -jar bin/apktool/APKEditor.jar b -f -i tmp/AIUnit -o "$apk" > /dev/null
+    java -jar bin/apktool/APKEditor.jar b -f -i tmp/AIUnit -o "$apk" 2> /dev/null
 }
  
 patch_oplus_launcher() {
@@ -609,7 +609,7 @@ patch_oplus_launcher() {
     log_info "Decompiling OplusLauncher"
     mkdir -p tmp
     cp -f "$apk" tmp/OplusLauncher.bak
-    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/OplusLauncher > /dev/null
+    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/OplusLauncher 2> /dev/null
  
     local smali
     log_info "Patching method "getFirstApiLevel" in smali"
@@ -618,7 +618,7 @@ patch_oplus_launcher() {
         python3 bin/patchmethod_v2.py "$smali" getFirstApiLevel ".locals 1\n\tconst/16 v0, 0x22\n\treturn v0" > /dev/null
     fi
  
-    java -jar bin/apktool/APKEditor.jar b -f -i tmp/OplusLauncher -o "$apk" > /dev/null
+    java -jar bin/apktool/APKEditor.jar b -f -i tmp/OplusLauncher -o "$apk" 2> /dev/null
 }
  
 patch_systemui_apk() {
@@ -629,32 +629,32 @@ patch_systemui_apk() {
     log_info "Decompiling SystemUI"
     mkdir -p tmp
     cp -f "$apk" tmp/SystemUI.bak
-    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/SystemUI > /dev/null
+    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/SystemUI 2> /dev/null
  
     local smooth_smali
     smooth_smali=$(find tmp/SystemUI -type f -name "SmoothTransitionController.smali")
     if [[ -f "$smooth_smali" ]]; then
-        python3 bin/patchmethod_v2.py "$smooth_smali" setPanoramicStatusForApplication > /dev/null
-        python3 bin/patchmethod_v2.py "$smooth_smali" setPanoramicSupportAllDayForApplication > /dev/null
+        python3 bin/patchmethod_v2.py "$smooth_smali" setPanoramicStatusForApplication 2> /dev/null
+        python3 bin/patchmethod_v2.py "$smooth_smali" setPanoramicSupportAllDayForApplication 2> /dev/null
     fi
  
     local aod_smali
     aod_smali=$(find tmp/SystemUI -type f -name "AODDisplayUtil.smali")
     [[ -f "$aod_smali" ]] && \
-        python3 bin/patchmethod_v2.py "$aod_smali" isPanoramicProcessTypeNotSupportAllDay -return false > /dev/null
+        python3 bin/patchmethod_v2.py "$aod_smali" isPanoramicProcessTypeNotSupportAllDay -return false 2> /dev/null
  
-    python3 bin/patchmethod_v2.py -d tmp/SystemUI -n isCtsTest -return false > /dev/null
+    python3 bin/patchmethod_v2.py -d tmp/SystemUI -n isCtsTest -return false 2> /dev/null
  
     local feature_smali
     feature_smali=$(find tmp/SystemUI -type f -path "*/systemui/common/feature/FeatureOption.smali")
     [[ -f "$feature_smali" ]] && \
-        python3 bin/patchmethod_v2.py "$feature_smali" isSupportMyDevice -return true > /dev/null
+        python3 bin/patchmethod_v2.py "$feature_smali" isSupportMyDevice -return true 2> /dev/null
  
     while IFS= read -r sxml; do
         sed -i "s/style\/null/7f1403f6/g" "$sxml"
     done < <(find tmp/SystemUI -name "styles.xml")
  
-    java -jar bin/apktool/APKEditor.jar b -f -i tmp/SystemUI -o "$apk" > /dev/null
+    java -jar bin/apktool/APKEditor.jar b -f -i tmp/SystemUI -o "$apk" 2> /dev/null
 }
  
 patch_aod_apk() {
@@ -665,15 +665,15 @@ patch_aod_apk() {
     log_info "Decompiling AOD"
     mkdir -p tmp
     cp -f "$apk" tmp/Aod.bak
-    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Aod > /dev/null
+    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Aod 2> /dev/null
  
     local common_smali settings_smali
     common_smali=$(find tmp/Aod -type f -path "*/com/oplus/aod/util/CommonUtils.smali")
     settings_smali=$(find tmp/Aod -type f -path "*/com/oplus/aod/util/SettingsUtils.smali")
     log_info "Patching method "isSupportFullAod" with true in smali"
-    [[ -f "$common_smali" ]] && python3 bin/patchmethod_v2.py "$common_smali" isSupportFullAod -return true > /dev/null
+    [[ -f "$common_smali" ]] && python3 bin/patchmethod_v2.py "$common_smali" isSupportFullAod -return true 2> /dev/null
     log_info "Patching method "getKeyAodAllDaySupportSettings" with true in smali"
-    [[ -f "$settings_smali" ]] && python3 bin/patchmethod_v2.py "$settings_smali" getKeyAodAllDaySupportSettings -return true > /dev/null
+    [[ -f "$settings_smali" ]] && python3 bin/patchmethod_v2.py "$settings_smali" getKeyAodAllDaySupportSettings -return true 2> /dev/null
  
     java -jar bin/apktool/APKEditor.jar b -f -i tmp/Aod -o "$apk" > /dev/null
 }
@@ -696,7 +696,7 @@ patch_settings_apk() {
     </com.oplus.settings.widget.preference.SettingsPreferenceCategory>' device_version_info.xml
  
     cd ../../
-    java -jar ../apktool.jar b -o Settings_patched.apk
+    java -jar ../apktool.jar b -o Settings_patched.apk 2> /dev/null
     mv Settings_patched.apk ../
     cd ..
     keytool -genkey -v -keystore signkey.keystore -alias signkey \
@@ -714,11 +714,11 @@ patch_gallery_apk() {
     log_info "Decompiling OppoGallery2"
     mkdir -p tmp
     cp -f "$apk" tmp/OppoGallery2.bak
-    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Gallery > /dev/null
+    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Gallery 2> /dev/null
     python3 bin/patchmethod_v2.py -d tmp/Gallery \
         -k "const-string.*\"ro.product.first_api_level\"" \
         -hook " const/16 reg, 0x22"
-    java -jar bin/apktool/APKEditor.jar b -f -i tmp/Gallery -o "$apk" > /dev/null
+    java -jar bin/apktool/APKEditor.jar b -f -i tmp/Gallery -o "$apk" 2> /dev/null
 }
  
 patch_battery_apk() {
@@ -730,10 +730,10 @@ patch_battery_apk() {
     log_info "Decompiling Battery"
     mkdir -p tmp
     cp -f "$apk" tmp/Battery.bak
-    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Battery > /dev/null
+    java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Battery 2> /dev/null
     log_info "Patching method "getUIsohValue" in smali"
-    python3 bin/patchmethod_v2.py -d tmp/Battery -k "getUIsohValue" -m devices/common/patch_battery_soh.txt > /dev/null
-    java -jar bin/apktool/APKEditor.jar b -f -i tmp/Battery -o "$apk" > /dev/null
+    python3 bin/patchmethod_v2.py -d tmp/Battery -k "getUIsohValue" -m devices/common/patch_battery_soh.txt 2> /dev/null
+    java -jar bin/apktool/APKEditor.jar b -f -i tmp/Battery -o "$apk" 2> /dev/null
 }
  
 build_image() {
@@ -797,44 +797,44 @@ package_zip() {
     rm -rf out/
 }
 
-#build_recovery() {
-#    log_info "Building OrangeFox Recovery for miatoll..."
+build_recovery() {
+    log_info "Building OrangeFox Recovery for miatoll"
 
-#    git clone https://gitlab.com/OrangeFox/misc/scripts.git -b master
-#    cd scripts
-#    sudo bash setup/android_build_env.sh
-#    cd "$WORK_DIR"
+    git clone https://gitlab.com/OrangeFox/misc/scripts.git -b master
+    cd scripts
+    sudo bash setup/android_build_env.sh
+    cd "$WORK_DIR"
 
-#    mkdir -p "$WORK_DIR/OrangeFox"
-#    cd "$WORK_DIR/OrangeFox"
-#    git clone https://gitlab.com/OrangeFox/sync.git -b master
-#    cd sync
-#    ./orangefox_sync.sh --branch 12.1 --path "$WORK_DIR/OrangeFox/fox_12.1"
-#    cd "$WORK_DIR/OrangeFox/fox_12.1"
+    mkdir -p "$WORK_DIR/OrangeFox"
+    cd "$WORK_DIR/OrangeFox"
+    git clone https://gitlab.com/OrangeFox/sync.git -b master
+    cd sync
+    ./orangefox_sync.sh --branch 12.1 --path "$WORK_DIR/OrangeFox/fox_12.1"
+    cd "$WORK_DIR/OrangeFox/fox_12.1"
 
-#    git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
+    git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
 
-#    set +e
-#    source build/envsetup.sh
-#    export ALLOW_MISSING_DEPENDENCIES=true
-#    set -e
+    set +e
+    source build/envsetup.sh
+    export ALLOW_MISSING_DEPENDENCIES=true
+    set -e
 
-#    lunch twrp_miatoll-eng && make clean && mka adbd recoveryimage
+    lunch twrp_miatoll-eng && make clean && mka adbd recoveryimage
 
-#    local recovery_img
-#    recovery_img=$(find out/target/product/miatoll -name "OrangeFox*.img" | head -n1)
-#    [[ -z "$recovery_img" ]] && recovery_img=$(find out/target/product/miatoll -name "recovery.img" | head -n1)
+    local recovery_img
+    recovery_img=$(find out/target/product/miatoll -name "OrangeFox*.img" | head -n1)
+    [[ -z "$recovery_img" ]] && recovery_img=$(find out/target/product/miatoll -name "recovery.img" | head -n1)
 
-#    if [[ -z "$recovery_img" ]]; then
-#        log_info "recovery.img not found after build!"
-#        exit 1
-#    fi
+    if [[ -z "$recovery_img" ]]; then
+        log_info "recovery.img not found after build!"
+        exit 1
+    fi
 
-#    mv "$recovery_img" "$WORK_DIR/out/recovery.img"
-#    cd "$WORK_DIR"
-#    rm -rf OrangeFox scripts
-#    log_info "OrangeFox recovery built successfully."
-#}
+    mv "$recovery_img" "$WORK_DIR/out/recovery.img"
+    cd "$WORK_DIR"
+    rm -rf OrangeFox scripts
+    log_info "OrangeFox recovery built successfully."
+}
  
 debloat() {
     local BASE="portrom/system/system"
@@ -993,7 +993,7 @@ main() {
     build_image "vendor"     "baserom/vendor"                  "baserom/config"
  
     mkdir -p out
-    # build_recovery
+    build_recovery
     compress_images
     package_zip
  
