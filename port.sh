@@ -270,44 +270,56 @@ patch_file_contexts() {
  
 patch_port_buildprops() {
     local my_product_prop="portrom/system/system/my_product/build.prop"
- 
+    
     sed -i 's/ro.sf.lcd_density=560/ro.sf.lcd_density=440/' "$my_product_prop"
+    log_info_in "Replacing "ro.oplus.display.screenhole.positon" prop with 596,40:668,112 in /my_product/build.prop"
     sed -i 's/ro.oplus.display.screenhole.positon=596,40:668,112/# ro.oplus.display.screenhole.positon=596,40:668,112\nro.oplus.display.screenhole.positon=519,36:569,86/' "$my_product_prop"
+    log_info_in "Replacing "ro.vendor.display.sensortype" prop with # in /my_product/build.prop"
     sed -i 's/ro.vendor.display.sensortype=2/# ro.vendor.display.sensortype=2/' "$my_product_prop"
+    log_info_in "Replacing "persist.oplus.display.vrr" prop with # in /my_product/build.prop"
     sed -i 's/^persist.oplus.display.vrr=1$/# persist.oplus.display.vrr=1/' "$my_product_prop"
+    log_info_in "Replacing "persist.oplus.display.vrr.adfr" prop with # in /my_product/build.prop"
     sed -i 's/^persist.oplus.display.vrr.adfr=2$/# persist.oplus.display.vrr.adfr=2/' "$my_product_prop"
+    log_info_in "Replacing "persist.oplus.display.vrr.adfr.scale" prop with # in /my_product/build.prop"
     sed -i 's/^persist.oplus.display.vrr.adfr.scale=129$/# persist.oplus.display.vrr.adfr.scale=129/' "$my_product_prop"
+    log_info_in "Replacing "vendor.display.use_layer_ext" prop with # in /my_product/build.prop"
     sed -i 's/^vendor.display.use_layer_ext=1$/# vendor.display.use_layer_ext=1/' "$my_product_prop"
+    log_info_in "Replacing "ro.oplus.density.fhd_default" prop with 440 in /my_product/build.prop"
     sed -i 's/ro.oplus.density.fhd_default=480/ro.oplus.density.fhd_default=440/' "$my_product_prop"
+    log_info_in "Replacing "ro.oplus.resolution.low" prop with 1080,2400 in /my_product/build.prop"
     sed -i 's/ro.oplus.resolution.low=1080,2376/ro.oplus.resolution.low=1080,2400/' "$my_product_prop"
+    log_info_in "Replacing "ro.oplus.gaussianlevel" prop with 3 in /my_product/build.prop"
     sed -i '/ro.oplus.gaussianlevel=3/d' "$my_product_prop"
+    log_info_in "Adding "debug.sf.disable_client_composition_cache" prop with 0 in /my_product/build.prop
     echo "debug.sf.disable_client_composition_cache=0" >> "$my_product_prop"
  
     local allnet="portrom/system/system/my_product/etc/permissions/com.oppo.features_allnet_android.xml"
     local display_feat="portrom/system/system/my_product/etc/permissions/oplus.product.display_features.xml"
     local video_feat="portrom/system/system/my_product/etc/permissions/oplus.product.feature_video_unique.xml"
-    log_info "Patching permissions"
+    log_info "Patching biometric permissions"
     sed -i 's/<feature name="android.hardware.biometrics.face" \/>$/<!-- <feature name="android.hardware.biometrics.face" \/>  -->/' "$allnet"
     sed -i 's/<feature name="oppo.common.support.curved.display" \/>$/<!-- <feature name="oppo.common.support.curved.display" \/> -->/' "$allnet"
     sed -i 's/<oplus-feature name="oplus.software.fingeprint_optical_enabled"\/>$/<!-- <oplus-feature name="oplus.software.fingeprint_optical_enabled"\/> -->/' "$display_feat"
     sed -i 's/<feature name="oplus.software.video.sr_support"\/>$/<!-- <feature name="oplus.software.video.sr_support"\/> -->/' "$video_feat"
     sed -i 's/<feature name="oplus.software.video.osie_support"\/>$/<!-- <feature name="oplus.software.video.osie_support"\/> -->/' "$video_feat"
  
-    log_info "Patching system build.prop"
+    log_info "Patching props on source firmware"
     local sys_prop="portrom/system/system/system/build.prop"
     sed -i 's/dalvik.vm.minidebuginfo=true/dalvik.vm.minidebuginfo=false/' "$sys_prop"
     sed -i 's/dalvik.vm.dex2oat-minidebuginfo=true/dalvik.vm.dex2oat-minidebuginfo=false/' "$sys_prop"
 }
  
 patch_port_init() {
-    log_info "Patching init files"
+    log_info "Patching init files on source firmware"
     sed -i 's/write \/proc\/sys\/kernel\/panic_on_oops 1/write \/proc\/sys\/kernel\/panic_on_oops 0/' \
         portrom/system/system/system/etc/init/hw/init.rc
  
-    sed -i '/vendor.sys.usb.adb.disabled/d'          portrom/system/system/system/etc/init/hw/init.usb.rc
-    sed -i '/persist.vendor.usb.config/d'             portrom/system/system/system/etc/init/hw/init.usb.rc
+    log_info_in "Adding "vendor.sys.usb.adb.disabled" prop to /system/system/etc/init/hw/init.rc
+    sed -i '/vendor.sys.usb.adb.disabled/d' portrom/system/system/system/etc/init/hw/init.usb.rc
+    log_info_in "Adding "vendor.usb.config" prop to /system/system/etc/init/hw/init.usb.rc
+    sed -i '/persist.vendor.usb.config/d' portrom/system/system/system/etc/init/hw/init.usb.rc
+    log_info_in "Adding "persist.usb.config.*persist.vendor" prop to /system/system/etc/init/hw/init.usb.rc
     sed -i '/persist.sys.usb.config.*persist.vendor/d' portrom/system/system/system/etc/init/hw/init.usb.rc
- 
     local configfs_rc="portrom/system/system/system/etc/init/hw/init.usb.configfs.rc"
     sed -i '/setusbconfig to/d' "$configfs_rc"
     sed -i '/sys.usb.config=\* && property:sys.usb.configfs=1/d' "$configfs_rc"
@@ -336,13 +348,25 @@ EOF
 }
  
 patch_port_vendor() {
-    log_info "Patching base firmware vendor"
     local vendor_prop="baserom/vendor/build.prop"
     sed -i '/sys.thermal.data.path/d' "$vendor_prop"
     sed -i 's/ro.control_privapp_permissions=$/ro.control_privapp_permissions=enforce/' "$vendor_prop"
     sed -i 's/#ro.frp.pst/ro.frp.pst/' "$vendor_prop"
     sed -i '/persist.vendor.radio.manual_nw_rej_ct/d' "$vendor_prop"
- 
+    log_info_in "Adding "persist.vendor.radio.manual_nw_rej_ct" prop with 1 to /vendor/build.prop"
+    log_info_in "Adding "ro.product.mod_device" prop with joyeuse_global to /vendor/build.prop"
+    log_info_in "Adding "ro.vendor.se.type" prop with HCE,UICC to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.bg_apps_limit" prop with 48 to /vendor/build.prop"
+    log_info_in "Adding "ro.vendor.qti.sys.fw.bservice_enable" prop with true to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.empty_app_percent" prop with 50 to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.use_trim_settings" prop with true to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.trim_empty_percent" prop with 100 to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.trim_enable_memory" prop with 2147483648 to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.trim_cache_percent" prop with 100 to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.bservice_age" prop with 120000 to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.bservice_limit" prop with 6 to /vendor/build.prop"
+    log_info_in "Adding "persist.sys.fw.bservice_enable" prop with true to /vendor/build.prop"
+    log_info_in "Adding surface flingers to /vendor/build.prop"
     cat >> "$vendor_prop" << 'EOF'
 persist.vendor.radio.manual_nw_rej_ct=1
 ro.product.mod_device=joyeuse_global
@@ -371,7 +395,19 @@ persist.sys.fw.bservice_enable=true
 # ro.surface_flinger.wcg_composition_dataspace=143261696
 # ro.surface_flinger.enable_frame_rate_override=false
 EOF
- 
+    log_info_in "Adding "ro.soc.model" prop with SDM720G to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "ro.oplus.display.screenSizeInches.primary" prop with 6.67 to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "ro.build.device_family" prop with OPSM8550 to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "ro.product.oplus.cpuinfo" prop with SDM720G to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "ro.vendor.qti.va_odm.support" prop with 1 to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "import /my_bigball/build.prop" prop to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "import /my_carrier/build.prop" prop to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "import /my_engineering/build.prop" prop to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "import /my_heytap/build.prop" prop to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "import /my_region/build.prop" prop to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "import /my_stock/build.prop" prop to /vendor/odm/etc/build.prop"
+    log_info_in "Adding "import /my_manifest/build.prop" prop to /vendor/odm/etc/build.prop"
+
     cat >> baserom/vendor/odm/etc/build.prop << 'EOF'
 ro.soc.model=SDM720G
 ro.oplus.display.screenSizeInches.primary=6.67
@@ -397,7 +433,7 @@ disable_encryption() {
 }
  
 disable_avb() {
-    log_info_in "Removing AVB from fstab"
+    log_info_in "Removing Android Verified Boot from fstab"
     while IFS= read -r fstab; do
         sed -i 's/,avb_keys=[^ ]*//g' "$fstab"
         sed -i 's/,avb=vbmeta_system//g' "$fstab"
@@ -432,7 +468,7 @@ patch_services_jar() {
     local jar="portrom/system/system/framework/services.jar"
     [[ -f "$jar" ]] || { log_info_in "services.jar not found, skipping."; return; }
  
-    log_info "Patching services.jar"
+    log_info "Decompiling services.jar"
     mkdir -p tmp/services
     cp -f "$jar" tmp/services.jar
     java -jar bin/apktool/APKEditor.jar d -f -i tmp/services.jar -o tmp/services > /dev/null
@@ -440,6 +476,7 @@ patch_services_jar() {
     local scan_pkg
     scan_pkg=$(find tmp/services -type f -name "ScanPackageUtils.smali")
     if [[ -f "$scan_pkg" ]]; then
+        log_info_in "Patching method "assertMinSignatureSchemeIsValid" in smali" 
         python3 bin/patchmethod_v2.py "$scan_pkg" assertMinSignatureSchemeIsValid > /dev/null
     fi
  
@@ -455,6 +492,7 @@ patch_services_jar() {
         local end_line
         end_line=$(awk -v ML="$method_line" 'NR>=ML && /move-result /{print NR; exit}' "$smali_file")
         [[ -z "$end_line" ]] && continue
+        log_info_in "Patching method getMinimumSignatureSchemeVersionForTargetSdk in $(basename "$smali_file")"
  
         sed -i "${method_line},${end_line}d" "$smali_file"
         sed -i "${method_line}i\\    const/4 v${reg}, 0x0" "$smali_file"
@@ -465,6 +503,7 @@ patch_services_jar() {
     reconcile=$(find tmp/services -type f -name "ReconcilePackageUtils.smali")
     if [[ -f "$reconcile" ]]; then
         local match
+        log_info_in "Patching method "ALLOW_NON_PRELOADS_SYSTEM_SHAREDUIDS" in smali"
         match=$(grep -n "sput-boolean .*ALLOW_NON_PRELOADS_SYSTEM_SHAREDUIDS" "$reconcile" | head -n1)
         if [[ -n "$match" ]]; then
             local lno reg2
@@ -482,13 +521,14 @@ patch_heytap_speech_assist() {
     apk=$(find portrom/ -name "HeyTapSpeechAssist.apk" | head -n1)
     [[ -f "$apk" ]] || { log_info_in "HeyTapSpeechAssist.apk not found, skipping."; return; }
  
-    log_info "Patching HeyTapSpeechAssist"
+    log_info "Decompiling HeyTapSpeechAssist"
     mkdir -p tmp
     cp -f "$apk" tmp/HeyTapSpeechAssist.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/HeyTapSpeechAssist > /dev/null
  
     local smali
     smali=$(find tmp/HeyTapSpeechAssist -type f -name "AiCallCommonBean.smali")
+    log_info_in "Patching method "getSupportAiCall" with true in smali"
     [[ -f "$smali" ]] && python3 bin/patchmethod_v2.py "$smali" getSupportAiCall -return true > /dev/null
  
     find tmp/HeyTapSpeechAssist -type f -name "*.smali" -exec \
@@ -502,10 +542,11 @@ patch_ota_apk() {
     apk=$(find portrom/ -name "OTA.apk" | head -n1)
     [[ -f "$apk" ]] || { log_info_in "OTA.apk not found, skipping."; return; }
  
-    log_info "Patching OTA"
+    log_info "Decompiling OTA"
     mkdir -p tmp
     cp -f "$apk" tmp/OTA.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/OTA > /dev/null
+    log_info_in "Patching method "ro.boot.vbmeta.device_state" with locked in baksmali"
     python3 bin/patchmethod_v2.py -d tmp/OTA -k ro.boot.vbmeta.device_state -k locked -return false > /dev/null
     java -jar bin/apktool/APKEditor.jar b -f -i tmp/OTA -o "$apk" > /dev/null
 }
@@ -517,7 +558,7 @@ patch_aiunit_apk() {
  
     local MODEL="PLG110"
  
-    log_info "Patching AIUnit"
+    log_info "Decompiling AIUnit"
     mkdir -p tmp
     cp -f "$apk" tmp/AIUnit.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/AIUnit > /dev/null
@@ -527,6 +568,7 @@ patch_aiunit_apk() {
  
     local unit_smali
     unit_smali=$(find tmp/AIUnit -type f -name "UnitConfig.smali")
+    log_info_in "Spoofing model for AI features in smali"
     if [[ -f "$unit_smali" ]]; then
         python3 bin/patchmethod_v2.py "$unit_smali" isAllWhiteConditionMatch > /dev/null
         python3 bin/patchmethod_v2.py "$unit_smali" isWhiteConditionsMatch > /dev/null
@@ -565,12 +607,13 @@ patch_oplus_launcher() {
     apk=$(find portrom/ -name "OplusLauncher.apk" | head -n1)
     [[ -f "$apk" ]] || { log_info_in "OplusLauncher.apk not found, skipping."; return; }
  
-    log_info "Patching OplusLauncher"
+    log_info "Decompiling OplusLauncher"
     mkdir -p tmp
     cp -f "$apk" tmp/OplusLauncher.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/OplusLauncher > /dev/null
  
     local smali
+    log_info_in "Patching method "getFirstApiLevel" in smali"
     smali=$(find tmp/OplusLauncher -type f -path "*/com/oplus/basecommon/util/SystemPropertiesHelper.smali")
     if [[ -f "$smali" ]]; then
         python3 bin/patchmethod_v2.py "$smali" getFirstApiLevel ".locals 1\n\tconst/16 v0, 0x22\n\treturn v0" > /dev/null
@@ -584,7 +627,7 @@ patch_systemui_apk() {
     apk=$(find portrom/ -name "SystemUI.apk" | head -n1)
     [[ -f "$apk" ]] || { log_info_in "SystemUI.apk not found, skipping."; return; }
  
-    log_info "Patching SystemUI"
+    log_info "Decompiling SystemUI"
     mkdir -p tmp
     cp -f "$apk" tmp/SystemUI.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/SystemUI > /dev/null
@@ -620,7 +663,7 @@ patch_aod_apk() {
     apk=$(find portrom/ -name "Aod.apk" | head -n1)
     [[ -f "$apk" ]] || { log_info_in "Aod.apk not found, skipping."; return; }
  
-    log_info "Patching AOD"
+    log_info "Decompiling AOD"
     mkdir -p tmp
     cp -f "$apk" tmp/Aod.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Aod > /dev/null
@@ -628,14 +671,16 @@ patch_aod_apk() {
     local common_smali settings_smali
     common_smali=$(find tmp/Aod -type f -path "*/com/oplus/aod/util/CommonUtils.smali")
     settings_smali=$(find tmp/Aod -type f -path "*/com/oplus/aod/util/SettingsUtils.smali")
-    [[ -f "$common_smali" ]]   && python3 bin/patchmethod_v2.py "$common_smali" isSupportFullAod -return true > /dev/null
+    log_info_in "Patching method "isSupportFullAod" with true in smali"
+    [[ -f "$common_smali" ]] && python3 bin/patchmethod_v2.py "$common_smali" isSupportFullAod -return true > /dev/null
+    log_info_in "Patching method "getKeyAodAllDaySupportSettings" with true in smali"
     [[ -f "$settings_smali" ]] && python3 bin/patchmethod_v2.py "$settings_smali" getKeyAodAllDaySupportSettings -return true > /dev/null
  
     java -jar bin/apktool/APKEditor.jar b -f -i tmp/Aod -o "$apk" > /dev/null
 }
  
 patch_settings_apk() {
-    log_info "Patching Settings"
+    log_info "Decompiling Settings"
     mkdir -p tmp
     mv portrom/system_ext/system_ext/priv-app/Settings/Settings.apk tmp/
     cd tmp/
@@ -667,7 +712,7 @@ patch_gallery_apk() {
     apk=$(find portrom/ -name "OppoGallery2.apk" | head -n1)
     [[ -f "$apk" ]] || { log_info_in "OppoGallery2.apk not found, skipping."; return; }
  
-    log_info "Patching OppoGallery2"
+    log_info "Decompiling OppoGallery2"
     mkdir -p tmp
     cp -f "$apk" tmp/OppoGallery2.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Gallery > /dev/null
@@ -683,10 +728,11 @@ patch_battery_apk() {
     [[ -f "$apk" ]] || { log_info_in "Battery.apk not found, skipping."; return; }
     [[ -f "devices/common/patch_battery_soh.txt" ]] || { log_info_in "patch_battery_soh.txt not found, skipping Battery patch."; return; }
  
-    log_info "Patching Battery"
+    log_info "Decompiling Battery"
     mkdir -p tmp
     cp -f "$apk" tmp/Battery.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Battery > /dev/null
+    log_info_in "Patching method "getUIsohValue" in smali"
     python3 bin/patchmethod_v2.py -d tmp/Battery -k "getUIsohValue" -m devices/common/patch_battery_soh.txt > /dev/null
     java -jar bin/apktool/APKEditor.jar b -f -i tmp/Battery -o "$apk" > /dev/null
 }
@@ -696,7 +742,7 @@ build_image() {
     local ROOTFS="$2"
     local CONFIG_DIR="$3"
  
-    log_info_in "Building $NAME"
+    log_info "Building OS images"
  
     local SIZE PAD_SIZE FS_CONFIG CONTEXTS ARGS
     SIZE=$(du -sb "$ROOTFS" | cut -f1)
@@ -756,6 +802,45 @@ package_zip() {
     cd "$WORK_DIR"
     rm -rf out/
 }
+
+#build_recovery() {
+#    log_info "Building OrangeFox Recovery for miatoll..."
+
+#    git clone https://gitlab.com/OrangeFox/misc/scripts.git -b master
+#    cd scripts
+#    sudo bash setup/android_build_env.sh
+#    cd "$WORK_DIR"
+
+#    mkdir -p "$WORK_DIR/OrangeFox"
+#    cd "$WORK_DIR/OrangeFox"
+#    git clone https://gitlab.com/OrangeFox/sync.git -b master
+#    cd sync
+#    ./orangefox_sync.sh --branch 12.1 --path "$WORK_DIR/OrangeFox/fox_12.1"
+#    cd "$WORK_DIR/OrangeFox/fox_12.1"
+
+#    git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
+
+#    set +e
+#    source build/envsetup.sh
+#    export ALLOW_MISSING_DEPENDENCIES=true
+#    set -e
+
+#    lunch twrp_miatoll-eng && make clean && mka adbd recoveryimage
+
+#    local recovery_img
+#    recovery_img=$(find out/target/product/miatoll -name "OrangeFox*.img" | head -n1)
+#    [[ -z "$recovery_img" ]] && recovery_img=$(find out/target/product/miatoll -name "recovery.img" | head -n1)
+
+#    if [[ -z "$recovery_img" ]]; then
+#        log_info "recovery.img not found after build!"
+#        exit 1
+#    fi
+
+#    mv "$recovery_img" "$WORK_DIR/out/recovery.img"
+#    cd "$WORK_DIR"
+#    rm -rf OrangeFox scripts
+#    log_info "OrangeFox recovery built successfully."
+#}
  
 debloat() {
     local BASE="portrom/system/system"
@@ -845,9 +930,8 @@ my_stock/priv-app/KeKeMarket
 my_stock/priv-app/LinktoWindows
 my_stock/priv-app/NumberRecognition
 "
-    log_info "Debloating"
     for p in $PATHS; do
-        log_info_in "Removing $p"
+        log_info_in "Deleting $p"
         rm -rf "${BASE}/${p}"
     done
  
@@ -915,6 +999,7 @@ main() {
     build_image "vendor"     "baserom/vendor"                  "baserom/config"
  
     mkdir -p out
+    # build_recovery
     compress_images
     package_zip
  
