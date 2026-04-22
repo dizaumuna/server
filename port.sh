@@ -18,6 +18,7 @@ WORK_DIR=$(pwd)
 BUILD_START=${SECONDS}
 PADDING=3
 EXTRA=10485760
+VENDOR="baserom/vendor"
  
 chmod +x bin/*
  
@@ -268,108 +269,94 @@ patch_file_contexts() {
     fi
 }
  
-patch_port_buildprops() {
-    local my_product_prop="portrom/system/system/my_product/build.prop"
-    
-    sed -i 's/ro.sf.lcd_density=560/ro.sf.lcd_density=440/' "$my_product_prop"
-    log_info "Replacing "ro.oplus.display.screenhole.positon" prop with 596,40:668,112 in /my_product/build.prop"
-    sed -i 's/ro.oplus.display.screenhole.positon=596,40:668,112/# ro.oplus.display.screenhole.positon=596,40:668,112\nro.oplus.display.screenhole.positon=519,36:569,86/' "$my_product_prop"
-    log_info "Replacing "ro.vendor.display.sensortype" prop with # in /my_product/build.prop"
-    sed -i 's/ro.vendor.display.sensortype=2/# ro.vendor.display.sensortype=2/' "$my_product_prop"
-    log_info "Replacing "persist.oplus.display.vrr" prop with # in /my_product/build.prop"
-    sed -i 's/^persist.oplus.display.vrr=1$/# persist.oplus.display.vrr=1/' "$my_product_prop"
-    log_info "Replacing "persist.oplus.display.vrr.adfr" prop with # in /my_product/build.prop"
-    sed -i 's/^persist.oplus.display.vrr.adfr=2$/# persist.oplus.display.vrr.adfr=2/' "$my_product_prop"
-    log_info "Replacing "persist.oplus.display.vrr.adfr.scale" prop with # in /my_product/build.prop"
-    sed -i 's/^persist.oplus.display.vrr.adfr.scale=129$/# persist.oplus.display.vrr.adfr.scale=129/' "$my_product_prop"
-    log_info "Replacing "vendor.display.use_layer_ext" prop with # in /my_product/build.prop"
-    sed -i 's/^vendor.display.use_layer_ext=1$/# vendor.display.use_layer_ext=1/' "$my_product_prop"
-    log_info "Replacing "ro.oplus.density.fhd_default" prop with 440 in /my_product/build.prop"
-    sed -i 's/ro.oplus.density.fhd_default=480/ro.oplus.density.fhd_default=440/' "$my_product_prop"
-    log_info "Replacing "ro.oplus.resolution.low" prop with 1080,2400 in /my_product/build.prop"
-    sed -i 's/ro.oplus.resolution.low=1080,2376/ro.oplus.resolution.low=1080,2400/' "$my_product_prop"
-    log_info "Replacing "ro.oplus.gaussianlevel" prop with 3 in /my_product/build.prop"
-    sed -i '/ro.oplus.gaussianlevel=3/d' "$my_product_prop"
-    log_info "Adding "debug.sf.disable_client_composition_cache" prop with 0 in /my_product/build.prop"
-    echo "debug.sf.disable_client_composition_cache=0" >> "$my_product_prop"
- 
-    local allnet="portrom/system/system/my_product/etc/permissions/com.oppo.features_allnet_android.xml"
-    local display_feat="portrom/system/system/my_product/etc/permissions/oplus.product.display_features.xml"
-    local video_feat="portrom/system/system/my_product/etc/permissions/oplus.product.feature_video_unique.xml"
-    log_info_in "Patching biometric permissions"
-    sed -i 's/<feature name="android.hardware.biometrics.face" \/>$/<!-- <feature name="android.hardware.biometrics.face" \/>  -->/' "$allnet"
-    sed -i 's/<feature name="oppo.common.support.curved.display" \/>$/<!-- <feature name="oppo.common.support.curved.display" \/> -->/' "$allnet"
-    sed -i 's/<oplus-feature name="oplus.software.fingeprint_optical_enabled"\/>$/<!-- <oplus-feature name="oplus.software.fingeprint_optical_enabled"\/> -->/' "$display_feat"
-    sed -i 's/<feature name="oplus.software.video.sr_support"\/>$/<!-- <feature name="oplus.software.video.sr_support"\/> -->/' "$video_feat"
-    sed -i 's/<feature name="oplus.software.video.osie_support"\/>$/<!-- <feature name="oplus.software.video.osie_support"\/> -->/' "$video_feat"
+patch_props() {
+    local FILE="$VENDOR/build.prop"
 
-    local sys_prop="portrom/system/system/system/build.prop"
-    sed -i 's/dalvik.vm.minidebuginfo=true/dalvik.vm.minidebuginfo=false/' "$sys_prop"
-    sed -i 's/dalvik.vm.dex2oat-minidebuginfo=true/dalvik.vm.dex2oat-minidebuginfo=false/' "$sys_prop"
-}
- 
-patch_port_init() {
-    log_info "Patching init files on source firmware"
-    sed -i 's/write \/proc\/sys\/kernel\/panic_on_oops 1/write \/proc\/sys\/kernel\/panic_on_oops 0/' \
-        portrom/system/system/system/etc/init/hw/init.rc
- 
-    log_info "Adding "vendor.sys.usb.adb.disabled" prop to /system/system/etc/init/hw/init.rc"
-    sed -i '/vendor.sys.usb.adb.disabled/d' portrom/system/system/system/etc/init/hw/init.usb.rc
-    log_info "Adding "vendor.usb.config" prop to /system/system/etc/init/hw/init.usb.rc"
-    sed -i '/persist.vendor.usb.config/d' portrom/system/system/system/etc/init/hw/init.usb.rc
-    log_info "Adding "persist.usb.config.*persist.vendor" prop to /system/system/etc/init/hw/init.usb.rc"
-    sed -i '/persist.sys.usb.config.*persist.vendor/d' portrom/system/system/system/etc/init/hw/init.usb.rc
-    local configfs_rc="portrom/system/system/system/etc/init/hw/init.usb.configfs.rc"
-    sed -i '/setusbconfig to/d' "$configfs_rc"
-    sed -i '/sys.usb.config=\* && property:sys.usb.configfs=1/d' "$configfs_rc"
-    sed -i '/rmdir.*rndis.gs4/d' "$configfs_rc"
- 
-    cat >> "$configfs_rc" << 'EOF'
- 
-on property:sys.usb.config=rndis && property:sys.usb.configfs=1
-    mkdir /config/usb_gadget/g1/functions/rndis.gs4
-    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis"
-    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1
-    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
-    setprop sys.usb.state ${sys.usb.config}
- 
-on property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1
-    start adbd
- 
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1
-    mkdir /config/usb_gadget/g1/functions/rndis.gs4
-    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis_adb"
-    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1
-    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f2
-    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
-    setprop sys.usb.state ${sys.usb.config}
-EOF
-}
- 
-patch_port_vendor() {
-    local vendor_prop="baserom/vendor/build.prop"
-    sed -i '/sys.thermal.data.path/d' "$vendor_prop"
-    sed -i 's/ro.control_privapp_permissions=$/ro.control_privapp_permissions=enforce/' "$vendor_prop"
-    sed -i 's/#ro.frp.pst/ro.frp.pst/' "$vendor_prop"
-    sed -i '/persist.vendor.radio.manual_nw_rej_ct/d' "$vendor_prop"
-    log_info "Adding "persist.vendor.radio.manual_nw_rej_ct" prop with 1 to /vendor/build.prop"
-    log_info "Adding "ro.product.mod_device" prop with joyeuse_global to /vendor/build.prop"
-    log_info "Adding "ro.vendor.se.type" prop with HCE,UICC to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.bg_apps_limit" prop with 48 to /vendor/build.prop"
-    log_info "Adding "ro.vendor.qti.sys.fw.bservice_enable" prop with true to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.empty_app_percent" prop with 50 to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.use_trim_settings" prop with true to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.trim_empty_percent" prop with 100 to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.trim_enable_memory" prop with 2147483648 to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.trim_cache_percent" prop with 100 to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.bservice_age" prop with 120000 to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.bservice_limit" prop with 6 to /vendor/build.prop"
-    log_info "Adding "persist.sys.fw.bservice_enable" prop with true to /vendor/build.prop"
-    log_info "Adding surface flingers to /vendor/build.prop"
-    cat >> "$vendor_prop" << 'EOF'
-persist.vendor.radio.manual_nw_rej_ct=1
-ro.product.mod_device=joyeuse_global
-ro.vendor.se.type=HCE,UICC
+    log_in "Replacing ro.vendor.build.security_patch 2023-02-01 with 2023-04-01 in vendor/build.prop"
+    sed -i 's/ro.vendor.build.security_patch=2023-02-01/ro.vendor.build.security_patch=2023-04-01/' "$FILE"
+    log_in "Replacing ro.product.board=joyeuse with miatoll in vendor/build.prop"
+    sed -i 's/ro.product.board=joyeuse/ro.product.board=miatoll/' "$FILE"
+    log_in "Replacing joyeuse/special_ro.prop comment with miatoll in vendor/build.prop"
+    sed -i 's|# from device/xiaomi/joyeuse/special_ro.prop|# from device/xiaomi/miatoll/special_ro.prop|' "$FILE"
+    log_in "Replacing joyeuse/system_12.prop comment with miatoll in vendor/build.prop"
+    sed -i 's|# from device/xiaomi/joyeuse/system_12.prop|# from device/xiaomi/miatoll/system_12.prop|' "$FILE"
+    log_in "Replacing '# enable temp dds' block with thermal configs block in vendor/build.prop"
+    sed -i 's/# enable temp dds/#thermal configs path\nsys.thermal.data.path=\/data\/vendor\/thermal\/\n\n#enable temp dds/' "$FILE"
+    log_in "Removing persist.vendor.radio.manual_nw_rej_ct=1 from vendor/build.prop"
+    sed -i '/persist.vendor.radio.manual_nw_rej_ct=1/d' "$FILE"
+    log_in "Replacing ro.build.version.release=12 with 15 in vendor/build.prop"
+    sed -i 's/ro.build.version.release=12/ro.build.version.release=15/' "$FILE"
+    log_in "Replacing end of joyeuse/system_12.prop comment with miatoll in vendor/build.prop"
+    sed -i 's|# end of device/xiaomi/joyeuse/system_12.prop|# end of device/xiaomi/miatoll/system_12.prop|' "$FILE"
+    log_in "Replacing joyeuse/special_rw.prop comment with miatoll in vendor/build.prop"
+    sed -i 's|# from device/xiaomi/joyeuse/special_rw.prop|# from device/xiaomi/miatoll/special_rw.prop|' "$FILE"
+    log_in "Replacing ro.vendor.build.date with miatoll date in vendor/build.prop"
+    sed -i 's/ro.vendor.build.date=Tue Mar  7 12:12:31 CST 2023/ro.vendor.build.date=Mon Apr 10 17:14:21 CST 2023/' "$FILE"
+    log_in "Replacing ro.vendor.build.date.utc with miatoll value in vendor/build.prop"
+    sed -i 's/ro.vendor.build.date.utc=1678162351/ro.vendor.build.date.utc=1681118061/' "$FILE"
+    log_in "Replacing ro.vendor.build.fingerprint with miatoll in vendor/build.prop"
+    sed -i 's|ro.vendor.build.fingerprint=Redmi/joyeuse_global/joyeuse:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys|ro.vendor.build.fingerprint=Redmi/miatoll_global/miatoll:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys|' "$FILE"
+    log_in "Replacing ro.vendor.build.id=RKQ1.211019.001 with AQ3A.240912.001 in vendor/build.prop"
+    sed -i 's/ro.vendor.build.id=RKQ1.211019.001/ro.vendor.build.id=AQ3A.240912.001/' "$FILE"
+    log_in "Removing ro.vendor.build.version.incremental from vendor/build.prop"
+    sed -i '/ro.vendor.build.version.incremental=V14.0.3.0.SJZMIXM/d' "$FILE"
+    log_in "Replacing ro.vendor.build.version.release_or_codename=12 with 15 in vendor/build.prop"
+    sed -i 's/ro.vendor.build.version.release_or_codename=12/ro.vendor.build.version.release_or_codename=15/' "$FILE"
+    log_in "Replacing ro.vendor.build.version.sdk=30 with 35 in vendor/build.prop"
+    sed -i 's/ro.vendor.build.version.sdk=30/ro.vendor.build.version.sdk=35/' "$FILE"
+    log_in "Replacing ro.product.vendor.device=joyeuse with miatoll in vendor/build.prop"
+    sed -i 's/ro.product.vendor.device=joyeuse/ro.product.vendor.device=miatoll/' "$FILE"
+    log_in "Replacing ro.product.vendor.model with Redmi Note 9 Pro Max in vendor/build.prop"
+    sed -i 's/ro.product.vendor.model=Redmi Note 9 Pro$/ro.product.vendor.model=Redmi Note 9 Pro Max/' "$FILE"
+    log_in "Replacing ro.product.vendor.name=joyeuse_global with miatoll in vendor/build.prop"
+    sed -i 's/ro.product.vendor.name=joyeuse_global/ro.product.vendor.name=miatoll/' "$FILE"
+    log_in "Replacing ro.product.vendor.marketname with Redmi Note 9 Pro Max in vendor/build.prop"
+    sed -i 's/ro.product.vendor.marketname=$/ro.product.vendor.marketname=Redmi Note 9 Pro Max/' "$FILE"
+    log_in "Adding # ro.product.mod_device=miatoll after marketname in vendor/build.prop"
+    sed -i '/ro.product.vendor.marketname=Redmi Note 9 Pro Max/a # ro.product.mod_device=miatoll' "$FILE"
+    log_in "Replacing ro.bootimage.build.date with miatoll date in vendor/build.prop"
+    sed -i 's/ro.bootimage.build.date=Tue Mar 7 12:12:31 CST 2023/ro.bootimage.build.date=Mon Apr 10 17:14:21 CST 2023/' "$FILE"
+    log_in "Replacing ro.bootimage.build.date.utc with miatoll value in vendor/build.prop"
+    sed -i 's/ro.bootimage.build.date.utc=1678162351/ro.bootimage.build.date.utc=1681118061/' "$FILE"
+    log_in "Replacing ro.bootimage.build.fingerprint with miatoll in vendor/build.prop"
+    sed -i 's|ro.bootimage.build.fingerprint=Redmi/joyeuse_global/joyeuse:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys|ro.bootimage.build.fingerprint=Redmi/miatoll_global/miatoll:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys|' "$FILE"
+    log_in "Replacing ro.control_privapp_permissions=enforce with empty in vendor/build.prop"
+    sed -i 's/ro.control_privapp_permissions=enforce/ro.control_privapp_permissions=/' "$FILE"
+    log_in "Replacing ro.frp.pst active line with commented out in vendor/build.prop"
+    sed -i 's|^ro.frp.pst=/dev/block/bootdevice/by-name/frp|#ro.frp.pst=/dev/block/bootdevice/by-name/frp|' "$FILE"
+    log_in "Removing ro.product.mod_device=joyeuse_global from vendor/build.prop"
+    sed -i '/ro.product.mod_device=joyeuse_global/d' "$FILE"
+    log_in "Removing ro.vendor.se.type=HCE,UICC from vendor/build.prop"
+    sed -i '/ro.vendor.se.type=HCE,UICC/d' "$FILE"
+        log_in "Adding miatoll tweak props block at end of vendor/build.prop"
+    cat >> "$FILE" << 'EOF'
+persist.sys.disable_rescue=true
+persist.vendor.fingerprint.sensor_type=side
+#vendor.display.enable_default_color_mode=0
+persist.sys.ui.hw=true
+persist.sys.ui.vsync=true
+debug.composition.type=gpu
+debug.egl.hw=1
+dalvik.vm.heapsize=512m
+dalvik.vm.execution-mode=int:jit
+persist.sys.strictmode.enable=true
+persist.sys.stay_on_while_plugged_in=1
+persist.audio.fluence.speaker=true
+persist.audio.fluence.headset=true
+persist.sys.audio.deep_buffer=true
+persist.sys.usb.mtp=1
+persist.sys.usb.config=mtp,adb
+ro.sf.enable_hwc_vds=true
+ro.sf.render_engine=parallel
+debug.sf.hw=1
+hwui.render_dirty_regions=false
+persist.sys.ui.hw=1
+ro.hwui.texture_cache_size=88
+ro.hwui.layer_cache_size=58
+ro.hwui.r_buffer_cache_size=9
+ro.hwui.gradient_cache_size=1
+persist.sys.oplus.nandswap.condition=true
+persist.xd.d2w=true
 persist.sys.fw.bg_apps_limit=48
 ro.vendor.qti.sys.fw.bservice_enable=true
 persist.sys.fw.empty_app_percent=50
@@ -380,34 +367,16 @@ persist.sys.fw.trim_cache_percent=100
 persist.sys.fw.bservice_age=120000
 persist.sys.fw.bservice_limit=6
 persist.sys.fw.bservice_enable=true
- 
-# ro.surface_flinger.use_color_management=true
-# ro.surface_flinger.protected_contents=true
-# ro.surface_flinger.use_content_detection_for_refresh_rate=true
-# ro.surface_flinger.set_touch_timer_ms=200
-# ro.surface_flinger.force_hwc_copy_for_virtual_displays=true
-# ro.surface_flinger.max_frame_buffer_acquired_buffers=3
-# ro.surface_flinger.max_virtual_display_dimension=4096
-# ro.surface_flinger.supports_background_blur=1
-# ro.surface_flinger.has_wide_color_display=true
-# ro.surface_flinger.has_HDR_display=true
-# ro.surface_flinger.wcg_composition_dataspace=143261696
-# ro.surface_flinger.enable_frame_rate_override=false
+# this firmware is builded on Builder-miatoll
+# the owner of Builder-miatoll is diza u muna
 EOF
-    log_info "Adding "ro.soc.model" prop with SDM720G to /vendor/odm/etc/build.prop"
-    log_info "Adding "ro.oplus.display.screenSizeInches.primary" prop with 6.67 to /vendor/odm/etc/build.prop"
-    log_info "Adding "ro.build.device_family" prop with OPSM8550 to /vendor/odm/etc/build.prop"
-    log_info "Adding "ro.product.oplus.cpuinfo" prop with SDM720G to /vendor/odm/etc/build.prop"
-    log_info "Adding "ro.vendor.qti.va_odm.support" prop with 1 to /vendor/odm/etc/build.prop"
-    log_info "Adding "import /my_bigball/build.prop" prop to /vendor/odm/etc/build.prop"
-    log_info "Adding "import /my_carrier/build.prop" prop to /vendor/odm/etc/build.prop"
-    log_info "Adding "import /my_engineering/build.prop" prop to /vendor/odm/etc/build.prop"
-    log_info "Adding "import /my_heytap/build.prop" prop to /vendor/odm/etc/build.prop"
-    log_info "Adding "import /my_region/build.prop" prop to /vendor/odm/etc/build.prop"
-    log_info "Adding "import /my_stock/build.prop" prop to /vendor/odm/etc/build.prop"
-    log_info "Adding "import /my_manifest/build.prop" prop to /vendor/odm/etc/build.prop"
+}
+ 
+patch_odm() {
+        local FILE="$VENDOR/odm/etc/build.prop"
 
-    cat >> baserom/vendor/odm/etc/build.prop << 'EOF'
+    log_in "Replacing odm/etc/build.prop content with miatoll version"
+    cat > "$FILE" << 'EOF'
 ro.soc.model=SDM720G
 ro.oplus.display.screenSizeInches.primary=6.67
 ro.build.device_family=OPSM8550
@@ -415,32 +384,861 @@ ro.product.oplus.cpuinfo=SDM720G
 ro.vendor.qti.va_odm.support=1
 import /my_bigball/build.prop
 import /my_carrier/build.prop
+import /my_company/build.prop
 import /my_engineering/build.prop
 import /my_heytap/build.prop
+import /my_preload/build.prop
+import /my_product/build.prop
 import /my_region/build.prop
 import /my_stock/build.prop
 import /my_manifest/build.prop
+import /vendor/custom_props/properties/${ro.boot.hwname}_build.prop
 EOF
 }
- 
-disable_encryption() {
-    log_info "Removing wrappedkey and ice fileencryption from fstab"
-    for fstab in baserom/vendor/etc/fstab.default baserom/vendor/etc/fstab.emmc; do
-        [[ -f "$fstab" ]] || continue
-        sed -i 's/,inlinecrypt\b//g; s/,fileencryption=ice,wrappedkey\b//g' "$fstab"
+
+add_custom_props () {
+    mkdir -p custom_props && mkdir -p custom_props/properties/
+    log_in "Adding custom_props for miatoll devices"
+    echo "ro.vendor.oplus.camera.frontCamSize=16MP" >> custom_props/properties/curtana_build.prop
+    echo "ro.vendor.oplus.camera.backCamSize=64MP+8MP+5MP+2MP" >> custom_props/properties/curtana_build.prop
+    echo "ro.vendor.oplus.market.name=Redmi Note 9S/9Pro/10Lite" >> custom_props/properties/curtana_build.prop
+    echo "ro.vendor.oplus.market.enname=Redmi Note 9S/9Pro/10Lite" >> custom_props/properties/curtana_build.prop
+    echo "ro.product.model=M2003J6A1G" >> custom_props/properties/curtana_build.prop
+
+    echo "ro.vendor.oplus.camera.frontCamSize=32MP" >> custom_props/properties/excalibur_build.prop
+    echo "ro.vendor.oplus.camera.backCamSize=64MP+8MP+5MP+2MP" >> custom_props/properties/excalibur_build.prop
+    echo "ro.vendor.oplus.market.name=Redmi Note 9 Pro Max" >> custom_props/properties/excalibur_build.prop
+    echo "ro.vendor.oplus.market.enname=Redmi Note 9 Pro Max" >> custom_props/properties/excalibur_build.prop
+    echo "ro.product.model=M2003J6B1I" >> custom_props/properties/excalibur_build.prop
+
+    echo "ro.vendor.oplus.camera.frontCamSize=16MP" >> custom_props/properties/gram_build.prop
+    echo "ro.vendor.oplus.camera.backCamSize=48MP+8MP+5MP+2MP" >> custom_props/properties/gram_build.prop
+    echo "ro.vendor.oplus.market.name=Xiaomi Poco M2 Pro" >> custom_props/properties/gram_build.prop
+    echo "ro.vendor.oplus.market.enname=Xiaomi Poco M2 Pro" >> custom_props/properties/gram_build.prop
+    echo "ro.product.model=POCO M2 Pro" >> custom_props/properties/gram_build.prop
+
+    echo "ro.vendor.oplus.camera.frontCamSize=16MP" >> custom_props/properties/joyeuse_build.prop
+    echo "ro.vendor.oplus.camera.backCamSize=64MP+8MP+5MP+2MP" >> custom_props/properties/joyeuse_build.prop
+    echo "ro.vendor.oplus.market.name=Redmi Note 9 Pro" >> custom_props/properties/joyeuse_build.prop
+    echo "ro.vendor.oplus.market.enname=Redmi Note 9 Pro" >> custom_props/properties/joyeuse_build.prop
+    echo "ro.product.model=M2003J6B2G" >> custom_props/properties/joyeuse_build.prop
+}
+
+patch_odm_media_profiles() {
+    local FILE="$VENDOR/odm/etc/media_profiles_V1_0.xml"
+
+    log_in "Replacing FIXME comment with author signature in odm/etc/media_profiles_V1_0.xml"
+    sed -i 's|        FIXME:\n.*\n.*\n.*\n.*||' "$FILE"
+    python3 -c "
+import re, sys
+content = open('$FILE').read()
+content = re.sub(
+    r'FIXME:.*?for other applications, we do\s*\n\s*not perform any checks at all\.',
+    'authored by diza u muna',
+    content, flags=re.DOTALL
+)
+open('$FILE', 'w').write(content)
+"
+}
+
+patch_audio_effects() {
+    local FILE="$VENDOR/etc/audio_effects.xml"
+
+    log_in "Adding dirac library entry in etc/audio_effects.xml"
+    sed -i 's|        <library name="misoundfx" path="libmisoundfx.so"/>|        <library name="misoundfx" path="libmisoundfx.so"/>\n        <library name="dirac" path="libdirac.so"/>|' "$FILE"
+
+    log_in "Adding dirac effect entry in etc/audio_effects.xml"
+    sed -i 's|        <effect name="misoundfx" library="misoundfx" uuid="5b8e36a5-144a-4c38-b1d7-0002a5d5c51b"/>|        <effect name="misoundfx" library="misoundfx" uuid="5b8e36a5-144a-4c38-b1d7-0002a5d5c51b"/>\n        <effect name="dirac" library="dirac" uuid="e069d9e0-8329-11df-9168-0002a5d5c51b"/>|' "$FILE"
+}
+
+patch_audio_io_policy() {
+    local FILE="$VENDOR/etc/audio_io_policy.conf"
+
+    log_in "Replacing voip_rx flags order in etc/audio_io_policy.conf"
+    sed -i 's/flags AUDIO_OUTPUT_FLAG_VOIP_RX|AUDIO_OUTPUT_FLAG_DIRECT/flags AUDIO_OUTPUT_FLAG_DIRECT|AUDIO_OUTPUT_FLAG_VOIP_RX/' "$FILE"
+
+    log_in "Replacing compress_offload_24 formats with full list in etc/audio_io_policy.conf"
+    sed -i 's/formats AUDIO_FORMAT_PCM_24_BIT_OFFLOAD|AUDIO_FORMAT_FLAC|AUDIO_FORMAT_ALAC|AUDIO_FORMAT_APE|AUDIO_FORMAT_VORBIS|AUDIO_FORMAT_WMA|AUDIO_FORMAT_WMA_PRO/formats AUDIO_FORMAT_MP3|AUDIO_FORMAT_PCM_24_BIT_OFFLOAD|AUDIO_FORMAT_FLAC|AUDIO_FORMAT_ALAC|AUDIO_FORMAT_APE|AUDIO_FORMAT_AAC_LC|AUDIO_FORMAT_AAC_HE_V1|AUDIO_FORMAT_AAC_HE_V2|AUDIO_FORMAT_VORBIS|AUDIO_FORMAT_WMA|AUDIO_FORMAT_WMA_PRO|AUDIO_FORMAT_AAC_ADTS_LC|AUDIO_FORMAT_AAC_ADTS_HE_V1|AUDIO_FORMAT_AAC_ADTS_HE_V2/' "$FILE"
+
+    log_in "Removing record_24bit block from etc/audio_io_policy.conf"
+    python3 -c "
+import re
+content = open('$FILE').read()
+content = re.sub(r'  record_24bit \{[^}]+\}\n', '', content)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Removing record_32bit block from etc/audio_io_policy.conf"
+    python3 -c "
+import re
+content = open('$FILE').read()
+content = re.sub(r'  record_32bit \{[^}]+\}\n', '', content)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing record_compress_16 sampling_rates with 48000|96000 in etc/audio_io_policy.conf"
+    sed -i '/record_compress_16/,/}/ s/sampling_rates 8000|16000|32000|44100|48000|88200|96000|176400|192000/sampling_rates 48000|96000/' "$FILE"
+
+    log_in "Adding voip_tx and low_latency_voip_tx blocks at end of etc/audio_io_policy.conf"
+    sed -i 's/^}$/  voip_tx {\n    flags AUDIO_INPUT_FLAG_VOIP_TX\n    formats AUDIO_FORMAT_PCM_16_BIT\n    sampling_rates 8000|16000|32000|48000\n    bit_width 16\n    app_type 69946\n  }\n  low_latency_voip_tx {\n    flags AUDIO_INPUT_FLAG_VOIP_TX|AUDIO_INPUT_FLAG_FAST\n    formats AUDIO_FORMAT_PCM_16_BIT\n    sampling_rates 48000\n    bit_width 16\n    app_type 69946\n  }\n}/' "$FILE"
+}
+
+patch_audio_platform_info() {
+    local FILE="$VENDOR/etc/audio_platform_info_intcodec.xml"
+
+    log_in "Replacing input_mic_max_count 4 with 2 in etc/audio_platform_info_intcodec.xml"
+    sed -i 's/<param key="input_mic_max_count" value="4"\/>/<param key="input_mic_max_count" value="2"\/>/' "$FILE"
+
+    log_in "Removing CTS test device entry from etc/audio_platform_info_intcodec.xml"
+    sed -i '/<!-- Add for CTS test -->/d' "$FILE"
+    sed -i '/SND_DEVICE_IN_VOICE_RECOG_USB_HEADSET_MIC_CTS/d' "$FILE"
+}
+
+patch_audio_policy_configuration() {
+    local FILE="$VENDOR/etc/audio_policy_configuration.xml"
+
+    log_in "Replacing copyright year 2016-2017, 2019 with 2016-2020 in etc/audio_policy_configuration.xml"
+    sed -i 's/Copyright (c) 2016-2017, 2019/Copyright (c) 2016-2020/' "$FILE"
+
+    log_in "Adding call_screen_mode_supported to globalConfiguration in etc/audio_policy_configuration.xml"
+    sed -i 's/<globalConfiguration speaker_drc_enabled="true"\/>/<globalConfiguration speaker_drc_enabled="true" call_screen_mode_supported="true"\/>/' "$FILE"
+
+    log_in "Adding Primary Audio HAL comment before primary module in etc/audio_policy_configuration.xml"
+    sed -i 's/        <module name="primary" halVersion="2.0">/        <!-- Primary Audio HAL -->\n        <module name="primary" halVersion="2.0">/' "$FILE"
+
+    log_in "Replacing attachedDevices order and removing Speaker Safe, adding FM Tuner in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '''            <attachedDevices>
+                <item>Speaker</item>
+                <item>Speaker Safe</item>
+                <item>Earpiece</item>
+                <item>Telephony Tx</item>
+                <item>Built-In Mic</item>
+                <item>Built-In Back Mic</item>'''
+new = '''            <attachedDevices>
+                <item>Earpiece</item>
+                <item>Speaker</item>
+                <item>Telephony Tx</item>
+                <item>Built-In Mic</item>
+                <item>Built-In Back Mic</item>'''
+content = content.replace(old, new)
+content = content.replace('                <item>Telephony Rx</item>', '                <item>FM Tuner</item>\n                <item>Telephony Rx</item>', 1)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing primary output and voip_rx mixPort definitions in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '''                <mixPort name=\"primary output\" role=\"source\" flags=\"AUDIO_OUTPUT_FLAG_PRIMARY|AUDIO_OUTPUT_FLAG_FAST\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </mixPort>'''
+new = '''                <mixPort name=\"voip_rx\" role=\"source\"
+                         flags=\"AUDIO_OUTPUT_FLAG_DIRECT|AUDIO_OUTPUT_FLAG_VOIP_RX\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000,32000,48000\" channelMasks=\"AUDIO_CHANNEL_OUT_MONO\"/>
+                </mixPort>
+                <mixPort name=\"primary output\" role=\"source\" flags=\"AUDIO_OUTPUT_FLAG_FAST|AUDIO_OUTPUT_FLAG_PRIMARY\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_24_BIT_PACKED\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </mixPort>'''
+content = content.replace(old, new)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing raw mixPort flags in etc/audio_policy_configuration.xml"
+    sed -i 's/flags="AUDIO_OUTPUT_FLAG_RAW|AUDIO_OUTPUT_FLAG_FAST"/flags="AUDIO_OUTPUT_FLAG_FAST"/' "$FILE"
+
+    log_in "Removing hifi_playback from before deep_buffer, adding after deep_buffer with mmap/compress/direct_pcm in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+content = content.replace('                <mixPort name=\"hifi_playback\" role=\"source\" />\n                <mixPort name=\"deep_buffer\"', '                <mixPort name=\"deep_buffer\"', 1)
+old_deep = '                             samplingRates=\"44100,48000\"\n                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>\n                </mixPort>'
+new_deep = '''                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </mixPort>
+                <mixPort name=\"mmap_no_irq_out\" role=\"source\" flags=\"AUDIO_OUTPUT_FLAG_DIRECT|AUDIO_OUTPUT_FLAG_MMAP_NOIRQ\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </mixPort>
+                <mixPort name=\"hifi_playback\" role=\"source\" />
+                <mixPort name=\"compress_passthrough\" role=\"source\"
+                        flags=\"AUDIO_OUTPUT_FLAG_DIRECT|AUDIO_OUTPUT_FLAG_COMPRESS_OFFLOAD|AUDIO_OUTPUT_FLAG_NON_BLOCKING\">
+                    <profile name=\"\" format=\"dynamic\"
+                             samplingRates=\"dynamic\" channelMasks=\"dynamic\"/>
+                </mixPort>
+                <mixPort name=\"direct_pcm\" role=\"source\"
+                        flags=\"AUDIO_OUTPUT_FLAG_DIRECT\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000,128000,176400,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_2POINT1,AUDIO_CHANNEL_OUT_QUAD,AUDIO_CHANNEL_OUT_PENTA,AUDIO_CHANNEL_OUT_5POINT1,AUDIO_CHANNEL_OUT_6POINT1,AUDIO_CHANNEL_OUT_7POINT1\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_8_24_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000,128000,176400,192000,352800,384000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_2POINT1,AUDIO_CHANNEL_OUT_QUAD,AUDIO_CHANNEL_OUT_PENTA,AUDIO_CHANNEL_OUT_5POINT1,AUDIO_CHANNEL_OUT_6POINT1,AUDIO_CHANNEL_OUT_7POINT1\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_24_BIT_PACKED\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000,128000,176400,192000,352800,384000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_2POINT1,AUDIO_CHANNEL_OUT_QUAD,AUDIO_CHANNEL_OUT_PENTA,AUDIO_CHANNEL_OUT_5POINT1,AUDIO_CHANNEL_OUT_6POINT1,AUDIO_CHANNEL_OUT_7POINT1\"/>
+                  <profile name=\"\" format=\"AUDIO_FORMAT_PCM_32_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000,128000,176400,192000,352800,384000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_2POINT1,AUDIO_CHANNEL_OUT_QUAD,AUDIO_CHANNEL_OUT_PENTA,AUDIO_CHANNEL_OUT_5POINT1,AUDIO_CHANNEL_OUT_6POINT1,AUDIO_CHANNEL_OUT_7POINT1\"/>
+                </mixPort>'''
+content = content.replace(old_deep, new_deep, 1)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Adding FLAC/ALAC/APE/DTS/DTS_HD/AAC_ADTS profiles and dsd_compress_passthrough to compressed_offload in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '                    <profile name=\"\" format=\"AUDIO_FORMAT_AAC_HE_V2\"\n                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"\n                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>\n                </mixPort>\n                <mixPort name=\"voice_tx\"'
+new = '''                    <profile name=\"\" format=\"AUDIO_FORMAT_FLAC\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000,128000,176400,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_ALAC\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000,128000,176400,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_2POINT1,AUDIO_CHANNEL_OUT_QUAD,AUDIO_CHANNEL_OUT_PENTA,AUDIO_CHANNEL_OUT_5POINT1,AUDIO_CHANNEL_OUT_6POINT1,AUDIO_CHANNEL_OUT_7POINT1\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_APE\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000,128000,176400,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_AAC_HE_V2\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_DTS\"
+                             samplingRates=\"32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_2POINT1,AUDIO_CHANNEL_OUT_QUAD,AUDIO_CHANNEL_OUT_PENTA,AUDIO_CHANNEL_OUT_5POINT1\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_DTS_HD\"
+                             samplingRates=\"32000,44100,48000,64000,88200,96000,128000,176400,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_2POINT1,AUDIO_CHANNEL_OUT_QUAD,AUDIO_CHANNEL_OUT_PENTA,AUDIO_CHANNEL_OUT_5POINT1,AUDIO_CHANNEL_OUT_6POINT1,AUDIO_CHANNEL_OUT_7POINT1\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_AAC_ADTS_LC\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_AAC_ADTS_HE_V1\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_AAC_ADTS_HE_V2\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,64000,88200,96000\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>
+                </mixPort>
+                <mixPort name=\"dsd_compress_passthrough\" role=\"source\"
+                         flags=\"AUDIO_OUTPUT_FLAG_DIRECT|AUDIO_OUTPUT_FLAG_COMPRESS_OFFLOAD|AUDIO_OUTPUT_FLAG_NON_BLOCKING\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_DSD\"
+                             samplingRates=\"2822400,5644800\"
+                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>
+                </mixPort>
+                <mixPort name=\"voice_tx\"'''
+content = content.replace(old, new, 1)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing joyeuse mmap_no_irq_out and voip_rx sink mixPorts with hotword input in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '''                <mixPort name=\"mmap_no_irq_out\" role=\"source\" flags=\"AUDIO_OUTPUT_FLAG_DIRECT|AUDIO_OUTPUT_FLAG_MMAP_NOIRQ\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </mixPort>
+                <mixPort name=\"voip_rx\" role=\"source\"
+                         flags=\"AUDIO_OUTPUT_FLAG_VOIP_RX\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                           samplingRates=\"8000,16000,32000,48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </mixPort>
+                <mixPort name=\"incall_music_uplink\"'''
+new = '''                <mixPort name=\"hotword input\" role=\"sink\" flags=\"AUDIO_INPUT_FLAG_HW_HOTWORD\" maxActiveCount=\"0\" >
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO\"/>
+                </mixPort>
+                <mixPort name=\"incall_music_uplink\"'''
+content = content.replace(old, new, 1)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing primary input and fast input mixPorts with miatoll versions in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '''                <mixPort name=\"primary input\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_8_24_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_INDEX_MASK_3\"/>
+                </mixPort>
+                <mixPort name=\"fast input\" role=\"sink\" flags=\"AUDIO_INPUT_FLAG_FAST\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_8_24_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_INDEX_MASK_3\"/>
+                </mixPort>
+                <mixPort name=\"hifi_input\" role=\"sink\" />'''
+new = '''                <mixPort name=\"primary input\" role=\"sink\" maxOpenCount=\"2\" maxActiveCount=\"2\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK\"/>
+                </mixPort>
+                <mixPort name=\"uplink downlink input\" role=\"sink\" flags=\"AUDIO_INPUT_FLAG_INCALL_UPLINK_DOWNLINK\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK\"/>
+                </mixPort>
+                <mixPort name=\"voip_tx\" role=\"sink\"
+                         flags=\"AUDIO_INPUT_FLAG_VOIP_TX\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000,32000,48000\" channelMasks=\"AUDIO_CHANNEL_IN_MONO\"/>
+                </mixPort>
+                <mixPort name=\"usb_surround_sound\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,88200,96000,176400,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_INDEX_MASK_3,AUDIO_CHANNEL_INDEX_MASK_4,AUDIO_CHANNEL_IN_5POINT1,AUDIO_CHANNEL_INDEX_MASK_6,AUDIO_CHANNEL_IN_7POINT1,AUDIO_CHANNEL_INDEX_MASK_8\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_32_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,88200,96000,176400,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_5POINT1,AUDIO_CHANNEL_INDEX_MASK_6,AUDIO_CHANNEL_IN_7POINT1,AUDIO_CHANNEL_INDEX_MASK_8\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_FLOAT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,88200,96000,176400,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_5POINT1,AUDIO_CHANNEL_INDEX_MASK_6,AUDIO_CHANNEL_IN_7POINT1,AUDIO_CHANNEL_INDEX_MASK_8\"/>
+                </mixPort>
+                <mixPort name=\"record_24\" role=\"sink\" maxOpenCount=\"2\" maxActiveCount=\"2\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_24_BIT_PACKED\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,96000,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_INDEX_MASK_3,AUDIO_CHANNEL_INDEX_MASK_4\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_8_24_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,96000,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_INDEX_MASK_3,AUDIO_CHANNEL_INDEX_MASK_4\"/>
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_FLOAT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000,96000,192000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_INDEX_MASK_3,AUDIO_CHANNEL_INDEX_MASK_4\"/>
+                </mixPort>'''
+content = content.replace(old, new, 1)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing voip_tx sink mixPort with hifi_input+fast_input at end of mixPorts in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '''                <mixPort name=\"voip_tx\" role=\"sink\"
+                         flags=\"AUDIO_INPUT_FLAG_VOIP_TX\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000,32000,48000\" channelMasks=\"AUDIO_CHANNEL_IN_MONO\"/>
+                </mixPort>
+            </mixPorts>'''
+new = '''                <mixPort name=\"voice_rx\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000,48000\" channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO\"/>
+                </mixPort>
+                <mixPort name=\"hifi_input\" role=\"sink\" />
+                <mixPort name=\"fast input\" role=\"sink\"
+                         flags=\"AUDIO_INPUT_FLAG_FAST\">
+                     <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                              samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                              channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK\"/>
+                </mixPort>
+            </mixPorts>'''
+content = content.replace(old, new, 1)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing devicePorts section in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '''            <devicePorts>
+                <devicePort tagName=\"Earpiece\" type=\"AUDIO_DEVICE_OUT_EARPIECE\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"Speaker\" type=\"AUDIO_DEVICE_OUT_SPEAKER\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"Speaker Safe\" type=\"AUDIO_DEVICE_OUT_SPEAKER_SAFE\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"BT SCO\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_SCO\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"BT SCO Headset\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"BT SCO Car Kit\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"Telephony Tx\" type=\"AUDIO_DEVICE_OUT_TELEPHONY_TX\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"USB Device Out\" type=\"AUDIO_DEVICE_OUT_USB_DEVICE\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"USB Headset Out\" type=\"AUDIO_DEVICE_OUT_USB_HEADSET\" role=\"sink\">
+                </devicePort>
+                <devicePort tagName=\"BT A2DP Out\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_A2DP\" role=\"sink\"
+                            encodedFormats=\"AUDIO_FORMAT_LDAC AUDIO_FORMAT_APTX AUDIO_FORMAT_APTX_HD AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"44100,48000,88200,96000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"BT A2DP Headphones\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES\" role=\"sink\"
+                            encodedFormats=\"AUDIO_FORMAT_LDAC AUDIO_FORMAT_APTX AUDIO_FORMAT_APTX_HD AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"44100,48000,88200,96000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"BT A2DP Speaker\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER\" role=\"sink\"
+                            encodedFormats=\"AUDIO_FORMAT_LDAC AUDIO_FORMAT_APTX AUDIO_FORMAT_APTX_HD AUDIO_FORMAT_AAC AUDIO_FORMAT_SBC\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"44100,48000,88200,96000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"Built-In Mic\" type=\"AUDIO_DEVICE_IN_BUILTIN_MIC\" role=\"source\">
+                </devicePort>
+                <devicePort tagName=\"Built-In Back Mic\" type=\"AUDIO_DEVICE_IN_BACK_MIC\" role=\"source\">
+                </devicePort>
+                <devicePort tagName=\"BT SCO Headset Mic\" type=\"AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET\" role=\"source\">
+                </devicePort>
+                <devicePort tagName=\"Telephony Rx\" type=\"AUDIO_DEVICE_IN_TELEPHONY_RX\" role=\"source\">
+                </devicePort>
+                <!-- TODO: Enable multi-channel recording -->
+                <devicePort tagName=\"USB Device In\" type=\"AUDIO_DEVICE_IN_USB_DEVICE\" role=\"source\">
+                </devicePort>
+                <devicePort tagName=\"USB Headset In\" type=\"AUDIO_DEVICE_IN_USB_HEADSET\" role=\"source\">'''
+new = '''            <devicePorts>
+                <!-- Output devices declaration, i.e. Sink DEVICE PORT -->
+                <devicePort tagName=\"Earpiece\" type=\"AUDIO_DEVICE_OUT_EARPIECE\" role=\"sink\">
+                   <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                            samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_MONO\"/>
+                </devicePort>
+                <devicePort tagName=\"Speaker\" role=\"sink\" type=\"AUDIO_DEVICE_OUT_SPEAKER\" address=\"\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"Wired Headset\" type=\"AUDIO_DEVICE_OUT_WIRED_HEADSET\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"Wired Headphones\" type=\"AUDIO_DEVICE_OUT_WIRED_HEADPHONE\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"Line\" type=\"AUDIO_DEVICE_OUT_LINE\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"BT SCO\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_SCO\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000\" channelMasks=\"AUDIO_CHANNEL_OUT_MONO\"/>
+                </devicePort>
+                <devicePort tagName=\"BT SCO Headset\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000\" channelMasks=\"AUDIO_CHANNEL_OUT_MONO\"/>
+                </devicePort>
+                <devicePort tagName=\"BT SCO Car Kit\" type=\"AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000\" channelMasks=\"AUDIO_CHANNEL_OUT_MONO\"/>
+                </devicePort>
+                <devicePort tagName=\"Telephony Tx\" type=\"AUDIO_DEVICE_OUT_TELEPHONY_TX\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000\" channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"HDMI\" type=\"AUDIO_DEVICE_OUT_AUX_DIGITAL\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,16000,22050,32000,44100,48000,64000,88200,96000,128000,176400,192000\" channelMasks=\"dynamic\"/>
+                </devicePort>
+                <devicePort tagName=\"Proxy\" type=\"AUDIO_DEVICE_OUT_PROXY\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,16000,22050,32000,44100,48000,64000,88200,96000,128000,176400,192000\" channelMasks=\"dynamic\"/>
+                </devicePort>
+                <devicePort tagName=\"FM\" type=\"AUDIO_DEVICE_OUT_FM\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\" channelMasks=\"AUDIO_CHANNEL_OUT_MONO,AUDIO_CHANNEL_OUT_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"USB Device Out\" type=\"AUDIO_DEVICE_OUT_USB_DEVICE\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"44100,48000,64000,88200,96000,128000,176400,192000\" channelMasks=\"dynamic\"/>
+                </devicePort>
+                <devicePort tagName=\"USB Headset Out\" type=\"AUDIO_DEVICE_OUT_USB_HEADSET\" role=\"sink\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"44100,48000,64000,88200,96000,128000,176400,192000\" channelMasks=\"dynamic\"/>
+                </devicePort>
+
+                <!-- Input devices declaration, i.e. Source DEVICE PORT -->
+                <devicePort tagName=\"Built-In Mic\" type=\"AUDIO_DEVICE_IN_BUILTIN_MIC\" role=\"source\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK\"/>
+                </devicePort>
+                <devicePort tagName=\"Built-In Back Mic\" type=\"AUDIO_DEVICE_IN_BACK_MIC\" role=\"source\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK\"/>
+                </devicePort>
+                <devicePort tagName=\"FM Tuner\" type=\"AUDIO_DEVICE_IN_FM_TUNER\" role=\"source\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO\"/>
+                </devicePort>
+                <devicePort tagName=\"Wired Headset Mic\" type=\"AUDIO_DEVICE_IN_WIRED_HEADSET\" role=\"source\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"
+                             channelMasks=\"AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK\"/>
+                </devicePort>
+                <devicePort tagName=\"BT SCO Headset Mic\" type=\"AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET\" role=\"source\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000\" channelMasks=\"AUDIO_CHANNEL_IN_MONO\"/>
+                </devicePort>
+                <devicePort tagName=\"Telephony Rx\" type=\"AUDIO_DEVICE_IN_TELEPHONY_RX\" role=\"source\">
+                    <profile name=\"\" format=\"AUDIO_FORMAT_PCM_16_BIT\"
+                             samplingRates=\"8000,16000,48000\" channelMasks=\"AUDIO_CHANNEL_IN_MONO\"/>
+                </devicePort>
+                <devicePort tagName=\"USB Device In\" type=\"AUDIO_DEVICE_IN_USB_DEVICE\" role=\"source\">
+                </devicePort>
+                <devicePort tagName=\"USB Headset In\" type=\"AUDIO_DEVICE_IN_USB_HEADSET\" role=\"source\">'''
+content = content.replace(old, new, 1)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing routes section in etc/audio_policy_configuration.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '''            <routes>
+                <route type=\"mix\" sink=\"Earpiece\"
+                       sources=\"primary output,raw,deep_buffer,mmap_no_irq_out,voip_rx\"/>
+                <route type=\"mix\" sink=\"Speaker\"
+                       sources=\"primary output,raw,deep_buffer,compressed_offload,mmap_no_irq_out,voip_rx\"/>
+                <route type=\"mix\" sink=\"Speaker Safe\"
+                       sources=\"primary output,raw,deep_buffer,compressed_offload,mmap_no_irq_out,voip_rx\"/>
+                <route type=\"mix\" sink=\"BT SCO\"
+                       sources=\"primary output,raw,deep_buffer,voip_rx\"/>
+                <route type=\"mix\" sink=\"BT SCO Headset\"
+                       sources=\"primary output,raw,deep_buffer,voip_rx\"/>
+                <route type=\"mix\" sink=\"BT SCO Car Kit\"
+                       sources=\"primary output,raw,deep_buffer,voip_rx\"/>
+                <route type=\"mix\" sink=\"USB Device Out\"
+                       sources=\"primary output,raw,deep_buffer,compressed_offload,hifi_playback,mmap_no_irq_out,voip_rx\"/>
+                <route type=\"mix\" sink=\"USB Headset Out\"
+                       sources=\"primary output,raw,deep_buffer,compressed_offload,hifi_playback,mmap_no_irq_out,voip_rx\"/>
+                <route type=\"mix\" sink=\"Telephony Tx\"
+                       sources=\"voice_tx,incall_music_uplink\"/>
+                <route type=\"mix\" sink=\"primary input\"
+                       sources=\"Built-In Mic,Built-In Back Mic,BT SCO Headset Mic,USB Device In,USB Headset In\"/>
+                <route type=\"mix\" sink=\"fast input\"
+                       sources=\"Built-In Mic,Built-In Back Mic,BT SCO Headset Mic,USB Device In,USB Headset In\"/>
+                <route type=\"mix\" sink=\"voice_rx\"
+                       sources=\"Telephony Rx\"/>
+                <route type=\"mix\" sink=\"hifi_input\" sources=\"USB Device In,USB Headset In\" />
+                <route type=\"mix\" sink=\"mmap_no_irq_in\"
+                       sources=\"Built-In Mic,Built-In Back Mic,USB Device In,USB Headset In\"/>
+                <route type=\"mix\" sink=\"voip_tx\"
+                       sources=\"Built-In Mic,Built-In Back Mic,BT SCO Headset Mic,USB Device In,USB Headset In\"/>
+                <route type=\"mix\" sink=\"BT A2DP Out\"
+                       sources=\"primary output,deep_buffer,compressed_offload,voip_rx\"/>
+                <route type=\"mix\" sink=\"BT A2DP Headphones\"
+                       sources=\"primary output,deep_buffer,compressed_offload,voip_rx\"/>
+                <route type=\"mix\" sink=\"BT A2DP Speaker\"
+                       sources=\"primary output,deep_buffer,compressed_offload,voip_rx\"/>
+            </routes>'''
+new = '''            <!-- route declaration, i.e. list all available sources for a given sink -->
+            <routes>
+                <route type=\"mix\" sink=\"Earpiece\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,voip_rx,mmap_no_irq_out\"/>
+                <route type=\"mix\" sink=\"Speaker\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,voip_rx,mmap_no_irq_out\"/>
+                <route type=\"mix\" sink=\"Wired Headset\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,dsd_compress_passthrough,voip_rx,mmap_no_irq_out\"/>
+                <route type=\"mix\" sink=\"Wired Headphones\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,dsd_compress_passthrough,voip_rx,mmap_no_irq_out\"/>
+                <route type=\"mix\" sink=\"Line\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,dsd_compress_passthrough,voip_rx,mmap_no_irq_out\"/>
+                <route type=\"mix\" sink=\"HDMI\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,compress_passthrough,voip_rx\"/>
+                <route type=\"mix\" sink=\"Proxy\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload\"/>
+                <route type=\"mix\" sink=\"FM\"
+                       sources=\"primary output\"/>
+                <route type=\"mix\" sink=\"BT SCO\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,voip_rx\"/>
+                <route type=\"mix\" sink=\"BT SCO Headset\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,voip_rx\"/>
+                <route type=\"mix\" sink=\"BT SCO Car Kit\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,voip_rx\"/>
+                <route type=\"mix\" sink=\"USB Device Out\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,voip_rx,mmap_no_irq_out,hifi_playback\"/>
+                <route type=\"mix\" sink=\"USB Headset Out\"
+                       sources=\"primary output,raw,deep_buffer,direct_pcm,compressed_offload,voip_rx,mmap_no_irq_out,hifi_playback\"/>
+                <route type=\"mix\" sink=\"Telephony Tx\"
+                       sources=\"voice_tx,incall_music_uplink\"/>
+                <route type=\"mix\" sink=\"hotword input\"
+                       sources=\"Built-In Mic,Built-In Back Mic,BT SCO Headset Mic,USB Device In,USB Headset In\"/>
+                <route type=\"mix\" sink=\"voice_rx\"
+                       sources=\"Telephony Rx\"/>
+                <route type=\"mix\" sink=\"primary input\"
+                       sources=\"Built-In Mic,Built-In Back Mic,Wired Headset Mic,BT SCO Headset Mic,USB Device In,USB Headset In,Telephony Rx\"/>
+                <route type=\"mix\" sink=\"uplink downlink input\"
+                       sources=\"Wired Headset Mic,BT SCO Headset Mic,USB Device In,USB Headset In,Telephony Rx\"/>
+                <route type=\"mix\" sink=\"voip_tx\"
+                       sources=\"Built-In Mic,Built-In Back Mic,Wired Headset Mic,BT SCO Headset Mic,USB Device In,USB Headset In,Telephony Rx\"/>
+                <route type=\"mix\" sink=\"usb_surround_sound\"
+                       sources=\"USB Device In,USB Headset In\"/>
+                <route type=\"mix\" sink=\"record_24\"
+                       sources=\"Built-In Mic,Built-In Back Mic,Wired Headset Mic,BT SCO Headset Mic\"/>
+                <route type=\"mix\" sink=\"mmap_no_irq_in\"
+                       sources=\"Built-In Mic,Built-In Back Mic,Wired Headset Mic,USB Device In,USB Headset In\"/>
+                <route type=\"mix\" sink=\"hifi_input\" sources=\"USB Device In,USB Headset In\" />
+                <route type=\"mix\" sink=\"fast input\"
+                       sources=\"Built-In Mic,Built-In Back Mic,BT SCO Headset Mic,USB Device In,USB Headset In,Wired Headset Mic\"/>
+            </routes>'''
+content = content.replace(old, new, 1)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing inline a2dp module with xi:include in etc/audio_policy_configuration.xml"
+    python3 -c "
+import re
+content = open('$FILE').read()
+content = re.sub(
+    r'        <module name=\"a2dp\" halVersion=\"2\.0\">.*?</module>',
+    '        <xi:include href=\"/vendor/etc/a2dp_in_audio_policy_configuration.xml\"/>',
+    content, flags=re.DOTALL
+)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Fixing r_submix include path in etc/audio_policy_configuration.xml"
+    sed -i 's|href="r_submix_audio_policy_configuration.xml"|href="/vendor/etc/r_submix_audio_policy_configuration.xml"|' "$FILE"
+
+    log_in "Adding bluetooth_audio_policy_configuration include in etc/audio_policy_configuration.xml"
+    sed -i 's|        <xi:include href="/vendor/etc/r_submix_audio_policy_configuration.xml"/>|        <xi:include href="/vendor/etc/r_submix_audio_policy_configuration.xml"/>\n\n        <!-- Bluetooth Audio HAL -->\n        <xi:include href="/vendor/etc/bluetooth_audio_policy_configuration.xml"/>|' "$FILE"
+
+    log_in "Fixing volume include paths in etc/audio_policy_configuration.xml"
+    sed -i 's|href="audio_policy_volumes.xml"|href="/vendor/etc/audio_policy_volumes.xml"|' "$FILE"
+    sed -i 's|href="default_volume_tables.xml"|href="/vendor/etc/default_volume_tables.xml"|' "$FILE"
+}
+
+patch_audio_policy_volumes() {
+    local FILE="$VENDOR/etc/audio_policy_volumes.xml"
+
+    log_in "Replacing VOICE_CALL EARPIECE first point -2400 with -2500 in etc/audio_policy_volumes.xml"
+    sed -i '/AUDIO_STREAM_VOICE_CALL.*DEVICE_CATEGORY_EARPIECE/,/\/volume/ s/<point>0,-2400<\/point>/<point>0,-2500<\/point>/' "$FILE"
+
+    log_in "Replacing AUDIO_STREAM_SYSTEM SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '    <volume stream=\"AUDIO_STREAM_SYSTEM\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\"\n                                         ref=\"DEFAULT_SYSTEM_VOLUME_CURVE\"/>'
+new = '''    <volume stream=\"AUDIO_STREAM_SYSTEM\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\">
+        <point>1,-4400</point>
+        <point>57,-2400</point>
+        <point>71,-2100</point>
+        <point>85,-1900</point>
+        <point>100,-1700</point>
+    </volume>'''
+content = content.replace(old, new)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing AUDIO_STREAM_ENFORCED_AUDIBLE SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '    <volume stream=\"AUDIO_STREAM_ENFORCED_AUDIBLE\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\"\n                                                   ref=\"DEFAULT_SYSTEM_VOLUME_CURVE\"/>'
+new = '''    <volume stream=\"AUDIO_STREAM_ENFORCED_AUDIBLE\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\">
+        <point>1,-3400</point>
+        <point>71,-2400</point>
+        <point>100,-2000</point>
+    </volume>'''
+content = content.replace(old, new)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Replacing AUDIO_STREAM_DTMF SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
+    python3 -c "
+content = open('$FILE').read()
+old = '    <volume stream=\"AUDIO_STREAM_DTMF\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\"\n                                       ref=\"DEFAULT_SYSTEM_VOLUME_CURVE\"/>'
+new = '''    <volume stream=\"AUDIO_STREAM_DTMF\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\">
+        <point>1,-3700</point>
+        <point>71,-2100</point>
+        <point>100,-1100</point>
+    </volume>'''
+content = content.replace(old, new)
+open('$FILE', 'w').write(content)
+"
+}
+
+patch_default_volume_tables() {
+    local FILE="$VENDOR/etc/default_volume_tables.xml"
+
+    log_in "Replacing DEFAULT_SYSTEM_VOLUME_CURVE last point -600 with 0 in etc/default_volume_tables.xml"
+    sed -i '0,/<point>100,-600<\/point>/ s/<point>100,-600<\/point>/<point>100,0<\/point>/' "$FILE"
+
+    log_in "Replacing DEFAULT_DEVICE_CATEGORY_SPEAKER_VOLUME_CURVE points in etc/default_volume_tables.xml"
+    sed -i 's/<point>1,-4950<\/point>/<point>1,-5800<\/point>/' "$FILE"
+    sed -i 's/<point>20,-3350<\/point>/<point>20,-4000<\/point>/' "$FILE"
+
+    log_in "Replacing last point -1000 with 0 (two occurrences) in etc/default_volume_tables.xml"
+    sed -i 's/<point>100,-1000<\/point>/<point>100,0<\/point>/g' "$FILE"
+}
+
+patch_fstab() {
+    for f in fstab.default fstab.emmc; do
+        local FILE="$VENDOR/etc/$f"
+
+        log_in "Removing AVB flags from system/system_ext/product/vendor in etc/$f"
+        sed -i 's/wait,logical,first_stage_mount,avb=vbmeta_system,avb_keys=\/avb\/q-gsi.avbpubkey:\/avb\/r-gsi.avbpubkey:\/avb\/s-gsi.avbpubkey/wait,logical,first_stage_mount/' "$FILE"
+        sed -i 's/wait,logical,first_stage_mount,avb=vbmeta_system/wait,logical,first_stage_mount/' "$FILE"
+        sed -i 's/wait,logical,first_stage_mount,avb/wait,logical,first_stage_mount/' "$FILE"
+
+        log_in "Removing fileencryption/wrappedkey/quota flags from userdata in etc/$f"
+        sed -i 's/latemount,wait,check,formattable,fileencryption=ice,wrappedkey,quota,reservedsize=128M,checkpoint=fs/latemount,wait,check,formattable,reservedsize=128M,checkpoint=fs/' "$FILE"
+
+        log_in "Replacing zramsize=1073741824 with zramsize=4096M in etc/$f"
+        sed -i 's/zramsize=1073741824/zramsize=4096M/' "$FILE"
     done
 }
- 
-disable_avb() {
-    log_info "Removing Android Verified Boot from fstab"
-    while IFS= read -r fstab; do
-        sed -i 's/,avb_keys=[^ ]*//g' "$fstab"
-        sed -i 's/,avb=vbmeta_system//g' "$fstab"
-        sed -i 's/,avb=vbmeta_vendor//g' "$fstab"
-        sed -i 's/,avb=vbmeta//g' "$fstab"
-        sed -i 's/,avb,/,/g' "$fstab"
-        sed -i 's/,avb$//g' "$fstab"
-    done < <(find baserom/ portrom/ -name "fstab.*" 2>/dev/null)
+
+patch_group_passwd() {
+    log_in "Adding vendor_launcher and vendor_saures to etc/group"
+    cat >> "$VENDOR/etc/group" << 'EOF'
+vendor_launcher::2988:
+vendor_saures::2989:
+EOF
+
+    log_in "Adding vendor_launcher and vendor_saures to etc/passwd"
+    cat >> "$VENDOR/etc/passwd" << 'EOF'
+vendor_launcher::2988:2988::/:/bin/sh
+vendor_saures::2989:2989::/:/bin/sh
+EOF
+}
+
+patch_init_qcom_factory() {
+    local FILE="$VENDOR/etc/init/hw/init.qcom.factory.rc"
+
+    log_in "Adding author signature at end of etc/init/hw/init.qcom.factory.rc"
+    printf '\n\n\n# authored by diza u muna.' >> "$FILE"
+}
+
+patch_init_qcom_rc() {
+    local FILE="$VENDOR/etc/init/hw/init.qcom.rc"
+
+    log_in "Adding init.custom_xd.rc import in etc/init/hw/init.qcom.rc"
+    sed -i 's|import /vendor/etc/init/hw/init.qcom.test.rc|import /vendor/etc/init/hw/init.qcom.test.rc\nimport /vendor/etc/init/hw/init.custom_xd.rc|' "$FILE"
+
+    log_in "Adding start systemService on boot in etc/init/hw/init.qcom.rc"
+    sed -i 's/on boot$/on boot\n    start systemService/' "$FILE"
+
+    log_in "Adding systemService service definition in etc/init/hw/init.qcom.rc"
+    sed -i 's|    # limit discard size to 128MB in order to avoid long IO latency\n    write /sys/block/sda/queue/discard_max_bytes 134217728|    # limit discard size to 128MB in order to avoid long IO latency\n    write /sys/block/sda/queue/discard_max_bytes 134217728\n\nservice systemService /vendor/bin/systemService\n       class main\n    user root\n       group shell|' "$FILE"
+    # sed above may fail on multiline; use python3 instead
+    python3 -c "
+content = open('$FILE').read()
+old = '    write /sys/block/sda/queue/discard_max_bytes 134217728\n\n# msm specific files'
+new = '    write /sys/block/sda/queue/discard_max_bytes 134217728\n\nservice systemService /vendor/bin/systemService\n       class main\n    user root\n       group shell\n\n# msm specific files'
+content = content.replace(old, new, 1)
+open('$FILE', 'w').write(content)
+"
+}
+
+patch_init_target_rc() {
+    local FILE="$VENDOR/etc/init/hw/init.target.rc"
+
+    log_in "Replacing cnss_diag flags -q -f -t with -q -t in etc/init/hw/init.target.rc"
+    sed -i 's|cnss_diag -q -f -t HELIUM|cnss_diag -q -t HELIUM|' "$FILE"
+
+    log_in "Adding trailing newline at end of etc/init/hw/init.target.rc"
+    echo "" >> "$FILE"
+}
+
+patch_thermal_engine_rc() {
+    local FILE="$VENDOR/etc/init/init_thermal-engine.rc"
+
+    log_in "Commenting out thermal-engine service in etc/init/init_thermal-engine.rc"
+    python3 -c "
+content = open('$FILE').read()
+old = '''service thermal-engine /vendor/bin/thermal-engine
+       class main
+       user root
+       group root
+       socket thermal-send-client stream 0660 system oem_2907
+       socket thermal-recv-client stream 0660 system oem_2907
+       socket thermal-recv-passive-client stream 0660 system oem_2907
+       socket thermal-send-rule stream 0660 system oem_2907
+
+on property:sys.boot_completed=1
+       restart thermal-engine'''
+new = '''# service thermal-engine /vendor/bin/thermal-engine
+       # class main
+       # user root
+       # group root
+       # socket thermal-send-client stream 0660 system oem_2907
+       # socket thermal-recv-client stream 0660 system oem_2907
+       # socket thermal-recv-passive-client stream 0660 system oem_2907
+       # socket thermal-send-rule stream 0660 system oem_2907
+
+# on property:sys.boot_completed=1
+       # restart thermal-engine'''
+content = content.replace(old, new)
+open('$FILE', 'w').write(content)
+"
+}
+
+patch_selinux() {
+    log_in "Replacing 'sustem' typo with 'system' in etc/selinux/vendor_file_contexts"
+    sed -i 's|(vendor|sustem/vendor)|(vendor|system/vendor)|' "$VENDOR/etc/selinux/vendor_file_contexts"
+
+    log_in "Replacing precompiled_sepolicy.plat hash in etc/selinux/"
+    echo "506031746a363e32bf6bc24a7d552c2ba77df8dc069835f15cccb6e72110104f" > "$VENDOR/etc/selinux/precompiled_sepolicy.plat_sepolicy_and_mapping.sha256"
+
+    log_in "Replacing precompiled_sepolicy.product hash in etc/selinux/"
+    echo "a679a0438c691aa4557bf80c3c0d076a2d1ae709b32e8f52cddf8ba109aa0030" > "$VENDOR/etc/selinux/precompiled_sepolicy.product_sepolicy_and_mapping.sha256"
+
+    log_in "Replacing precompiled_sepolicy.system_ext hash in etc/selinux/"
+    echo "289aa0e0f85a5b969caf9f57847bbbb5a157ea3dec6fc8ebe17d12ff92d7c2bd" > "$VENDOR/etc/selinux/precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256"
+}
+
+patch_thermal_engine_map() {
+    local FILE="$VENDOR/etc/thermal-engine-map.conf"
+
+    log_in "Replacing thermal-engine-map.conf entries with joyeuse-suffixed names"
+    cat > "$FILE" << 'EOF'
+[0:thermal-engine-normal-joyeuse.conf]
+[1:thermal-engine-high-joyeuse.conf]
+[2:thermal-engine-extreme-joyeuse.conf]
+[8:thermal-engine-phone-joyeuse.conf]
+[9:thermal-engine-sgame-joyeuse.conf]
+[10:thermal-engine-nolimits-joyeuse.conf]
+[11:thermal-engine-class0-joyeuse.conf]
+[12:thermal-engine-camera-joyeuse.conf]
+[13:thermal-engine-pubgmhd-joyeuse.conf]
+[14:thermal-engine-youtobe-joyeuse.conf]
+[15:thermal-engine-arvr-joyeuse.conf]
+[16:thermal-engine-tgame-joyeuse.conf]
+EOF
+}
+
+patch_vintf_manifest() {
+    local FILE="$VENDOR/etc/vintf/manifest.xml"
+
+    log_in "Removing android.hardware.nfc HAL block from etc/vintf/manifest.xml"
+    python3 -c "
+import re
+content = open('$FILE').read()
+content = re.sub(r'    <hal format=\"hidl\">\n        <name>android\.hardware\.nfc</name>.*?</hal>\n', '', content, flags=re.DOTALL)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Removing android.hardware.secure_element HAL block from etc/vintf/manifest.xml"
+    python3 -c "
+import re
+content = open('$FILE').read()
+content = re.sub(r'    <hal format=\"hidl\">\n        <name>android\.hardware\.secure_element</name>.*?</hal>\n', '', content, flags=re.DOTALL)
+open('$FILE', 'w').write(content)
+"
+
+    log_in "Removing vendor.nxp.hardware.nfc HAL block from etc/vintf/manifest.xml"
+    python3 -c "
+import re
+content = open('$FILE').read()
+content = re.sub(r'    <hal format=\"hidl\">\n        <name>vendor\.nxp\.hardware\.nfc</name>.*?</hal>\n', '', content, flags=re.DOTALL)
+open('$FILE', 'w').write(content)
+"
+}
+
+patch_wifi() {
+    local FILE="$VENDOR/etc/wifi/WCNSS_qcom_cfg.ini"
+
+    log_in "Replacing gChannelBondingMode24GHz=0 with 1 in etc/wifi/WCNSS_qcom_cfg.ini"
+    sed -i 's/gChannelBondingMode24GHz=0/gChannelBondingMode24GHz=1/' "$FILE"
+
+    log_in "Replacing sae_enabled=0 with 1 in etc/wifi/WCNSS_qcom_cfg.ini"
+    sed -i 's/sae_enabled=0/sae_enabled=1/' "$FILE"
+}
+
+patch_qcril_sql() {
+    local FILE="$VENDOR/radio/qcril_database/upgrade/0_initial.sql"
+
+    log_in "Adding MCC 454 emergency entries to radio/qcril_database/upgrade/0_initial.sql"
+    sed -i "/INSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('450','911','','');/a INSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('454','112','','');\nINSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('454','110','','');\nINSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('454','999','','');\nINSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('454','911','','');" "$FILE"
+}
+
+patch_ueventd() {
+    log_in "Replacing /dev/diag permission 0660 with 0666 in ueventd.rc"
+    sed -i 's|/dev/diag                 0660   system     oem_2901|/dev/diag                 0666   system     oem_2901|' "$VENDOR/ueventd.rc"
 }
  
 patch_semi_vendor() {
@@ -961,11 +1759,28 @@ main() {
     done
  
     move_my_partitions_to_system
-    patch_port_buildprops
-    patch_port_init
-    patch_port_vendor
-    disable_avb
-    disable_encryption
+    patch_props
+    patch_odm
+    add_custom_props
+    patch_odm_media_profiles
+    patch_audio_effects
+    patch_audio_io_policy
+    patch_audio_platform_info
+    patch_audio_policy_configuration
+    patch_audio_policy_volumes
+    patch_default_volume_tables
+    patch_fstab
+    patch_group_passwd
+    patch_init_qcom_factory
+    patch_init_qcom_rc
+    patch_init_target_rc
+    patch_thermal_engine_rc
+    patch_selinux
+    patch_thermal_engine_map
+    patch_vintf_manifest
+    patch_wifi
+    patch_qcril_sql
+    patch_ueventd
     patch_file_contexts
     patch_semi_vendor
     debloat
