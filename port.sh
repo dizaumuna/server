@@ -272,63 +272,63 @@ patch_file_contexts() {
 patch_props() {
     local FILE="$VENDOR/build.prop"
 
-    log_in "Replacing ro.vendor.build.security_patch 2023-02-01 with 2023-04-01 in vendor/build.prop"
+    log_info "Replacing ro.vendor.build.security_patch 2023-02-01 with 2023-04-01 in vendor/build.prop"
     sed -i 's/ro.vendor.build.security_patch=2023-02-01/ro.vendor.build.security_patch=2023-04-01/' "$FILE"
-    log_in "Replacing ro.product.board=joyeuse with miatoll in vendor/build.prop"
+    log_info "Replacing ro.product.board=joyeuse with miatoll in vendor/build.prop"
     sed -i 's/ro.product.board=joyeuse/ro.product.board=miatoll/' "$FILE"
-    log_in "Replacing joyeuse/special_ro.prop comment with miatoll in vendor/build.prop"
+    log_info "Replacing joyeuse/special_ro.prop comment with miatoll in vendor/build.prop"
     sed -i 's|# from device/xiaomi/joyeuse/special_ro.prop|# from device/xiaomi/miatoll/special_ro.prop|' "$FILE"
-    log_in "Replacing joyeuse/system_12.prop comment with miatoll in vendor/build.prop"
+    log_info "Replacing joyeuse/system_12.prop comment with miatoll in vendor/build.prop"
     sed -i 's|# from device/xiaomi/joyeuse/system_12.prop|# from device/xiaomi/miatoll/system_12.prop|' "$FILE"
-    log_in "Replacing '# enable temp dds' block with thermal configs block in vendor/build.prop"
+    log_info "Replacing '# enable temp dds' block with thermal configs block in vendor/build.prop"
     sed -i 's/# enable temp dds/#thermal configs path\nsys.thermal.data.path=\/data\/vendor\/thermal\/\n\n#enable temp dds/' "$FILE"
-    log_in "Removing persist.vendor.radio.manual_nw_rej_ct=1 from vendor/build.prop"
+    log_info "Removing persist.vendor.radio.manual_nw_rej_ct=1 from vendor/build.prop"
     sed -i '/persist.vendor.radio.manual_nw_rej_ct=1/d' "$FILE"
-    log_in "Replacing ro.build.version.release=12 with 15 in vendor/build.prop"
+    log_info "Replacing ro.build.version.release=12 with 15 in vendor/build.prop"
     sed -i 's/ro.build.version.release=12/ro.build.version.release=15/' "$FILE"
-    log_in "Replacing end of joyeuse/system_12.prop comment with miatoll in vendor/build.prop"
+    log_info "Replacing end of joyeuse/system_12.prop comment with miatoll in vendor/build.prop"
     sed -i 's|# end of device/xiaomi/joyeuse/system_12.prop|# end of device/xiaomi/miatoll/system_12.prop|' "$FILE"
-    log_in "Replacing joyeuse/special_rw.prop comment with miatoll in vendor/build.prop"
+    log_info "Replacing joyeuse/special_rw.prop comment with miatoll in vendor/build.prop"
     sed -i 's|# from device/xiaomi/joyeuse/special_rw.prop|# from device/xiaomi/miatoll/special_rw.prop|' "$FILE"
-    log_in "Replacing ro.vendor.build.date with miatoll date in vendor/build.prop"
+    log_info "Replacing ro.vendor.build.date with miatoll date in vendor/build.prop"
     sed -i 's/ro.vendor.build.date=Tue Mar  7 12:12:31 CST 2023/ro.vendor.build.date=Mon Apr 10 17:14:21 CST 2023/' "$FILE"
-    log_in "Replacing ro.vendor.build.date.utc with miatoll value in vendor/build.prop"
+    log_info "Replacing ro.vendor.build.date.utc with miatoll value in vendor/build.prop"
     sed -i 's/ro.vendor.build.date.utc=1678162351/ro.vendor.build.date.utc=1681118061/' "$FILE"
-    log_in "Replacing ro.vendor.build.fingerprint with miatoll in vendor/build.prop"
+    log_info "Replacing ro.vendor.build.fingerprint with miatoll in vendor/build.prop"
     sed -i 's|ro.vendor.build.fingerprint=Redmi/joyeuse_global/joyeuse:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys|ro.vendor.build.fingerprint=Redmi/miatoll_global/miatoll:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys|' "$FILE"
-    log_in "Replacing ro.vendor.build.id=RKQ1.211019.001 with AQ3A.240912.001 in vendor/build.prop"
+    log_info "Replacing ro.vendor.build.id=RKQ1.211019.001 with AQ3A.240912.001 in vendor/build.prop"
     sed -i 's/ro.vendor.build.id=RKQ1.211019.001/ro.vendor.build.id=AQ3A.240912.001/' "$FILE"
-    log_in "Removing ro.vendor.build.version.incremental from vendor/build.prop"
+    log_info "Removing ro.vendor.build.version.incremental from vendor/build.prop"
     sed -i '/ro.vendor.build.version.incremental=V14.0.3.0.SJZMIXM/d' "$FILE"
-    log_in "Replacing ro.vendor.build.version.release_or_codename=12 with 15 in vendor/build.prop"
+    log_info "Replacing ro.vendor.build.version.release_or_codename=12 with 15 in vendor/build.prop"
     sed -i 's/ro.vendor.build.version.release_or_codename=12/ro.vendor.build.version.release_or_codename=15/' "$FILE"
-    log_in "Replacing ro.vendor.build.version.sdk=30 with 35 in vendor/build.prop"
+    log_info "Replacing ro.vendor.build.version.sdk=30 with 35 in vendor/build.prop"
     sed -i 's/ro.vendor.build.version.sdk=30/ro.vendor.build.version.sdk=35/' "$FILE"
-    log_in "Replacing ro.product.vendor.device=joyeuse with miatoll in vendor/build.prop"
+    log_info "Replacing ro.product.vendor.device=joyeuse with miatoll in vendor/build.prop"
     sed -i 's/ro.product.vendor.device=joyeuse/ro.product.vendor.device=miatoll/' "$FILE"
-    log_in "Replacing ro.product.vendor.model with Redmi Note 9 Pro Max in vendor/build.prop"
+    log_info "Replacing ro.product.vendor.model with Redmi Note 9 Pro Max in vendor/build.prop"
     sed -i 's/ro.product.vendor.model=Redmi Note 9 Pro$/ro.product.vendor.model=Redmi Note 9 Pro Max/' "$FILE"
-    log_in "Replacing ro.product.vendor.name=joyeuse_global with miatoll in vendor/build.prop"
+    log_info "Replacing ro.product.vendor.name=joyeuse_global with miatoll in vendor/build.prop"
     sed -i 's/ro.product.vendor.name=joyeuse_global/ro.product.vendor.name=miatoll/' "$FILE"
-    log_in "Replacing ro.product.vendor.marketname with Redmi Note 9 Pro Max in vendor/build.prop"
+    log_info "Replacing ro.product.vendor.marketname with Redmi Note 9 Pro Max in vendor/build.prop"
     sed -i 's/ro.product.vendor.marketname=$/ro.product.vendor.marketname=Redmi Note 9 Pro Max/' "$FILE"
-    log_in "Adding # ro.product.mod_device=miatoll after marketname in vendor/build.prop"
+    log_info "Adding # ro.product.mod_device=miatoll after marketname in vendor/build.prop"
     sed -i '/ro.product.vendor.marketname=Redmi Note 9 Pro Max/a # ro.product.mod_device=miatoll' "$FILE"
-    log_in "Replacing ro.bootimage.build.date with miatoll date in vendor/build.prop"
+    log_info "Replacing ro.bootimage.build.date with miatoll date in vendor/build.prop"
     sed -i 's/ro.bootimage.build.date=Tue Mar 7 12:12:31 CST 2023/ro.bootimage.build.date=Mon Apr 10 17:14:21 CST 2023/' "$FILE"
-    log_in "Replacing ro.bootimage.build.date.utc with miatoll value in vendor/build.prop"
+    log_info "Replacing ro.bootimage.build.date.utc with miatoll value in vendor/build.prop"
     sed -i 's/ro.bootimage.build.date.utc=1678162351/ro.bootimage.build.date.utc=1681118061/' "$FILE"
-    log_in "Replacing ro.bootimage.build.fingerprint with miatoll in vendor/build.prop"
+    log_info "Replacing ro.bootimage.build.fingerprint with miatoll in vendor/build.prop"
     sed -i 's|ro.bootimage.build.fingerprint=Redmi/joyeuse_global/joyeuse:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys|ro.bootimage.build.fingerprint=Redmi/miatoll_global/miatoll:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys|' "$FILE"
-    log_in "Replacing ro.control_privapp_permissions=enforce with empty in vendor/build.prop"
+    log_info "Replacing ro.control_privapp_permissions=enforce with empty in vendor/build.prop"
     sed -i 's/ro.control_privapp_permissions=enforce/ro.control_privapp_permissions=/' "$FILE"
-    log_in "Replacing ro.frp.pst active line with commented out in vendor/build.prop"
+    log_info "Replacing ro.frp.pst active line with commented out in vendor/build.prop"
     sed -i 's|^ro.frp.pst=/dev/block/bootdevice/by-name/frp|#ro.frp.pst=/dev/block/bootdevice/by-name/frp|' "$FILE"
-    log_in "Removing ro.product.mod_device=joyeuse_global from vendor/build.prop"
+    log_info "Removing ro.product.mod_device=joyeuse_global from vendor/build.prop"
     sed -i '/ro.product.mod_device=joyeuse_global/d' "$FILE"
-    log_in "Removing ro.vendor.se.type=HCE,UICC from vendor/build.prop"
+    log_info "Removing ro.vendor.se.type=HCE,UICC from vendor/build.prop"
     sed -i '/ro.vendor.se.type=HCE,UICC/d' "$FILE"
-        log_in "Adding miatoll tweak props block at end of vendor/build.prop"
+        log_info "Adding miatoll tweak props block at end of vendor/build.prop"
     cat >> "$FILE" << 'EOF'
 persist.sys.disable_rescue=true
 persist.vendor.fingerprint.sensor_type=side
@@ -375,7 +375,7 @@ EOF
 patch_odm() {
         local FILE="$VENDOR/odm/etc/build.prop"
 
-    log_in "Replacing odm/etc/build.prop content with miatoll version"
+    log_info "Replacing odm/etc/build.prop content with miatoll version"
     cat > "$FILE" << 'EOF'
 ro.soc.model=SDM720G
 ro.oplus.display.screenSizeInches.primary=6.67
@@ -398,7 +398,7 @@ EOF
 
 add_custom_props () {
     mkdir -p custom_props && mkdir -p custom_props/properties/
-    log_in "Adding custom_props for miatoll devices"
+    log_info "Adding custom_props for miatoll devices"
     echo "ro.vendor.oplus.camera.frontCamSize=16MP" >> custom_props/properties/curtana_build.prop
     echo "ro.vendor.oplus.camera.backCamSize=64MP+8MP+5MP+2MP" >> custom_props/properties/curtana_build.prop
     echo "ro.vendor.oplus.market.name=Redmi Note 9S/9Pro/10Lite" >> custom_props/properties/curtana_build.prop
@@ -427,7 +427,7 @@ add_custom_props () {
 patch_odm_media_profiles() {
     local FILE="$VENDOR/odm/etc/media_profiles_V1_0.xml"
 
-    log_in "Replacing FIXME comment with author signature in odm/etc/media_profiles_V1_0.xml"
+    log_info "Replacing FIXME comment with author signature in odm/etc/media_profiles_V1_0.xml"
     sed -i 's|        FIXME:\n.*\n.*\n.*\n.*||' "$FILE"
     python3 -c "
 import re, sys
@@ -444,23 +444,23 @@ open('$FILE', 'w').write(content)
 patch_audio_effects() {
     local FILE="$VENDOR/etc/audio_effects.xml"
 
-    log_in "Adding dirac library entry in etc/audio_effects.xml"
+    log_info "Adding dirac library entry in etc/audio_effects.xml"
     sed -i 's|        <library name="misoundfx" path="libmisoundfx.so"/>|        <library name="misoundfx" path="libmisoundfx.so"/>\n        <library name="dirac" path="libdirac.so"/>|' "$FILE"
 
-    log_in "Adding dirac effect entry in etc/audio_effects.xml"
+    log_info "Adding dirac effect entry in etc/audio_effects.xml"
     sed -i 's|        <effect name="misoundfx" library="misoundfx" uuid="5b8e36a5-144a-4c38-b1d7-0002a5d5c51b"/>|        <effect name="misoundfx" library="misoundfx" uuid="5b8e36a5-144a-4c38-b1d7-0002a5d5c51b"/>\n        <effect name="dirac" library="dirac" uuid="e069d9e0-8329-11df-9168-0002a5d5c51b"/>|' "$FILE"
 }
 
 patch_audio_io_policy() {
     local FILE="$VENDOR/etc/audio_io_policy.conf"
 
-    log_in "Replacing voip_rx flags order in etc/audio_io_policy.conf"
+    log_info "Replacing voip_rx flags order in etc/audio_io_policy.conf"
     sed -i 's/flags AUDIO_OUTPUT_FLAG_VOIP_RX|AUDIO_OUTPUT_FLAG_DIRECT/flags AUDIO_OUTPUT_FLAG_DIRECT|AUDIO_OUTPUT_FLAG_VOIP_RX/' "$FILE"
 
-    log_in "Replacing compress_offload_24 formats with full list in etc/audio_io_policy.conf"
+    log_info "Replacing compress_offload_24 formats with full list in etc/audio_io_policy.conf"
     sed -i 's/formats AUDIO_FORMAT_PCM_24_BIT_OFFLOAD|AUDIO_FORMAT_FLAC|AUDIO_FORMAT_ALAC|AUDIO_FORMAT_APE|AUDIO_FORMAT_VORBIS|AUDIO_FORMAT_WMA|AUDIO_FORMAT_WMA_PRO/formats AUDIO_FORMAT_MP3|AUDIO_FORMAT_PCM_24_BIT_OFFLOAD|AUDIO_FORMAT_FLAC|AUDIO_FORMAT_ALAC|AUDIO_FORMAT_APE|AUDIO_FORMAT_AAC_LC|AUDIO_FORMAT_AAC_HE_V1|AUDIO_FORMAT_AAC_HE_V2|AUDIO_FORMAT_VORBIS|AUDIO_FORMAT_WMA|AUDIO_FORMAT_WMA_PRO|AUDIO_FORMAT_AAC_ADTS_LC|AUDIO_FORMAT_AAC_ADTS_HE_V1|AUDIO_FORMAT_AAC_ADTS_HE_V2/' "$FILE"
 
-    log_in "Removing record_24bit block from etc/audio_io_policy.conf"
+    log_info "Removing record_24bit block from etc/audio_io_policy.conf"
     python3 -c "
 import re
 content = open('$FILE').read()
@@ -468,7 +468,7 @@ content = re.sub(r'  record_24bit \{[^}]+\}\n', '', content)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Removing record_32bit block from etc/audio_io_policy.conf"
+    log_info "Removing record_32bit block from etc/audio_io_policy.conf"
     python3 -c "
 import re
 content = open('$FILE').read()
@@ -476,20 +476,20 @@ content = re.sub(r'  record_32bit \{[^}]+\}\n', '', content)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing record_compress_16 sampling_rates with 48000|96000 in etc/audio_io_policy.conf"
+    log_info "Replacing record_compress_16 sampling_rates with 48000|96000 in etc/audio_io_policy.conf"
     sed -i '/record_compress_16/,/}/ s/sampling_rates 8000|16000|32000|44100|48000|88200|96000|176400|192000/sampling_rates 48000|96000/' "$FILE"
 
-    log_in "Adding voip_tx and low_latency_voip_tx blocks at end of etc/audio_io_policy.conf"
+    log_info "Adding voip_tx and low_latency_voip_tx blocks at end of etc/audio_io_policy.conf"
     sed -i 's/^}$/  voip_tx {\n    flags AUDIO_INPUT_FLAG_VOIP_TX\n    formats AUDIO_FORMAT_PCM_16_BIT\n    sampling_rates 8000|16000|32000|48000\n    bit_width 16\n    app_type 69946\n  }\n  low_latency_voip_tx {\n    flags AUDIO_INPUT_FLAG_VOIP_TX|AUDIO_INPUT_FLAG_FAST\n    formats AUDIO_FORMAT_PCM_16_BIT\n    sampling_rates 48000\n    bit_width 16\n    app_type 69946\n  }\n}/' "$FILE"
 }
 
 patch_audio_platform_info() {
     local FILE="$VENDOR/etc/audio_platform_info_intcodec.xml"
 
-    log_in "Replacing input_mic_max_count 4 with 2 in etc/audio_platform_info_intcodec.xml"
+    log_info "Replacing input_mic_max_count 4 with 2 in etc/audio_platform_info_intcodec.xml"
     sed -i 's/<param key="input_mic_max_count" value="4"\/>/<param key="input_mic_max_count" value="2"\/>/' "$FILE"
 
-    log_in "Removing CTS test device entry from etc/audio_platform_info_intcodec.xml"
+    log_info "Removing CTS test device entry from etc/audio_platform_info_intcodec.xml"
     sed -i '/<!-- Add for CTS test -->/d' "$FILE"
     sed -i '/SND_DEVICE_IN_VOICE_RECOG_USB_HEADSET_MIC_CTS/d' "$FILE"
 }
@@ -497,16 +497,16 @@ patch_audio_platform_info() {
 patch_audio_policy_configuration() {
     local FILE="$VENDOR/etc/audio_policy_configuration.xml"
 
-    log_in "Replacing copyright year 2016-2017, 2019 with 2016-2020 in etc/audio_policy_configuration.xml"
+    log_info "Replacing copyright year 2016-2017, 2019 with 2016-2020 in etc/audio_policy_configuration.xml"
     sed -i 's/Copyright (c) 2016-2017, 2019/Copyright (c) 2016-2020/' "$FILE"
 
-    log_in "Adding call_screen_mode_supported to globalConfiguration in etc/audio_policy_configuration.xml"
+    log_info "Adding call_screen_mode_supported to globalConfiguration in etc/audio_policy_configuration.xml"
     sed -i 's/<globalConfiguration speaker_drc_enabled="true"\/>/<globalConfiguration speaker_drc_enabled="true" call_screen_mode_supported="true"\/>/' "$FILE"
 
-    log_in "Adding Primary Audio HAL comment before primary module in etc/audio_policy_configuration.xml"
+    log_info "Adding Primary Audio HAL comment before primary module in etc/audio_policy_configuration.xml"
     sed -i 's/        <module name="primary" halVersion="2.0">/        <!-- Primary Audio HAL -->\n        <module name="primary" halVersion="2.0">/' "$FILE"
 
-    log_in "Replacing attachedDevices order and removing Speaker Safe, adding FM Tuner in etc/audio_policy_configuration.xml"
+    log_info "Replacing attachedDevices order and removing Speaker Safe, adding FM Tuner in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '''            <attachedDevices>
@@ -527,7 +527,7 @@ content = content.replace('                <item>Telephony Rx</item>', '        
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing primary output and voip_rx mixPort definitions in etc/audio_policy_configuration.xml"
+    log_info "Replacing primary output and voip_rx mixPort definitions in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '''                <mixPort name=\"primary output\" role=\"source\" flags=\"AUDIO_OUTPUT_FLAG_PRIMARY|AUDIO_OUTPUT_FLAG_FAST\">
@@ -547,10 +547,10 @@ content = content.replace(old, new)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing raw mixPort flags in etc/audio_policy_configuration.xml"
+    log_info "Replacing raw mixPort flags in etc/audio_policy_configuration.xml"
     sed -i 's/flags="AUDIO_OUTPUT_FLAG_RAW|AUDIO_OUTPUT_FLAG_FAST"/flags="AUDIO_OUTPUT_FLAG_FAST"/' "$FILE"
 
-    log_in "Removing hifi_playback from before deep_buffer, adding after deep_buffer with mmap/compress/direct_pcm in etc/audio_policy_configuration.xml"
+    log_info "Removing hifi_playback from before deep_buffer, adding after deep_buffer with mmap/compress/direct_pcm in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 content = content.replace('                <mixPort name=\"hifi_playback\" role=\"source\" />\n                <mixPort name=\"deep_buffer\"', '                <mixPort name=\"deep_buffer\"', 1)
@@ -586,7 +586,7 @@ content = content.replace(old_deep, new_deep, 1)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Adding FLAC/ALAC/APE/DTS/DTS_HD/AAC_ADTS profiles and dsd_compress_passthrough to compressed_offload in etc/audio_policy_configuration.xml"
+    log_info "Adding FLAC/ALAC/APE/DTS/DTS_HD/AAC_ADTS profiles and dsd_compress_passthrough to compressed_offload in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '                    <profile name=\"\" format=\"AUDIO_FORMAT_AAC_HE_V2\"\n                             samplingRates=\"8000,11025,12000,16000,22050,24000,32000,44100,48000\"\n                             channelMasks=\"AUDIO_CHANNEL_OUT_STEREO,AUDIO_CHANNEL_OUT_MONO\"/>\n                </mixPort>\n                <mixPort name=\"voice_tx\"'
@@ -629,7 +629,7 @@ content = content.replace(old, new, 1)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing joyeuse mmap_no_irq_out and voip_rx sink mixPorts with hotword input in etc/audio_policy_configuration.xml"
+    log_info "Replacing joyeuse mmap_no_irq_out and voip_rx sink mixPorts with hotword input in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '''                <mixPort name=\"mmap_no_irq_out\" role=\"source\" flags=\"AUDIO_OUTPUT_FLAG_DIRECT|AUDIO_OUTPUT_FLAG_MMAP_NOIRQ\">
@@ -652,7 +652,7 @@ content = content.replace(old, new, 1)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing primary input and fast input mixPorts with miatoll versions in etc/audio_policy_configuration.xml"
+    log_info "Replacing primary input and fast input mixPorts with miatoll versions in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '''                <mixPort name=\"primary input\" role=\"sink\">
@@ -707,7 +707,7 @@ content = content.replace(old, new, 1)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing voip_tx sink mixPort with hifi_input+fast_input at end of mixPorts in etc/audio_policy_configuration.xml"
+    log_info "Replacing voip_tx sink mixPort with hifi_input+fast_input at end of mixPorts in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '''                <mixPort name=\"voip_tx\" role=\"sink\"
@@ -732,7 +732,7 @@ content = content.replace(old, new, 1)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing devicePorts section in etc/audio_policy_configuration.xml"
+    log_info "Replacing devicePorts section in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '''            <devicePorts>
@@ -876,7 +876,7 @@ content = content.replace(old, new, 1)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing routes section in etc/audio_policy_configuration.xml"
+    log_info "Replacing routes section in etc/audio_policy_configuration.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '''            <routes>
@@ -970,7 +970,7 @@ content = content.replace(old, new, 1)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing inline a2dp module with xi:include in etc/audio_policy_configuration.xml"
+    log_info "Replacing inline a2dp module with xi:include in etc/audio_policy_configuration.xml"
     python3 -c "
 import re
 content = open('$FILE').read()
@@ -982,13 +982,13 @@ content = re.sub(
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Fixing r_submix include path in etc/audio_policy_configuration.xml"
+    log_info "Fixing r_submix include path in etc/audio_policy_configuration.xml"
     sed -i 's|href="r_submix_audio_policy_configuration.xml"|href="/vendor/etc/r_submix_audio_policy_configuration.xml"|' "$FILE"
 
-    log_in "Adding bluetooth_audio_policy_configuration include in etc/audio_policy_configuration.xml"
+    log_info "Adding bluetooth_audio_policy_configuration include in etc/audio_policy_configuration.xml"
     sed -i 's|        <xi:include href="/vendor/etc/r_submix_audio_policy_configuration.xml"/>|        <xi:include href="/vendor/etc/r_submix_audio_policy_configuration.xml"/>\n\n        <!-- Bluetooth Audio HAL -->\n        <xi:include href="/vendor/etc/bluetooth_audio_policy_configuration.xml"/>|' "$FILE"
 
-    log_in "Fixing volume include paths in etc/audio_policy_configuration.xml"
+    log_info "Fixing volume include paths in etc/audio_policy_configuration.xml"
     sed -i 's|href="audio_policy_volumes.xml"|href="/vendor/etc/audio_policy_volumes.xml"|' "$FILE"
     sed -i 's|href="default_volume_tables.xml"|href="/vendor/etc/default_volume_tables.xml"|' "$FILE"
 }
@@ -996,10 +996,10 @@ open('$FILE', 'w').write(content)
 patch_audio_policy_volumes() {
     local FILE="$VENDOR/etc/audio_policy_volumes.xml"
 
-    log_in "Replacing VOICE_CALL EARPIECE first point -2400 with -2500 in etc/audio_policy_volumes.xml"
+    log_info "Replacing VOICE_CALL EARPIECE first point -2400 with -2500 in etc/audio_policy_volumes.xml"
     sed -i '/AUDIO_STREAM_VOICE_CALL.*DEVICE_CATEGORY_EARPIECE/,/\/volume/ s/<point>0,-2400<\/point>/<point>0,-2500<\/point>/' "$FILE"
 
-    log_in "Replacing AUDIO_STREAM_SYSTEM SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
+    log_info "Replacing AUDIO_STREAM_SYSTEM SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '    <volume stream=\"AUDIO_STREAM_SYSTEM\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\"\n                                         ref=\"DEFAULT_SYSTEM_VOLUME_CURVE\"/>'
@@ -1014,7 +1014,7 @@ content = content.replace(old, new)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing AUDIO_STREAM_ENFORCED_AUDIBLE SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
+    log_info "Replacing AUDIO_STREAM_ENFORCED_AUDIBLE SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '    <volume stream=\"AUDIO_STREAM_ENFORCED_AUDIBLE\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\"\n                                                   ref=\"DEFAULT_SYSTEM_VOLUME_CURVE\"/>'
@@ -1027,7 +1027,7 @@ content = content.replace(old, new)
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Replacing AUDIO_STREAM_DTMF SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
+    log_info "Replacing AUDIO_STREAM_DTMF SPEAKER ref curve with manual points in etc/audio_policy_volumes.xml"
     python3 -c "
 content = open('$FILE').read()
 old = '    <volume stream=\"AUDIO_STREAM_DTMF\" deviceCategory=\"DEVICE_CATEGORY_SPEAKER\"\n                                       ref=\"DEFAULT_SYSTEM_VOLUME_CURVE\"/>'
@@ -1044,14 +1044,14 @@ open('$FILE', 'w').write(content)
 patch_default_volume_tables() {
     local FILE="$VENDOR/etc/default_volume_tables.xml"
 
-    log_in "Replacing DEFAULT_SYSTEM_VOLUME_CURVE last point -600 with 0 in etc/default_volume_tables.xml"
+    log_info "Replacing DEFAULT_SYSTEM_VOLUME_CURVE last point -600 with 0 in etc/default_volume_tables.xml"
     sed -i '0,/<point>100,-600<\/point>/ s/<point>100,-600<\/point>/<point>100,0<\/point>/' "$FILE"
 
-    log_in "Replacing DEFAULT_DEVICE_CATEGORY_SPEAKER_VOLUME_CURVE points in etc/default_volume_tables.xml"
+    log_info "Replacing DEFAULT_DEVICE_CATEGORY_SPEAKER_VOLUME_CURVE points in etc/default_volume_tables.xml"
     sed -i 's/<point>1,-4950<\/point>/<point>1,-5800<\/point>/' "$FILE"
     sed -i 's/<point>20,-3350<\/point>/<point>20,-4000<\/point>/' "$FILE"
 
-    log_in "Replacing last point -1000 with 0 (two occurrences) in etc/default_volume_tables.xml"
+    log_info "Replacing last point -1000 with 0 (two occurrences) in etc/default_volume_tables.xml"
     sed -i 's/<point>100,-1000<\/point>/<point>100,0<\/point>/g' "$FILE"
 }
 
@@ -1059,27 +1059,27 @@ patch_fstab() {
     for f in fstab.default fstab.emmc; do
         local FILE="$VENDOR/etc/$f"
 
-        log_in "Removing AVB flags from system/system_ext/product/vendor in etc/$f"
+        log_info "Removing AVB flags from system/system_ext/product/vendor in etc/$f"
         sed -i 's/wait,logical,first_stage_mount,avb=vbmeta_system,avb_keys=\/avb\/q-gsi.avbpubkey:\/avb\/r-gsi.avbpubkey:\/avb\/s-gsi.avbpubkey/wait,logical,first_stage_mount/' "$FILE"
         sed -i 's/wait,logical,first_stage_mount,avb=vbmeta_system/wait,logical,first_stage_mount/' "$FILE"
         sed -i 's/wait,logical,first_stage_mount,avb/wait,logical,first_stage_mount/' "$FILE"
 
-        log_in "Removing fileencryption/wrappedkey/quota flags from userdata in etc/$f"
+        log_info "Removing fileencryption/wrappedkey/quota flags from userdata in etc/$f"
         sed -i 's/latemount,wait,check,formattable,fileencryption=ice,wrappedkey,quota,reservedsize=128M,checkpoint=fs/latemount,wait,check,formattable,reservedsize=128M,checkpoint=fs/' "$FILE"
 
-        log_in "Replacing zramsize=1073741824 with zramsize=4096M in etc/$f"
+        log_info "Replacing zramsize=1073741824 with zramsize=4096M in etc/$f"
         sed -i 's/zramsize=1073741824/zramsize=4096M/' "$FILE"
     done
 }
 
 patch_group_passwd() {
-    log_in "Adding vendor_launcher and vendor_saures to etc/group"
+    log_info "Adding vendor_launcher and vendor_saures to etc/group"
     cat >> "$VENDOR/etc/group" << 'EOF'
 vendor_launcher::2988:
 vendor_saures::2989:
 EOF
 
-    log_in "Adding vendor_launcher and vendor_saures to etc/passwd"
+    log_info "Adding vendor_launcher and vendor_saures to etc/passwd"
     cat >> "$VENDOR/etc/passwd" << 'EOF'
 vendor_launcher::2988:2988::/:/bin/sh
 vendor_saures::2989:2989::/:/bin/sh
@@ -1089,20 +1089,20 @@ EOF
 patch_init_qcom_factory() {
     local FILE="$VENDOR/etc/init/hw/init.qcom.factory.rc"
 
-    log_in "Adding author signature at end of etc/init/hw/init.qcom.factory.rc"
+    log_info "Adding author signature at end of etc/init/hw/init.qcom.factory.rc"
     printf '\n\n\n# authored by diza u muna.' >> "$FILE"
 }
 
 patch_init_qcom_rc() {
     local FILE="$VENDOR/etc/init/hw/init.qcom.rc"
 
-    log_in "Adding init.custom_xd.rc import in etc/init/hw/init.qcom.rc"
+    log_info "Adding init.custom_xd.rc import in etc/init/hw/init.qcom.rc"
     sed -i 's|import /vendor/etc/init/hw/init.qcom.test.rc|import /vendor/etc/init/hw/init.qcom.test.rc\nimport /vendor/etc/init/hw/init.custom_xd.rc|' "$FILE"
 
-    log_in "Adding start systemService on boot in etc/init/hw/init.qcom.rc"
+    log_info "Adding start systemService on boot in etc/init/hw/init.qcom.rc"
     sed -i 's/on boot$/on boot\n    start systemService/' "$FILE"
 
-    log_in "Adding systemService service definition in etc/init/hw/init.qcom.rc"
+    log_info "Adding systemService service definition in etc/init/hw/init.qcom.rc"
     sed -i 's|    # limit discard size to 128MB in order to avoid long IO latency\n    write /sys/block/sda/queue/discard_max_bytes 134217728|    # limit discard size to 128MB in order to avoid long IO latency\n    write /sys/block/sda/queue/discard_max_bytes 134217728\n\nservice systemService /vendor/bin/systemService\n       class main\n    user root\n       group shell|' "$FILE"
     # sed above may fail on multiline; use python3 instead
     python3 -c "
@@ -1117,17 +1117,17 @@ open('$FILE', 'w').write(content)
 patch_init_target_rc() {
     local FILE="$VENDOR/etc/init/hw/init.target.rc"
 
-    log_in "Replacing cnss_diag flags -q -f -t with -q -t in etc/init/hw/init.target.rc"
+    log_info "Replacing cnss_diag flags -q -f -t with -q -t in etc/init/hw/init.target.rc"
     sed -i 's|cnss_diag -q -f -t HELIUM|cnss_diag -q -t HELIUM|' "$FILE"
 
-    log_in "Adding trailing newline at end of etc/init/hw/init.target.rc"
+    log_info "Adding trailing newline at end of etc/init/hw/init.target.rc"
     echo "" >> "$FILE"
 }
 
 patch_thermal_engine_rc() {
     local FILE="$VENDOR/etc/init/init_thermal-engine.rc"
 
-    log_in "Commenting out thermal-engine service in etc/init/init_thermal-engine.rc"
+    log_info "Commenting out thermal-engine service in etc/init/init_thermal-engine.rc"
     python3 -c "
 content = open('$FILE').read()
 old = '''service thermal-engine /vendor/bin/thermal-engine
@@ -1158,23 +1158,23 @@ open('$FILE', 'w').write(content)
 }
 
 patch_selinux() {
-    log_in "Replacing 'sustem' typo with 'system' in etc/selinux/vendor_file_contexts"
+    log_info "Replacing 'sustem' typo with 'system' in etc/selinux/vendor_file_contexts"
     sed -i 's|(vendor|sustem/vendor)|(vendor|system/vendor)|' "$VENDOR/etc/selinux/vendor_file_contexts"
 
-    log_in "Replacing precompiled_sepolicy.plat hash in etc/selinux/"
+    log_info "Replacing precompiled_sepolicy.plat hash in etc/selinux/"
     echo "506031746a363e32bf6bc24a7d552c2ba77df8dc069835f15cccb6e72110104f" > "$VENDOR/etc/selinux/precompiled_sepolicy.plat_sepolicy_and_mapping.sha256"
 
-    log_in "Replacing precompiled_sepolicy.product hash in etc/selinux/"
+    log_info "Replacing precompiled_sepolicy.product hash in etc/selinux/"
     echo "a679a0438c691aa4557bf80c3c0d076a2d1ae709b32e8f52cddf8ba109aa0030" > "$VENDOR/etc/selinux/precompiled_sepolicy.product_sepolicy_and_mapping.sha256"
 
-    log_in "Replacing precompiled_sepolicy.system_ext hash in etc/selinux/"
+    log_info "Replacing precompiled_sepolicy.system_ext hash in etc/selinux/"
     echo "289aa0e0f85a5b969caf9f57847bbbb5a157ea3dec6fc8ebe17d12ff92d7c2bd" > "$VENDOR/etc/selinux/precompiled_sepolicy.system_ext_sepolicy_and_mapping.sha256"
 }
 
 patch_thermal_engine_map() {
     local FILE="$VENDOR/etc/thermal-engine-map.conf"
 
-    log_in "Replacing thermal-engine-map.conf entries with joyeuse-suffixed names"
+    log_info "Replacing thermal-engine-map.conf entries with joyeuse-suffixed names"
     cat > "$FILE" << 'EOF'
 [0:thermal-engine-normal-joyeuse.conf]
 [1:thermal-engine-high-joyeuse.conf]
@@ -1194,7 +1194,7 @@ EOF
 patch_vintf_manifest() {
     local FILE="$VENDOR/etc/vintf/manifest.xml"
 
-    log_in "Removing android.hardware.nfc HAL block from etc/vintf/manifest.xml"
+    log_info "Removing android.hardware.nfc HAL block from etc/vintf/manifest.xml"
     python3 -c "
 import re
 content = open('$FILE').read()
@@ -1202,7 +1202,7 @@ content = re.sub(r'    <hal format=\"hidl\">\n        <name>android\.hardware\.n
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Removing android.hardware.secure_element HAL block from etc/vintf/manifest.xml"
+    log_info "Removing android.hardware.secure_element HAL block from etc/vintf/manifest.xml"
     python3 -c "
 import re
 content = open('$FILE').read()
@@ -1210,7 +1210,7 @@ content = re.sub(r'    <hal format=\"hidl\">\n        <name>android\.hardware\.s
 open('$FILE', 'w').write(content)
 "
 
-    log_in "Removing vendor.nxp.hardware.nfc HAL block from etc/vintf/manifest.xml"
+    log_info "Removing vendor.nxp.hardware.nfc HAL block from etc/vintf/manifest.xml"
     python3 -c "
 import re
 content = open('$FILE').read()
@@ -1222,22 +1222,22 @@ open('$FILE', 'w').write(content)
 patch_wifi() {
     local FILE="$VENDOR/etc/wifi/WCNSS_qcom_cfg.ini"
 
-    log_in "Replacing gChannelBondingMode24GHz=0 with 1 in etc/wifi/WCNSS_qcom_cfg.ini"
+    log_info "Replacing gChannelBondingMode24GHz=0 with 1 in etc/wifi/WCNSS_qcom_cfg.ini"
     sed -i 's/gChannelBondingMode24GHz=0/gChannelBondingMode24GHz=1/' "$FILE"
 
-    log_in "Replacing sae_enabled=0 with 1 in etc/wifi/WCNSS_qcom_cfg.ini"
+    log_info "Replacing sae_enabled=0 with 1 in etc/wifi/WCNSS_qcom_cfg.ini"
     sed -i 's/sae_enabled=0/sae_enabled=1/' "$FILE"
 }
 
 patch_qcril_sql() {
     local FILE="$VENDOR/radio/qcril_database/upgrade/0_initial.sql"
 
-    log_in "Adding MCC 454 emergency entries to radio/qcril_database/upgrade/0_initial.sql"
+    log_info "Adding MCC 454 emergency entries to radio/qcril_database/upgrade/0_initial.sql"
     sed -i "/INSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('450','911','','');/a INSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('454','112','','');\nINSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('454','110','','');\nINSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('454','999','','');\nINSERT INTO \"qcril_emergency_source_mcc_table\" VALUES('454','911','','');" "$FILE"
 }
 
 patch_ueventd() {
-    log_in "Replacing /dev/diag permission 0660 with 0666 in ueventd.rc"
+    log_info "Replacing /dev/diag permission 0660 with 0666 in ueventd.rc"
     sed -i 's|/dev/diag                 0660   system     oem_2901|/dev/diag                 0666   system     oem_2901|' "$VENDOR/ueventd.rc"
 }
  
