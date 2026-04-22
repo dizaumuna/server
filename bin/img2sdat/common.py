@@ -18,7 +18,6 @@ import copy
 import errno
 import getopt
 import getpass
-import imp
 import os
 import platform
 import re
