@@ -987,10 +987,10 @@ main() {
     rm -rf tmp
  
     log_info "Building OS images"
-    build_image "system"     "portrom/system/system"          "portrom/system/config"
-    build_image "system_ext" "portrom/system_ext/system_ext"  "portrom/system_ext/config"
-    build_image "product"    "portrom/product/product"         "portrom/product/config"
-    build_image "vendor"     "baserom/vendor"                  "baserom/config"
+    build_image "system"     "portrom/system/system"          "portrom/system/config" 2> /dev/null
+    build_image "system_ext" "portrom/system_ext/system_ext"  "portrom/system_ext/config" 2> /dev/null
+    build_image "product"    "portrom/product/product"         "portrom/product/config" 2> /dev/null
+    build_image "vendor"     "baserom/vendor"                  "baserom/config" 2> /dev/null
  
     mkdir -p out
     build_recovery
