@@ -902,7 +902,7 @@ main() {
     patch_oplus_launcher
     patch_systemui_apk
     patch_aod_apk
-    patch_settings_apk
+   # patch_settings_apk
     patch_gallery_apk
     patch_battery_apk
  
