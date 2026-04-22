@@ -290,7 +290,7 @@ patch_port_buildprops() {
     sed -i 's/ro.oplus.resolution.low=1080,2376/ro.oplus.resolution.low=1080,2400/' "$my_product_prop"
     log_info_in "Replacing "ro.oplus.gaussianlevel" prop with 3 in /my_product/build.prop"
     sed -i '/ro.oplus.gaussianlevel=3/d' "$my_product_prop"
-    log_info_in "Adding "debug.sf.disable_client_composition_cache" prop with 0 in /my_product/build.prop
+    log_info_in "Adding "debug.sf.disable_client_composition_cache" prop with 0 in /my_product/build.prop"
     echo "debug.sf.disable_client_composition_cache=0" >> "$my_product_prop"
  
     local allnet="portrom/system/system/my_product/etc/permissions/com.oppo.features_allnet_android.xml"
