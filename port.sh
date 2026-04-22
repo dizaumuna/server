@@ -807,19 +807,19 @@ build_recovery() {
 
     mkdir -p "$WORK_DIR/OrangeFox"
     cd "$WORK_DIR/OrangeFox"
-    git clone https://gitlab.com/OrangeFox/sync.git -b master
+    git clone https://gitlab.com/OrangeFox/sync.git -b master 2> /dev/null
     cd sync
-    ./orangefox_sync.sh --branch 12.1 --path "$WORK_DIR/OrangeFox/fox_12.1"
+    ./orangefox_sync.sh --branch 12.1 --path "$WORK_DIR/OrangeFox/fox_12.1" 2> /dev/null
     cd "$WORK_DIR/OrangeFox/fox_12.1"
 
-    git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll
+    git clone https://github.com/iput-object/ofox-device_xiaomi_miatoll -b 12.1 ./device/xiaomi/miatoll 2> /dev/null
 
     set +e
     source build/envsetup.sh
     export ALLOW_MISSING_DEPENDENCIES=true
     set -e
 
-    lunch twrp_miatoll-eng && make clean && mka adbd recoveryimage
+    lunch twrp_miatoll-eng && make clean && mka adbd recoveryimage 2> /dev/null
 
     local recovery_img
     recovery_img=$(find out/target/product/miatoll -name "OrangeFox*.img" | head -n1)
