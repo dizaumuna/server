@@ -454,7 +454,7 @@ add_custom_props () {
     echo "    write /sys/touchpanel/double_tap 1" >> baserom/vendor/etc/init/trsbservice.rc
 
     mv bin/MiatollFrameworkOverlay.apk baserom/vendor/overlay/
-    mv bin/custom_props.rc baserom/vendor/etc/init/hw/
+    mv bin/init.custom_props.rc baserom/vendor/etc/init/hw/
     
 }
 
