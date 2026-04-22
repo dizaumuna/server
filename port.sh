@@ -675,7 +675,7 @@ patch_aod_apk() {
     log_info "Patching method "getKeyAodAllDaySupportSettings" with true in smali"
     [[ -f "$settings_smali" ]] && python3 bin/patchmethod_v2.py "$settings_smali" getKeyAodAllDaySupportSettings -return true 2> /dev/null
  
-    java -jar bin/apktool/APKEditor.jar b -f -i tmp/Aod -o "$apk" > /dev/null
+    java -jar bin/apktool/APKEditor.jar b -f -i tmp/Aod -o "$apk" 2> /dev/null
 }
  
 patch_settings_apk() {
