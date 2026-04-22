@@ -422,6 +422,100 @@ add_custom_props () {
     echo "ro.vendor.oplus.market.name=Redmi Note 9 Pro" >> custom_props/properties/joyeuse_build.prop
     echo "ro.vendor.oplus.market.enname=Redmi Note 9 Pro" >> custom_props/properties/joyeuse_build.prop
     echo "ro.product.model=M2003J6B2G" >> custom_props/properties/joyeuse_build.prop
+
+    echo "#" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "# Copyright (C) 2023 The LineageOS Project" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "#" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "# SPDX-License-Identifier: Apache-2.0" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "#" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "# service vendor.nfc_hal_service /vendor/bin/hw/android.hardware.nfc-service.nxp" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # override" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # class early_hal" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # user nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # group nfc drmrpc system" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # disabled" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "# on early-init && property:ro.boot.hwname=joyeuse" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # setprop ro.boot.product.hardware.sku nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "# on init && property:ro.boot.product.hardware.sku=nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # start vendor.nfc_hal_service" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "# on post-fs-data && property:ro.boot.product.hardware.sku=nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # mkdir /data/vendor/nfc 0770 nfc nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    # mkdir /data/vendor/nfc/param 0770 nfc nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "service thermal-engine /vendor/bin/thermal-engine" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    class main" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    user root" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    group root" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    socket thermal-send-client stream 0660 system oem_2907" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    socket thermal-recv-client stream 0660 system oem_2907" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    socket thermal-recv-passive-client stream 0660 system oem_2907" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    socket thermal-send-rule stream 0660 system oem_2907" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    disabled" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "on boot && property:ro.boot.hwname=*" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    mount none /vendor/etc/thermal-engine-map-${ro.boot.hwname}.conf /vendor/etc/thermal-engine-map.conf bind" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    start thermal-engine" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "on property:persist.sys.oplus.nandswap.condition=*" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    resetprop persist.sys.oplus.nandswap.condition "true"" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "on boot" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    chmod 0640 /sys/fs/selinux/enforce" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    chmod 0440 /sys/fs/selinux/policy" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "on post-fs-data && property:persist.xd.d2w=true" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    write /proc/tp_gesture 1" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    write /sys/touchpanel/double_tap 1" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "on post-fs-data" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    mount ext4 /dev/block/by-name/cust /oem" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    mount overlay overlay /system/priv-app lowerdir=/oem/system/priv-app:/system/priv-app,context=u:object_r:system_file:s0" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    mount overlay overlay /system/etc lowerdir=/oem/system/etc:/system/etc,context=u:object_r:system_file:s0" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "on property:debug.tracing.screen_state=1" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    write /sys/class/backlight/panel0-backlight/brightness 80" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "on property:debug.tracing.screen_state=4" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+    echo "    write /sys/class/backlight/panel0-backlight/brightness 80" >> baserom/vendor/etc/init/hw/init.custom_props.rc
+
+    echo "# Copyright (c) 2019, The Linux Foundation. All rights reserved." >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# Redistribution and use in source and binary forms, with or without" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# modification, are permitted provided that the following conditions are" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# met:" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#   * Redistributions of source code must retain the above copyright" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#     notice, this list of conditions and the following disclaimer." >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#   * Redistributions in binary form must reproduce the above" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#     copyright notice, this list of conditions and the following" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#     disclaimer in the documentation and/or other materials provided" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#     with the distribution." >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#   * Neither the name of The Linux Foundation nor the names of its" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#     contributors may be used to endorse or promote products derived" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#     from this software without specific prior written permission." >> baserom/vendor/etc/init/trsbservice.rc
+    echo "#" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY," >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." >> baserom/vendor/etc/init/trsbservice.rc
+    echo "" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "on property:sys.boot_completed=1" >> baserom/vendor/etc/init/trsbservice.rc
+    echo "    write /sys/touchpanel/double_tap 1" >> baserom/vendor/etc/init/trsbservice.rc
+
+    mv bin/MiatollFrameworkOverlay.apk baserom/vendor/overlay/
+    
 }
 
 patch_odm_media_profiles() {
@@ -1096,8 +1190,8 @@ patch_init_qcom_factory() {
 patch_init_qcom_rc() {
     local FILE="$VENDOR/etc/init/hw/init.qcom.rc"
 
-    log_info "Adding init.custom_xd.rc import in etc/init/hw/init.qcom.rc"
-    sed -i 's|import /vendor/etc/init/hw/init.qcom.test.rc|import /vendor/etc/init/hw/init.qcom.test.rc\nimport /vendor/etc/init/hw/init.custom_xd.rc|' "$FILE"
+    log_info "Adding init.custom_props.rc import in etc/init/hw/init.qcom.rc"
+    sed -i 's|import /vendor/etc/init/hw/init.qcom.test.rc|import /vendor/etc/init/hw/init.qcom.test.rc\nimport /vendor/etc/init/hw/init.custom_props.rc|' "$FILE"
 
     log_info "Adding start systemService on boot in etc/init/hw/init.qcom.rc"
     sed -i 's/on boot$/on boot\n    start systemService/' "$FILE"
@@ -1158,9 +1252,6 @@ open('$FILE', 'w').write(content)
 }
 
 patch_selinux() {
-    log_info "Replacing 'sustem' typo with 'system' in etc/selinux/vendor_file_contexts"
-    sed -i 's|(vendor|sustem/vendor)|(vendor|system/vendor)|' "$VENDOR/etc/selinux/vendor_file_contexts"
-
     log_info "Replacing precompiled_sepolicy.plat hash in etc/selinux/"
     echo "506031746a363e32bf6bc24a7d552c2ba77df8dc069835f15cccb6e72110104f" > "$VENDOR/etc/selinux/precompiled_sepolicy.plat_sepolicy_and_mapping.sha256"
 
