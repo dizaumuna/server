@@ -314,11 +314,11 @@ patch_port_init() {
     sed -i 's/write \/proc\/sys\/kernel\/panic_on_oops 1/write \/proc\/sys\/kernel\/panic_on_oops 0/' \
         portrom/system/system/system/etc/init/hw/init.rc
  
-    log_info_in "Adding "vendor.sys.usb.adb.disabled" prop to /system/system/etc/init/hw/init.rc
+    log_info_in "Adding "vendor.sys.usb.adb.disabled" prop to /system/system/etc/init/hw/init.rc"
     sed -i '/vendor.sys.usb.adb.disabled/d' portrom/system/system/system/etc/init/hw/init.usb.rc
-    log_info_in "Adding "vendor.usb.config" prop to /system/system/etc/init/hw/init.usb.rc
+    log_info_in "Adding "vendor.usb.config" prop to /system/system/etc/init/hw/init.usb.rc"
     sed -i '/persist.vendor.usb.config/d' portrom/system/system/system/etc/init/hw/init.usb.rc
-    log_info_in "Adding "persist.usb.config.*persist.vendor" prop to /system/system/etc/init/hw/init.usb.rc
+    log_info_in "Adding "persist.usb.config.*persist.vendor" prop to /system/system/etc/init/hw/init.usb.rc"
     sed -i '/persist.sys.usb.config.*persist.vendor/d' portrom/system/system/system/etc/init/hw/init.usb.rc
     local configfs_rc="portrom/system/system/system/etc/init/hw/init.usb.configfs.rc"
     sed -i '/setusbconfig to/d' "$configfs_rc"
