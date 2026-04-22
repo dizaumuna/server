@@ -423,67 +423,6 @@ add_custom_props () {
     echo "ro.vendor.oplus.market.enname=Redmi Note 9 Pro" >> custom_props/properties/joyeuse_build.prop
     echo "ro.product.model=M2003J6B2G" >> custom_props/properties/joyeuse_build.prop
 
-    echo "#" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "# Copyright (C) 2023 The LineageOS Project" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "#" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "# SPDX-License-Identifier: Apache-2.0" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "#" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "# service vendor.nfc_hal_service /vendor/bin/hw/android.hardware.nfc-service.nxp" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # override" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # class early_hal" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # user nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # group nfc drmrpc system" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # disabled" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "# on early-init && property:ro.boot.hwname=joyeuse" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # setprop ro.boot.product.hardware.sku nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "# on init && property:ro.boot.product.hardware.sku=nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # start vendor.nfc_hal_service" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "# on post-fs-data && property:ro.boot.product.hardware.sku=nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # mkdir /data/vendor/nfc 0770 nfc nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    # mkdir /data/vendor/nfc/param 0770 nfc nfc" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "service thermal-engine /vendor/bin/thermal-engine" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    class main" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    user root" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    group root" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    socket thermal-send-client stream 0660 system oem_2907" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    socket thermal-recv-client stream 0660 system oem_2907" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    socket thermal-recv-passive-client stream 0660 system oem_2907" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    socket thermal-send-rule stream 0660 system oem_2907" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    disabled" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "on boot && property:ro.boot.hwname=*" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    mount none /vendor/etc/thermal-engine-map-${ro.boot.hwname}.conf /vendor/etc/thermal-engine-map.conf bind" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    start thermal-engine" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "on property:persist.sys.oplus.nandswap.condition=*" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    resetprop persist.sys.oplus.nandswap.condition "true"" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "on boot" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    chmod 0640 /sys/fs/selinux/enforce" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    chmod 0440 /sys/fs/selinux/policy" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "on post-fs-data && property:persist.xd.d2w=true" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    write /proc/tp_gesture 1" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    write /sys/touchpanel/double_tap 1" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "on post-fs-data" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    mount ext4 /dev/block/by-name/cust /oem" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    mount overlay overlay /system/priv-app lowerdir=/oem/system/priv-app:/system/priv-app,context=u:object_r:system_file:s0" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    mount overlay overlay /system/etc lowerdir=/oem/system/etc:/system/etc,context=u:object_r:system_file:s0" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "on property:debug.tracing.screen_state=1" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    write /sys/class/backlight/panel0-backlight/brightness 80" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "on property:debug.tracing.screen_state=4" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-    echo "    write /sys/class/backlight/panel0-backlight/brightness 80" >> baserom/vendor/etc/init/hw/init.custom_props.rc
-
     echo "# Copyright (c) 2019, The Linux Foundation. All rights reserved." >> baserom/vendor/etc/init/trsbservice.rc
     echo "#" >> baserom/vendor/etc/init/trsbservice.rc
     echo "# Redistribution and use in source and binary forms, with or without" >> baserom/vendor/etc/init/trsbservice.rc
@@ -515,6 +454,7 @@ add_custom_props () {
     echo "    write /sys/touchpanel/double_tap 1" >> baserom/vendor/etc/init/trsbservice.rc
 
     mv bin/MiatollFrameworkOverlay.apk baserom/vendor/overlay/
+    mv bin/custom_props.rc baserom/vendor/etc/init/hw/
     
 }
 
