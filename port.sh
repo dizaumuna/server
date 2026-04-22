@@ -644,14 +644,12 @@ patch_settings_apk() {
     java -jar apktool.jar d Settings.apk
     cd Settings/res/xml
  
-    sed -i '/<com.oplus.settings.widget.preference.SettingsPreferenceCategory>/,/<\/PreferenceScreen>/c\
-        </com.oplus.settings.widget.preference.SettingsPreferenceCategory>\
-        <com.oplus.settings.widget.preference.SettingsPreferenceCategory>\
-            <Preference android:title="Brought to you by @dizaumuna" android:summary="Thanks to miatoll community for helping.">\
-                <intent android:action="android.intent.action.VIEW" android:data="https://github.com/dizaumuna" />\
-            </Preference>\
-        </com.oplus.settings.widget.preference.SettingsPreferenceCategory>\
-    </PreferenceScreen>' device_version_info.xml
+ sed -i '/<\/PreferenceScreen>/i\
+    <com.oplus.settings.widget.preference.SettingsPreferenceCategory>\
+        <Preference android:title="Brought to you by @dizaumuna" android:summary="Thanks to miatoll community for helping.">\
+            <intent android:action="android.intent.action.VIEW" android:data="https://github.com/dizaumuna" />\
+        </Preference>\
+    </com.oplus.settings.widget.preference.SettingsPreferenceCategory>' device_version_info.xml
  
     cd ../../
     java -jar ../apktool.jar b -o Settings_patched.apk
