@@ -290,11 +290,7 @@ patch_port_buildprops() {
     sed -i 's/ro.oplus.resolution.low=1080,2376/ro.oplus.resolution.low=1080,2400/' "$my_product_prop"
     log_info "Replacing "ro.oplus.gaussianlevel" prop with 3 in /my_product/build.prop"
     sed -i '/ro.oplus.gaussianlevel=3/d' "$my_product_prop"
-<<<<<<< HEAD
     log_info "Adding "debug.sf.disable_client_composition_cache" prop with 0 in /my_product/build.prop"
-=======
-    log_info_in "Adding "debug.sf.disable_client_composition_cache" prop with 0 in /my_product/build.prop"
->>>>>>> 9cc0d829b8026d5437f76f301a52580f9bf06a3c
     echo "debug.sf.disable_client_composition_cache=0" >> "$my_product_prop"
  
     local allnet="portrom/system/system/my_product/etc/permissions/com.oppo.features_allnet_android.xml"
@@ -317,19 +313,11 @@ patch_port_init() {
     sed -i 's/write \/proc\/sys\/kernel\/panic_on_oops 1/write \/proc\/sys\/kernel\/panic_on_oops 0/' \
         portrom/system/system/system/etc/init/hw/init.rc
  
-<<<<<<< HEAD
     log_info "Adding "vendor.sys.usb.adb.disabled" prop to /system/system/etc/init/hw/init.rc"
     sed -i '/vendor.sys.usb.adb.disabled/d' portrom/system/system/system/etc/init/hw/init.usb.rc
     log_info "Adding "vendor.usb.config" prop to /system/system/etc/init/hw/init.usb.rc"
     sed -i '/persist.vendor.usb.config/d' portrom/system/system/system/etc/init/hw/init.usb.rc
     log_info "Adding "persist.usb.config.*persist.vendor" prop to /system/system/etc/init/hw/init.usb.rc"
-=======
-    log_info_in "Adding "vendor.sys.usb.adb.disabled" prop to /system/system/etc/init/hw/init.rc"
-    sed -i '/vendor.sys.usb.adb.disabled/d' portrom/system/system/system/etc/init/hw/init.usb.rc
-    log_info_in "Adding "vendor.usb.config" prop to /system/system/etc/init/hw/init.usb.rc"
-    sed -i '/persist.vendor.usb.config/d' portrom/system/system/system/etc/init/hw/init.usb.rc
-    log_info_in "Adding "persist.usb.config.*persist.vendor" prop to /system/system/etc/init/hw/init.usb.rc"
->>>>>>> 9cc0d829b8026d5437f76f301a52580f9bf06a3c
     sed -i '/persist.sys.usb.config.*persist.vendor/d' portrom/system/system/system/etc/init/hw/init.usb.rc
     local configfs_rc="portrom/system/system/system/etc/init/hw/init.usb.configfs.rc"
     sed -i '/setusbconfig to/d' "$configfs_rc"
