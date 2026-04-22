@@ -1808,7 +1808,7 @@ main() {
     build_image "vendor"     "baserom/vendor"                  "baserom/config" 2> /dev/null
  
     mkdir -p out
-    build_recovery
+    # build_recovery
     compress_images
     package_zip
  
