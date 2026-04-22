@@ -759,10 +759,10 @@ build_image() {
  
 compress_images() {
     log_info "Compressing images"
-    python3 bin/img2sdat.py system.img     -o outimages -v 4 -p system > /dev/null
-    python3 bin/img2sdat.py system_ext.img -o outimages -v 4 -p system_ext > /dev/null
-    python3 bin/img2sdat.py product.img    -o outimages -v 4 -p product > /dev/null
-    python3 bin/img2sdat.py vendor.img     -o outimages -v 4 -p vendor > /dev/null
+    python3 bin/img2sdat/img2sdat.py system.img     -o outimages -v 4 -p system > /dev/null
+    python3 bin/img2sdat/img2sdat.py system_ext.img -o outimages -v 4 -p system_ext > /dev/null
+    python3 bin/img2sdat/img2sdat.py product.img    -o outimages -v 4 -p product > /dev/null
+    python3 bin/img2sdat/img2sdat.py vendor.img     -o outimages -v 4 -p vendor > /dev/null
     rm -rf system.img system_ext.img product.img vendor.img
     mv outimages/* .
 }
