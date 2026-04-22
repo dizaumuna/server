@@ -58,7 +58,3 @@ on property:debug.tracing.screen_state=1
     
 on property:debug.tracing.screen_state=4
     write /sys/class/backlight/panel0-backlight/brightness 80
-
-
-    
-# This firmware is authored by @darksky4you. Unauthorized reproduction, modification, or distribution is strictly prohibited.
