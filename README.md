@@ -11,7 +11,7 @@
 
 | Feature            | Description    | State |
 |:-------------------|:---------------|:-----:|
-| Booting            | No screen, logs shows booted | ⚠️    |
+| Booting            | Boots with a private vendor | ⚠️    |
 | Display            | Brightness GG  | ⚠️    |
 | FBE & AVB          |                | ❌    |
 | Side Buttons       |                | ✅    |
