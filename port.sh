@@ -369,7 +369,6 @@ persist.sys.fw.bservice_age=120000
 persist.sys.fw.bservice_limit=6
 persist.sys.fw.bservice_enable=true
 # this firmware is builded on Builder-miatoll
-# the owner of Builder-miatoll is diza u muna
 EOF
 }
  
@@ -456,7 +455,6 @@ add_custom_props () {
 
     mv bin/MiatollFrameworkOverlay.apk baserom/vendor/overlay/
     mv bin/init.custom_props.rc baserom/vendor/etc/init/hw/
-    
 }
 
 patch_odm_media_profiles() {
@@ -1305,7 +1303,7 @@ patch_services_jar() {
     local scan_pkg
     scan_pkg=$(find tmp/services -type f -name "ScanPackageUtils.smali")
     if [[ -f "$scan_pkg" ]]; then
-        log_info "Patching method "assertMinSignatureSchemeIsValid" in smali" 
+        log_info_in "Patching method "assertMinSignatureSchemeIsValid" in smali" 
         python3 bin/patchmethod_v2.py "$scan_pkg" assertMinSignatureSchemeIsValid 2> /dev/null
     fi
  
@@ -1357,7 +1355,7 @@ patch_heytap_speech_assist() {
  
     local smali
     smali=$(find tmp/HeyTapSpeechAssist -type f -name "AiCallCommonBean.smali")
-    log_info "Patching method "getSupportAiCall" with true in smali"
+    log_info _in"Patching method "getSupportAiCall" with true in smali"
     [[ -f "$smali" ]] && python3 bin/patchmethod_v2.py "$smali" getSupportAiCall -return true 2> /dev/null
  
     find tmp/HeyTapSpeechAssist -type f -name "*.smali" -exec \
@@ -1375,7 +1373,7 @@ patch_ota_apk() {
     mkdir -p tmp
     cp -f "$apk" tmp/OTA.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/OTA 2> /dev/null
-    log_info "Patching method "ro.boot.vbmeta.device_state" with locked in baksmali"
+    log_info_in "Patching method "ro.boot.vbmeta.device_state" with locked in baksmali"
     python3 bin/patchmethod_v2.py -d tmp/OTA -k ro.boot.vbmeta.device_state -k locked -return false > /dev/null
     java -jar bin/apktool/APKEditor.jar b -f -i tmp/OTA -o "$apk" 2> /dev/null
 }
@@ -1397,7 +1395,7 @@ patch_aiunit_apk() {
  
     local unit_smali
     unit_smali=$(find tmp/AIUnit -type f -name "UnitConfig.smali")
-    log_info "Spoofing model for AI features in smali"
+    log_info_in "Spoofing model for AI features in smali"
     if [[ -f "$unit_smali" ]]; then
         python3 bin/patchmethod_v2.py "$unit_smali" isAllWhiteConditionMatch > /dev/null
         python3 bin/patchmethod_v2.py "$unit_smali" isWhiteConditionsMatch > /dev/null
@@ -1442,7 +1440,7 @@ patch_oplus_launcher() {
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/OplusLauncher 2> /dev/null
  
     local smali
-    log_info "Patching method "getFirstApiLevel" in smali"
+    log_info_in "Patching method "getFirstApiLevel" in smali"
     smali=$(find tmp/OplusLauncher -type f -path "*/com/oplus/basecommon/util/SystemPropertiesHelper.smali")
     if [[ -f "$smali" ]]; then
         python3 bin/patchmethod_v2.py "$smali" getFirstApiLevel ".locals 1\n\tconst/16 v0, 0x22\n\treturn v0" > /dev/null
@@ -1472,12 +1470,13 @@ patch_systemui_apk() {
     aod_smali=$(find tmp/SystemUI -type f -name "AODDisplayUtil.smali")
     [[ -f "$aod_smali" ]] && \
         python3 bin/patchmethod_v2.py "$aod_smali" isPanoramicProcessTypeNotSupportAllDay -return false 2> /dev/null
- 
+    log_info_in "Patching method "isCtsTest" with false in smali"
     python3 bin/patchmethod_v2.py -d tmp/SystemUI -n isCtsTest -return false 2> /dev/null
  
     local feature_smali
     feature_smali=$(find tmp/SystemUI -type f -path "*/systemui/common/feature/FeatureOption.smali")
     [[ -f "$feature_smali" ]] && \
+    log_info_in "Patching method "isSupporMyDevice" with true in smali"
         python3 bin/patchmethod_v2.py "$feature_smali" isSupportMyDevice -return true 2> /dev/null
  
     while IFS= read -r sxml; do
@@ -1500,9 +1499,9 @@ patch_aod_apk() {
     local common_smali settings_smali
     common_smali=$(find tmp/Aod -type f -path "*/com/oplus/aod/util/CommonUtils.smali")
     settings_smali=$(find tmp/Aod -type f -path "*/com/oplus/aod/util/SettingsUtils.smali")
-    log_info "Patching method "isSupportFullAod" with true in smali"
+    log_info_in "Patching method "isSupportFullAod" with true in smali"
     [[ -f "$common_smali" ]] && python3 bin/patchmethod_v2.py "$common_smali" isSupportFullAod -return true 2> /dev/null
-    log_info "Patching method "getKeyAodAllDaySupportSettings" with true in smali"
+    log_info_in "Patching method "getKeyAodAllDaySupportSettings" with true in smali"
     [[ -f "$settings_smali" ]] && python3 bin/patchmethod_v2.py "$settings_smali" getKeyAodAllDaySupportSettings -return true 2> /dev/null
  
     java -jar bin/apktool/APKEditor.jar b -f -i tmp/Aod -o "$apk" 2> /dev/null
@@ -1561,7 +1560,7 @@ patch_battery_apk() {
     mkdir -p tmp
     cp -f "$apk" tmp/Battery.bak
     java -jar bin/apktool/APKEditor.jar d -f -i "$apk" -o tmp/Battery 2> /dev/null
-    log_info "Patching method "getUIsohValue" in smali"
+    log_info_in "Patching method "getUIsohValue" in smali"
     python3 bin/patchmethod_v2.py -d tmp/Battery -k "getUIsohValue" -m devices/common/patch_battery_soh.txt 2> /dev/null
     java -jar bin/apktool/APKEditor.jar b -f -i tmp/Battery -o "$apk" 2> /dev/null
 }
