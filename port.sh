@@ -85,12 +85,13 @@ detect_device() {
 load_config() {
     local device="$1"
     local cfg="target/${device}/config.sh"
-    if [[ ! -f "$cfg" ]]; then
-        log_info "Target config not found: $cfg"
-        exit 1
-    fi
-    source "$cfg"
-    cat "$cfg"
+    [[ ! -f "$cfg" ]] && { log_info "Target config not found: $cfg"; exit 1; }
+
+    while IFS= read -r line; do
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line//[[:space:]]/}" ]] && continue
+        eval "$line"
+    done < "$cfg"
 }
  
 detect_img_type() {
