@@ -1590,6 +1590,38 @@ build_image() {
    # The *.size is needed for creating super.img, do not delete it
     echo "$PAD_SIZE" > "${NAME}.size"
 }
+
+build_super() {
+    local group="$TARGET_SUPER_GROUP"
+    local super_size="$TARGET_SUPER_SIZE"
+    local meta_size="$TARGET_SUPER_METADATA_SIZE"
+    local meta_slots="$TARGET_SUPER_METADATA_SLOTS"
+
+    mkdir -p out
+
+    local lpargs
+    lpargs="--metadata-size=${meta_size} \
+    --metadata-slots=${meta_slots} \
+    --device-size=${super_size} \
+    --super-name=super \
+    --group ${group}:${super_size}"
+
+    for part in system system_ext vendor product; do
+        local img="${part}.img"
+        local size_file="${part}.size"
+        if [[ -f "$img" ]]; then
+            local sz
+            if [[ -f "$size_file" ]]; then
+                sz=$(cat "$size_file")
+            else
+                sz=$(stat -c%s "$img")
+            fi
+            lpargs="$lpargs --partition ${part}:readonly:${sz}:${group} -i ${part}=${img}"
+        fi
+    done
+
+    eval bin/lpmake $lpargs -o out/super.img
+}
  
 compress_images() {
     log_info "Compressing images"
@@ -1871,7 +1903,8 @@ main() {
  
     mkdir -p out
     # build_recovery
-    compress_images
+    build_super
+    #compress_images
     package_zip
  
     local elapsed=$(( SECONDS - BUILD_START ))
