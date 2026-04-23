@@ -15,7 +15,7 @@ source /etc/os-release
 
 echo "  - ID: $ID"
 
-LOG_STEP_IN "Installing required dependencies"
+echo "  - Installing required dependencies"
 
 if [[ "$ID" == "arch" ]]; then
     sudo pacman -S --needed \
@@ -96,4 +96,4 @@ rm pdg.tar.gz
 rm LICENSE
 rm README.md
 
-LOG_STEP_OUT "Done installing dependencies."
+echo "  - Done installing dependencies."
