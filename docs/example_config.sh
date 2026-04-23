@@ -34,7 +34,8 @@ TARGET_SUPER_SIZE=8589934592 # <super partition size>
 TARGET_SUPER_GROUP="qti_dynamic_partitions" # <cluster name, if you don't know and porting to snapdragon use default, for mssi (mtk) use "main">
 TARGET_SUPER_METADATA_SIZE=67108864 # <super metadata size>
 TARGET_SUPER_METADATA_SLOTS=2 # <super metadata slots>
-
-# Base ROM ~ Port ROM File Types
 TARGET_BASEROM_TYPE="dat.br" # <base rom type, you can check it by extracting zip. Only payload, dat.br, img and dat supported>
 TARGET_PORTROM_TYPE="payload" # <port rom type, you can check it by extracting zip. Only payload, dat.br, img and dat supported>
+
+# Out ZIP type
+TARGET_ZIP_TYPE="image" # <out zip type. Only image, new.dat and new.dat.br supported>
