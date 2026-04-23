@@ -1591,6 +1591,11 @@ compress_images() {
     python3 bin/img2sdat/img2sdat.py product.img    -o out -v 4 -p product > /dev/null
     python3 bin/img2sdat/img2sdat.py vendor.img     -o out -v 4 -p vendor > /dev/null
     rm -rf system.img system_ext.img product.img vendor.img
+    brotli -q 11 -w 24 out/system.new.dat -o out/system.new.dat.br
+    brotli -q 11 -w 24 out/system_ext.new.dat -o out/system_ext.new.dat.br
+    brotli -q 11 -w 24 out/product.new.dat -o out/product.new.dat.br
+    brotli -q 11 -w 24 out/vendor.new.dat -o out/vendor.new.dat.br
+    rm -rf out/*.new.dat
 }
  
 add_apex30() {
