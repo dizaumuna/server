@@ -1569,18 +1569,25 @@ build_image() {
     local NAME="$1"
     local ROOTFS="$2"
     local CONFIG_DIR="$3"
- 
-    local SIZE PAD_SIZE FS_CONFIG CONTEXTS ARGS
+
+    local SIZE PAD_SIZE FS_CONFIG CONTEXTS
     SIZE=$(du -sb "$ROOTFS" | cut -f1)
     PAD_SIZE=$((SIZE + SIZE * PADDING / 100 + EXTRA))
     FS_CONFIG="$CONFIG_DIR/${NAME}_fs_config"
     CONTEXTS="$CONFIG_DIR/${NAME}_file_contexts"
-    ARGS=""
- 
-    [[ -f "$FS_CONFIG" ]] && ARGS="$ARGS -C $FS_CONFIG"
-    [[ -f "$CONTEXTS" ]] && ARGS="$ARGS -S $CONTEXTS"
- 
-    ./bin/make_ext4fs -s -L "$NAME" -a "$NAME" -J -T 1 $ARGS -l "$PAD_SIZE" "${NAME}.img" "$ROOTFS"
+
+    if [[ "$TARGET_FS" == "erofs" ]]; then
+        local ARGS="-z lz4hc,9"
+        [[ -f "$FS_CONFIG" ]] && ARGS="$ARGS --fs-config-file=$FS_CONFIG"
+        [[ -f "$CONTEXTS" ]] && ARGS="$ARGS --file-contexts=$CONTEXTS"
+        mkfs.erofs $ARGS "${NAME}.img" "$ROOTFS" > /dev/null 2>&1
+    else
+        local ARGS=""
+        [[ -f "$FS_CONFIG" ]] && ARGS="$ARGS -C $FS_CONFIG"
+        [[ -f "$CONTEXTS" ]] && ARGS="$ARGS -S $CONTEXTS"
+        ./bin/make_ext4fs -s -L "$NAME" -a "$NAME" -J -T 1 $ARGS -l "$PAD_SIZE" "${NAME}.img" "$ROOTFS" > /dev/null 2>&1
+    fi
+   # The *.size is needed for creating super.img, do not delete it
     echo "$PAD_SIZE" > "${NAME}.size"
 }
  
