@@ -36,6 +36,7 @@ TARGET_SUPER_METADATA_SIZE=67108864 # <super metadata size>
 TARGET_SUPER_METADATA_SLOTS=2 # <super metadata slots>
 TARGET_BASEROM_TYPE="dat.br" # <base rom type, you can check it by extracting zip. Only payload, dat.br, img and dat supported>
 TARGET_PORTROM_TYPE="payload" # <port rom type, you can check it by extracting zip. Only payload, dat.br, img and dat supported>
+TARGET_BUILD_SUPER=true # <build super or not, true or false>
 
 # Out ZIP type
 TARGET_ZIP_TYPE="image" # <out zip type. Only image, new.dat and new.dat.br supported>
