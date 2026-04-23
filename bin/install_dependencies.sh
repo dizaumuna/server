@@ -11,23 +11,9 @@
 #!/bin/bash
 set -e
 
-LOG_STEP_IN() {
-    echo "  - $1"
-}
-
-LOG_STEP_OUT() {
-    echo "  - $1"
-}
-
-CREATE_WORKDIR () {
-    if [ ! -d "workdir" ]; then
-        mkdir workdir
-    fi
-}
-
 source /etc/os-release
 
-echo "ID: $ID"
+echo "  - ID: $ID"
 
 LOG_STEP_IN "Installing required dependencies"
 
@@ -83,6 +69,7 @@ elif [[ "$ID" == "ubuntu" ]]; then
     python3-pip \
     python3-venv \
     aria2 \
+    brotli \
     ninja-build \
     ccache \
     golang \
