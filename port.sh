@@ -501,26 +501,7 @@ patch_system_props() {
         sed -i '/setusbconfig to/d' "$USB_CFG"
         sed -i '/sys.usb.config=\* && property:sys.usb.configfs=1/d' "$USB_CFG"
         sed -i '/rmdir.*rndis.gs4/d' "$USB_CFG"
-        cat >> "$USB_CFG" << 'RCEOF'
-
-on property:sys.usb.config=rndis && property:sys.usb.configfs=1
-    mkdir /config/usb_gadget/g1/functions/rndis.gs4
-    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis"
-    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1
-    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
-    setprop sys.usb.state ${sys.usb.config}
-
-on property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1
-    start adbd
-
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1
-    mkdir /config/usb_gadget/g1/functions/rndis.gs4
-    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis_adb"
-    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1
-    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f2
-    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
-    setprop sys.usb.state ${sys.usb.config}
-RCEOF
+        printf '\non property:sys.usb.config=rndis && property:sys.usb.configfs=1\n    mkdir /config/usb_gadget/g1/functions/rndis.gs4\n    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis"\n    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1\n    write /config/usb_gadget/g1/UDC ${sys.usb.controller}\n    setprop sys.usb.state ${sys.usb.config}\n\non property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1\n    start adbd\n\non property:sys.usb.ffs.ready=1 && property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1\n    mkdir /config/usb_gadget/g1/functions/rndis.gs4\n    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis_adb"\n    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1\n    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f2\n    write /config/usb_gadget/g1/UDC ${sys.usb.controller}\n    setprop sys.usb.state ${sys.usb.config}\n' >> "$USB_CFG"
     fi
 
     local PERM_XML="portrom/system/system/my_product/my_product/etc/permissions/com.oppo.features_allnet_android.xml"
