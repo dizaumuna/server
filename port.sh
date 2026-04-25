@@ -329,6 +329,12 @@ patch_props() {
     sed -i '/ro.product.mod_device=joyeuse_global/d' "$FILE"
     log_info "Removing ro.vendor.se.type=HCE,UICC from vendor/build.prop"
     sed -i '/ro.vendor.se.type=HCE,UICC/d' "$FILE"
+
+    log_info "Restoring joyeuse-required props"
+    sed -i 's/ro.control_privapp_permissions=$/ro.control_privapp_permissions=enforce/' "$FILE"
+    sed -i 's/#ro.frp.pst/ro.frp.pst/' "$FILE"
+    echo "ro.product.mod_device=joyeuse_global" >> "$FILE"
+    echo "ro.vendor.se.type=HCE,UICC" >> "$FILE"
         log_info "Adding miatoll tweak props block at end of vendor/build.prop"
     cat >> "$FILE" << 'EOF'
 persist.sys.disable_rescue=true
@@ -375,8 +381,8 @@ EOF
 patch_odm() {
         local FILE="$VENDOR/odm/etc/build.prop"
 
-    log_info "Replacing odm/etc/build.prop content with miatoll version"
-    cat > "$FILE" << 'EOF'
+    log_info "Appending miatoll odm props"
+    cat >> "$FILE" << 'EOF'
 ro.soc.model=SDM720G
 ro.oplus.display.screenSizeInches.primary=6.67
 ro.build.device_family=OPSM8550
@@ -384,15 +390,11 @@ ro.product.oplus.cpuinfo=SDM720G
 ro.vendor.qti.va_odm.support=1
 import /my_bigball/build.prop
 import /my_carrier/build.prop
-import /my_company/build.prop
 import /my_engineering/build.prop
 import /my_heytap/build.prop
-import /my_preload/build.prop
-import /my_product/build.prop
 import /my_region/build.prop
 import /my_stock/build.prop
 import /my_manifest/build.prop
-import /vendor/custom_props/properties/${ro.boot.hwname}_build.prop
 EOF
 }
 
@@ -455,6 +457,86 @@ add_custom_props () {
 
     mv bin/MiatollFrameworkOverlay.apk baserom/vendor/overlay/
     mv bin/init.custom_props.rc baserom/vendor/etc/init/hw/
+}
+
+patch_system_props() {
+    log_info "Patching system/product props and permissions"
+
+    sed -i 's/ro.product.first_api_level=34/#ro.product.first_api_level=34/g' portrom/system/system/my_manifest/my_manifest/build.prop 2>/dev/null || true
+
+    local PROD="portrom/system/system/my_product/my_product/build.prop"
+    [[ -f "$PROD" ]] || PROD=$(find portrom -path "*/my_product/build.prop" | head -n1)
+    if [[ -f "$PROD" ]]; then
+        sed -i 's/ro.sf.lcd_density=560/ro.sf.lcd_density=440/' "$PROD"
+        sed -i 's/ro.oplus.display.screenhole.positon=596,40:668,112/# ro.oplus.display.screenhole.positon=596,40:668,112\nro.oplus.display.screenhole.positon=519,36:569,86/' "$PROD"
+        sed -i 's/ro.vendor.display.sensortype=2/# ro.vendor.display.sensortype=2/' "$PROD"
+        sed -i 's/^persist.oplus.display.vrr=1$/# persist.oplus.display.vrr=1/' "$PROD"
+        sed -i 's/^persist.oplus.display.vrr.adfr=2$/# persist.oplus.display.vrr.adfr=2/' "$PROD"
+        sed -i 's/^persist.oplus.display.vrr.adfr.scale=129$/# persist.oplus.display.vrr.adfr.scale=129/' "$PROD"
+        sed -i 's/^vendor.display.use_layer_ext=1$/# vendor.display.use_layer_ext=1/' "$PROD"
+        sed -i 's/ro.oplus.density.fhd_default=480/ro.oplus.density.fhd_default=440/' "$PROD"
+        sed -i 's/ro.oplus.resolution.low=1080,2376/ro.oplus.resolution.low=1080,2400/' "$PROD"
+        sed -i '/ro.oplus.gaussianlevel=3/d' "$PROD"
+        echo "debug.sf.disable_client_composition_cache=0" >> "$PROD"
+    fi
+
+    local SYS_BP="portrom/system/system/system/build.prop"
+    [[ -f "$SYS_BP" ]] && {
+        sed -i 's/dalvik.vm.minidebuginfo=true/dalvik.vm.minidebuginfo=false/' "$SYS_BP"
+        sed -i 's/dalvik.vm.dex2oat-minidebuginfo=true/dalvik.vm.dex2oat-minidebuginfo=false/' "$SYS_BP"
+    }
+
+    local INIT_RC="portrom/system/system/system/etc/init/hw/init.rc"
+    [[ -f "$INIT_RC" ]] && sed -i 's/write \/proc\/sys\/kernel\/panic_on_oops 1/write \/proc\/sys\/kernel\/panic_on_oops 0/' "$INIT_RC"
+
+    local USB_RC="portrom/system/system/system/etc/init/hw/init.usb.rc"
+    if [[ -f "$USB_RC" ]]; then
+        sed -i '/vendor.sys.usb.adb.disabled/d' "$USB_RC"
+        sed -i '/persist.vendor.usb.config/d' "$USB_RC"
+        sed -i '/persist.sys.usb.config.*persist.vendor/d' "$USB_RC"
+    fi
+
+    local USB_CFG="portrom/system/system/system/etc/init/hw/init.usb.configfs.rc"
+    if [[ -f "$USB_CFG" ]]; then
+        sed -i '/setusbconfig to/d' "$USB_CFG"
+        sed -i '/sys.usb.config=\* && property:sys.usb.configfs=1/d' "$USB_CFG"
+        sed -i '/rmdir.*rndis.gs4/d' "$USB_CFG"
+        cat >> "$USB_CFG" << 'RCEOF'
+
+on property:sys.usb.config=rndis && property:sys.usb.configfs=1
+    mkdir /config/usb_gadget/g1/functions/rndis.gs4
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis"
+    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1
+    start adbd
+
+on property:sys.usb.ffs.ready=1 && property:sys.usb.config=rndis,adb && property:sys.usb.configfs=1
+    mkdir /config/usb_gadget/g1/functions/rndis.gs4
+    write /config/usb_gadget/g1/configs/b.1/strings/0x409/configuration "rndis_adb"
+    symlink /config/usb_gadget/g1/functions/rndis.gs4 /config/usb_gadget/g1/configs/b.1/f1
+    symlink /config/usb_gadget/g1/functions/ffs.adb /config/usb_gadget/g1/configs/b.1/f2
+    write /config/usb_gadget/g1/UDC ${sys.usb.controller}
+    setprop sys.usb.state ${sys.usb.config}
+RCEOF
+    fi
+
+    local PERM_XML="portrom/system/system/my_product/my_product/etc/permissions/com.oppo.features_allnet_android.xml"
+    [[ -f "$PERM_XML" ]] && {
+        sed -i 's/<feature name="android.hardware.biometrics.face" \/>$/<!-- <feature name="android.hardware.biometrics.face" \/>  -->/' "$PERM_XML"
+        sed -i 's/<feature name="oppo.common.support.curved.display" \/>$/<!-- <feature name="oppo.common.support.curved.display" \/> -->/' "$PERM_XML"
+    }
+
+    local DISP_XML="portrom/system/system/my_product/my_product/etc/permissions/oplus.product.display_features.xml"
+    [[ -f "$DISP_XML" ]] && sed -i 's/<oplus-feature name="oplus.software.fingeprint_optical_enabled"\/>$/<!-- <oplus-feature name="oplus.software.fingeprint_optical_enabled"\/> -->/' "$DISP_XML"
+
+    local VID_XML="portrom/system/system/my_product/my_product/etc/permissions/oplus.product.feature_video_unique.xml"
+    [[ -f "$VID_XML" ]] && {
+        sed -i 's/<feature name="oplus.software.video.sr_support"\/>$/<!-- <feature name="oplus.software.video.sr_support"\/> -->/' "$VID_XML"
+        sed -i 's/<feature name="oplus.software.video.osie_support"\/>$/<!-- <feature name="oplus.software.video.osie_support"\/> -->/' "$VID_XML"
+    }
 }
 
 patch_odm_media_profiles() {
@@ -1856,6 +1938,7 @@ main() {
     patch_props
     patch_odm
     add_custom_props
+    patch_system_props
     patch_odm_media_profiles
     patch_audio_effects
     patch_audio_io_policy
