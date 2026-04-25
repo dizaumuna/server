@@ -20,7 +20,5 @@ def main():
     ext = ULTRAMAN()
     ext.MONSTER(img, out)
 
-    print("finished")
-
 if __name__ == "__main__":
     main()
