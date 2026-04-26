@@ -24,6 +24,15 @@ set -euo pipefail
 chmod +x bin/*
 chmod +x *
 
+# install pdg system-wide
+wget https://github.com/ssut/payload-dumper-go/releases/download/1.3.0/payload-dumper-go_1.3.0_linux_amd64.tar.gz -O pdg.tar.gz > /dev/null
+tar -xvzf pdg.tar.gz > /dev/null
+sudo mv payload-dumper-go /usr/local/bin
+
+rm pdg.tar.gz
+rm LICENSE
+rm README.md
+
 
 # Change URL1 with your Port ROM url
 # Change URL2 with your Stock ROM url
