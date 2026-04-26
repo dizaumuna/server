@@ -109,7 +109,6 @@ def run_sdat2img_logic(transfer_list_file, new_dat_file, output_image_file):
 
     output_img.close()
     new_data_file.close()
-    print(f'sdat2img module: Conversion completed. Output image: {os.path.realpath(output_img.name)}')
     return True
 
 
@@ -120,11 +119,6 @@ def convert_rom_files(br_file_name, transfer_list_name, output_img_name):
     2. Convert .dat and .transfer.list to .img using sdat2img logic.
     Files must be in the same directory as the script, or paths provided.
     """
-    
-    print("----------------------------------------")
-    print(f"Processing files: '{br_file_name}' and '{transfer_list_name}'")
-    print(f"Output image will be: '{output_img_name}'")
-    print("----------------------------------------")
 
     if not os.path.exists(br_file_name):
         print(f"Error: '{br_file_name}' not found. Please ensure the path is correct.")
@@ -147,23 +141,18 @@ def convert_rom_files(br_file_name, transfer_list_name, output_img_name):
             # If not .br, it might already be .dat or another extension, simply append .dat suffix
             dat_file_path = br_file_name + ".dat"
 
-
-    print(f"\nStep 1/2: Decompressing '{br_file_name}' to '{dat_file_path}'...")
     try:
         with open(br_file_name, 'rb') as f_in:
             decompressed_data = brotli.decompress(f_in.read())
             with open(dat_file_path, 'wb') as f_out:
                 f_out.write(decompressed_data)
-        print("Decompression completed.")
     except brotli.error as e:
         print(f"Brotli decompression failed: {e}")
         return False
     except Exception as e:
         print(f"Unknown error during decompression: {e}")
         return False
-
-    print(f"\nStep 2/2: Converting '{dat_file_path}' to '{output_img_name}'...")
-    
+        
     success = False
     try:
         success = run_sdat2img_logic(transfer_list_name, dat_file_path, output_img_name)
@@ -171,9 +160,7 @@ def convert_rom_files(br_file_name, transfer_list_name, output_img_name):
         print(f"Error during conversion: {e}")
     finally:
         if os.path.exists(dat_file_path):
-            print(f"\nCleaning up temporary file '{dat_file_path}'...")
             os.remove(dat_file_path)
-            print("Cleanup done.")
             
     return success
 
@@ -219,21 +206,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Display the parameters being used
-    print("\n----------------------------------------")
-    print(" Command-line arguments set:")
-    print(f"  .dat.br file: {args.datbr}")
-    print(f"  .transfer.list file: {args.transferlist}")
-    print(f"  Output .img file: {args.outputimg}")
-    print("----------------------------------------\n")
-
     overall_success = convert_rom_files(args.datbr, args.transferlist, args.outputimg)
-
-    print("\n----------------------------------------")
-    if overall_success:
-        print("Conversion completed successfully!")
-        print("You can now use tools like DiskGenius, 7-Zip, or Linux Reader to explore the .img file.")
-    else:
-        print("Conversion failed. Please check the error messages above!")
-    print("----------------------------------------")
 
