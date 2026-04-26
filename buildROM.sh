@@ -28,7 +28,7 @@ chmod +x *
 wget https://github.com/ssut/payload-dumper-go/releases/download/1.3.0/payload-dumper-go_1.3.0_linux_amd64.tar.gz -O pdg.tar.gz > /dev/null
 tar -xvzf pdg.tar.gz > /dev/null
 sudo mv payload-dumper-go /usr/local/bin
-
+pip3 install brotli
 rm pdg.tar.gz
 rm LICENSE
 rm README.md
