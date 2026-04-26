@@ -114,6 +114,17 @@ python3 bin/extractor.py workdir/source/vendor.img workdir/source/vendor
 # Clean-up
 rm -rf workdir/source/vendor.img
 
+LOGINFO "Moving OnePlus partitions to system/"
+mv workdir/target/my_bigball workdir/target/system/
+mv workdir/target/my_carrier workdir/target/system/
+mv workdir/target/my_company workdir/target/system/
+mv workdir/target/my_engineering workdir/target/system/
+mv workdir/target/my_heytap workdir/target/system/
+mv workdir/target/my_manifest workdir/target/system/
+mv workdir/target/my_preload workdir/target/system/
+mv workdir/target/my_product workdir/target/system/
+mv workdir/target/my_region workdir/target/system/
+mv workdir/target/my_stock workdir/target/system/
 
 
 ####################################################
@@ -187,18 +198,6 @@ echo "import /my_stock/build.prop" >> workdir/source/vendor/build.prop
 LOGINFO "Replacing OnePlus overlays"
 rm -rf workdir/source/vendor/overlay/*
 cp -a workdir/target/vendor/overlay/* workdir/source/vendor/overlay/
-
-LOGINFO "Moving OnePlus partitions to system/"
-mv workdir/target/my_bigball workdir/target/system/
-mv workdir/target/my_carrier workdir/target/system/
-mv workdir/target/my_company workdir/target/system/
-mv workdir/target/my_engineering workdir/target/system/
-mv workdir/target/my_heytap workdir/target/system/
-mv workdir/target/my_manifest workdir/target/system/
-mv workdir/target/my_preload workdir/target/system/
-mv workdir/target/my_product workdir/target/system/
-mv workdir/target/my_region workdir/target/system/
-mv workdir/target/my_stock workdir/target/system/
 
 LOGINFO "Adding debug lines"
 sed -i \
