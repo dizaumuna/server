@@ -73,8 +73,8 @@ payload-dumper-go -o workdir/target/ \
 python bin/sdat2img_brotli.py -d workdir/source/vendor.new.dat.br -t workdir/source/vendor.transfer.list -o workdir/source/vendor.img
 
 # extract erofs images
-./bin/extract.erofs -i workdir/target/system.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/system_ext.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target_ext.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/vendor.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/my_manifest.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/my_preload.img -o workdir/target -x > /dev/null
@@ -101,8 +101,8 @@ rm -rf workdir/target/my_bigball.img
 rm -rf workdir/target/my_carrier.img
 rm -rf workdir/target/my_engineering.img
 rm -rf workdir/target/my_company.img
-rm -rf workdir/target/system.img
-rm -rf workdir/target/system_ext.img
+rm -rf workdir/target.img
+rm -rf workdir/target_ext.img
 rm -rf workdir/target/vendor.img
 
 # extract ext image
@@ -115,62 +115,62 @@ python3 bin/extractor.py workdir/source/vendor.img workdir/source/vendor
 rm -rf workdir/source/vendor.img
 
 LOGINFO "Moving OnePlus partitions to system/"
-mv workdir/target/my_bigball workdir/target/system/
-mv workdir/target/my_carrier workdir/target/system/
-mv workdir/target/my_company workdir/target/system/
-mv workdir/target/my_engineering workdir/target/system/
-mv workdir/target/my_heytap workdir/target/system/
-mv workdir/target/my_manifest workdir/target/system/
-mv workdir/target/my_preload workdir/target/system/
-mv workdir/target/my_product workdir/target/system/
-mv workdir/target/my_region workdir/target/system/
-mv workdir/target/my_stock workdir/target/system/
+mv workdir/target/my_bigball workdir/target/
+mv workdir/target/my_carrier workdir/target/
+mv workdir/target/my_company workdir/target/
+mv workdir/target/my_engineering workdir/target/
+mv workdir/target/my_heytap workdir/target/
+mv workdir/target/my_manifest workdir/target/
+mv workdir/target/my_preload workdir/target/
+mv workdir/target/my_product workdir/target/
+mv workdir/target/my_region workdir/target/
+mv workdir/target/my_stock workdir/target/
 
 
 ####################################################
 #                 Debloating                       #
 LOGINFO "Debloating system"
-rm -rf workdir/target/system/system/my_bigball/del-app-pre/*
-rm -rf workdir/target/system/system/my_bigball/del-app/*
+rm -rf workdir/target/system/my_bigball/del-app-pre/*
+rm -rf workdir/target/system/my_bigball/del-app/*
 
 # my_bigball/priv-app
-rm -rf workdir/target/system/system/my_bigball/priv-app/Google_Files
-rm -rf workdir/target/system/system/my_bigball/priv-app/GoogleDialer
-rm -rf workdir/target/system/system/my_bigball/priv-app/Messages
-rm -rf workdir/target/system/system/my_bigball/priv-app/GlobalSearch
+rm -rf workdir/target/system/my_bigball/priv-app/Google_Files
+rm -rf workdir/target/system/my_bigball/priv-app/GoogleDialer
+rm -rf workdir/target/system/my_bigball/priv-app/Messages
+rm -rf workdir/target/system/my_bigball/priv-app/GlobalSearch
 
 # my_bigball/app
-rm -rf workdir/target/system/system/my_bigball/app/Drive
-rm -rf workdir/target/system/system/my_bigball/app/CalendarGoogle
-rm -rf workdir/target/system/system/my_bigball/app/Google_Lens
-rm -rf workdir/target/system/system/my_bigball/app/Google_Wallet
-rm -rf workdir/target/system/system/my_bigball/app/GoogleContacts
-rm -rf workdir/target/system/system/my_bigball/app/Meet
-rm -rf workdir/target/system/system/my_bigball/app/YTMusic
-rm -rf workdir/target/system/system/my_bigball/app/Photos
-rm -rf workdir/target/system/system/my_bigball/app/Videos
+rm -rf workdir/target/system/my_bigball/app/Drive
+rm -rf workdir/target/system/my_bigball/app/CalendarGoogle
+rm -rf workdir/target/system/my_bigball/app/Google_Lens
+rm -rf workdir/target/system/my_bigball/app/Google_Wallet
+rm -rf workdir/target/system/my_bigball/app/GoogleContacts
+rm -rf workdir/target/system/my_bigball/app/Meet
+rm -rf workdir/target/system/my_bigball/app/YTMusic
+rm -rf workdir/target/system/my_bigball/app/Photos
+rm -rf workdir/target/system/my_bigball/app/Videos
 
 # my_product/priv-app
-rm -rf workdir/target/system/system/my_product/priv-app/OnePlusCamera
+rm -rf workdir/target/system/my_product/priv-app/OnePlusCamera
 
 # my_stock/app
-rm -rf workdir/target/system/system/my_stock/app/RomUpdate
-rm -rf workdir/target/system/system/my_stock/app/ChildrenSpace
-rm -rf workdir/target/system/system/my_stock/app/OppoWeather2
-rm -rf workdir/target/system/system/my_stock/app/OplusOperationManual
-rm -rf workdir/target/system/system/my_stock/app/Calculator2
-rm -rf workdir/target/system/system/my_stock/app/Clock
-rm -rf workdir/target/system/system/my_stock/app/FileManager
-rm -rf workdir/target/system/system/my_stock/app/SceneMode
-rm -rf workdir/target/system/system/my_stock/app/SmartSideBar
+rm -rf workdir/target/system/my_stock/app/RomUpdate
+rm -rf workdir/target/system/my_stock/app/ChildrenSpace
+rm -rf workdir/target/system/my_stock/app/OppoWeather2
+rm -rf workdir/target/system/my_stock/app/OplusOperationManual
+rm -rf workdir/target/system/my_stock/app/Calculator2
+rm -rf workdir/target/system/my_stock/app/Clock
+rm -rf workdir/target/system/my_stock/app/FileManager
+rm -rf workdir/target/system/my_stock/app/SceneMode
+rm -rf workdir/target/system/my_stock/app/SmartSideBar
 
 # my_stock/del-app
-rm -rf workdir/target/system/system/my_stock/del-app/OppoRelax
-rm -rf workdir/target/system/system/my_stock/del-app/OPForum
+rm -rf workdir/target/system/my_stock/del-app/OppoRelax
+rm -rf workdir/target/system/my_stock/del-app/OPForum
 
 # my_stock/priv-app
-rm -rf workdir/target/system/system/my_stock/priv-app/Games
-rm -rf workdir/target/system/system/my_stock/priv-app/LinktoWindows
+rm -rf workdir/target/system/my_stock/priv-app/Games
+rm -rf workdir/target/system/my_stock/priv-app/LinktoWindows
 ########################################################
 
 # port rom (real)
@@ -181,7 +181,7 @@ cp -a workdir/target/vendor/etc/group workdir/source/vendor/etc/
 cp -a workdir/target/vendor/etc/passwd workdir/source/vendor/etc/
 
 LOGINFO "Deleting prop ro.product.first_api_level in my_manifest"
-sed -i '/^ro\.product\.first_api_level=30$/d' workdir/target/system/my_manifest/build.prop
+sed -i '/^ro\.product\.first_api_level=30$/d' workdir/target/my_manifest/build.prop
 
 LOGINFO "Adding import props to vendor/build.prop"
 echo "import /my_bigball/build.prop" >> workdir/source/vendor/build.prop
@@ -204,7 +204,7 @@ sed -i \
 -e 's/^ro\.debuggable=0$/ro.debuggable=1/' \
 -e 's/^ro\.force\.debuggable=0$/ro.force.debuggable=1/' \
 -e 's/^ro\.adb\.secure=1$/ro.adb.secure=0/' \
-workdir/target/system/system/build.prop
+workdir/target/system/build.prop
 
 LOGINFO "Removing encryption in fstab"
 # todo: add removing
@@ -213,8 +213,8 @@ LOGINFO "Building images"
 PADDING=3
 
 python3 bin/fspatch.py workdir/source/vendor workdir/source/config/vendor_fsconfig.txt > /dev/null
-python3 bin/fspatch.py workdir/target/system workdir/target/config/system_fs_config > /dev/null
-python3 bin/fspatch.py workdir/target/system_ext workdir/target/config/system_ext_fs_config > /dev/null
+python3 bin/fspatch.py workdir/target workdir/target/config/system_fs_config > /dev/null
+python3 bin/fspatch.py workdir/target_ext workdir/target/config/system_ext_fs_config > /dev/null
 
 sed -i 's|^\(/system/my_[^ ]*\) u:object_r:system_file:s0|\1(/.*)?    u:object_r:system_file:s0|' workdir/target/config/system_file_contexts
 
@@ -254,12 +254,12 @@ build_image() {
 
 build_image \
   "system" \
-  "workdir/target/system" \
+  "workdir/target" \
   "workdir/target/config" > /dev/null
 
 build_image \
   "system_ext" \
-  "workdir/target/system_ext" \
+  "workdir/target_ext" \
   "workdir/target/config" > /dev/null
 
 build_image \
