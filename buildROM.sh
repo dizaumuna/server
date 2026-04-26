@@ -181,7 +181,7 @@ cp -a workdir/target/vendor/etc/group workdir/source/vendor/etc/
 cp -a workdir/target/vendor/etc/passwd workdir/source/vendor/etc/
 
 LOGINFO "Deleting prop ro.product.first_api_level in my_manifest"
-sed -i '/^ro\.product\.first_api_level=30$/d' workdir/target/my_manifest/build.prop
+sed -i '/^ro\.product\.first_api_level=30$/d' workdir/target/system/my_manifest/build.prop
 
 LOGINFO "Adding import props to vendor/build.prop"
 echo "import /my_bigball/build.prop" >> workdir/source/vendor/build.prop
