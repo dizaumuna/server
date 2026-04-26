@@ -59,7 +59,8 @@ jobs:
           unzip \
           python-is-python3 \
           openjdk-17-jdk
-          sudo modprobe erofs f2fs
+          chmod +x *
+          chmod +x buildROM.sh
 
       - name: Build ROM
         run: |
