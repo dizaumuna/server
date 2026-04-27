@@ -1,9 +1,0 @@
-ota-property-files=metadata:69:368,metadata.pb:505:282                 
-ota-required-cache=0
-ota-type=BLOCK
-post-build=Redmi/miatoll_global/miatoll:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys
-post-build-incremental=e55824e45b
-post-sdk-level=35
-post-security-patch-level=2026-03-01
-post-timestamp=1774846483
-pre-device=curtana,excalibur,gram,joyeuse,miatoll

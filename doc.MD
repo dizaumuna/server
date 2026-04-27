@@ -1,2 +1,0 @@
-# Document of PortMation
-Portmation is a automated OS porting script, which is downloads the given URL ROM's, extracts them, ports, debloats, rebuilds and creates a flashable ZIP file. This is saving a lot of time. All you just have to do is click Start workflow button and that's it!
