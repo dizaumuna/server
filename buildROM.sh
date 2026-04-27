@@ -101,8 +101,8 @@ rm -rf workdir/target/my_bigball.img
 rm -rf workdir/target/my_carrier.img
 rm -rf workdir/target/my_engineering.img
 rm -rf workdir/target/my_company.img
-rm -rf workdir/target.img
-rm -rf workdir/target_ext.img
+rm -rf workdir/target/system.img
+rm -rf workdir/target/system_ext.img
 rm -rf workdir/target/vendor.img
 
 # extract ext image
@@ -125,7 +125,6 @@ mv workdir/target/my_preload workdir/target/
 mv workdir/target/my_product workdir/target/
 mv workdir/target/my_region workdir/target/
 mv workdir/target/my_stock workdir/target/
-
 
 ####################################################
 #                 Debloating                       #
