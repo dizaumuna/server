@@ -73,8 +73,8 @@ payload-dumper-go -o workdir/target/ \
 python bin/sdat2img_brotli.py -d workdir/source/vendor.new.dat.br -t workdir/source/vendor.transfer.list -o workdir/source/vendor.img
 
 # extract erofs images
-./bin/extract.erofs -i workdir/target.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target_ext.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/system.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/system_ext.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/vendor.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/my_manifest.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/my_preload.img -o workdir/target -x > /dev/null
