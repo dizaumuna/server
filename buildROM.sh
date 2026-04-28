@@ -314,6 +314,8 @@ DEBLOAT=(
     workdir/target/product/app/SogouIME
     workdir/target/product/app/Updater
     workdir/target/product/app/MiSound
+    workdir/target/product/app/TrichromeLibrary64
+    workdir/target/product/app/VoiceAssistAndroidT
     workdir/target/product/app/WebViewGoogle64
     workdir/target/product/priv-app/MIShare
     workdir/target/product/priv-app/MIUIBrowser
