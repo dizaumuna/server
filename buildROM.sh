@@ -212,8 +212,8 @@ LOGINFO "Building images"
 PADDING=3
 
 python3 bin/fspatch.py workdir/source/vendor workdir/source/config/vendor_fsconfig.txt > /dev/null
-python3 bin/fspatch.py workdir/target workdir/target/config/system_fs_config > /dev/null
-python3 bin/fspatch.py workdir/target_ext workdir/target/config/system_ext_fs_config > /dev/null
+python3 bin/fspatch.py workdir/target/system workdir/target/config/system_fs_config > /dev/null
+python3 bin/fspatch.py workdir/target/system_ext workdir/target/config/system_ext_fs_config > /dev/null
 
 sed -i 's|^\(/system/my_[^ ]*\) u:object_r:system_file:s0|\1(/.*)?    u:object_r:system_file:s0|' workdir/target/config/system_file_contexts
 
@@ -253,12 +253,12 @@ build_image() {
 
 build_image \
   "system" \
-  "workdir/target" \
+  "workdir/target/system" \
   "workdir/target/config" > /dev/null
 
 build_image \
   "system_ext" \
-  "workdir/target_ext" \
+  "workdir/target/system_ext" \
   "workdir/target/config" > /dev/null
 
 build_image \
