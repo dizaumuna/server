@@ -4,9 +4,10 @@
 set -euo pipefail
 
 SOURCE_FP="Redmi/miatoll_global/miatoll:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys"
-TARGET_FP="Xiaomi/haotian/haotian:15/idk/OS2.0.212.0.VOBCNXM:user/release-keys"
+TARGET_FP="qti/missi/missi:15/AQ3A.240812.002/OS2.0.212.0.VOBCNXM:user/release-keys"
 ANDROID="15"
 AUTHOR="diza u muna"
+DATE="%Y-%m-%d"
 
 VENDOR="workdir/source/vendor"
 BUILTS="builts"
@@ -324,6 +325,7 @@ DEBLOAT=(
     workdir/target/product/priv-app/MiuiExtraPhoto
     workdir/target/product/priv-app/NewCall
     workdir/target/product/priv-app/MiuiBarrage
+    workdir/target/product/priv-app/GmsCore # tmp
 )
 
 for D in "${DEBLOAT[@]}"; do
@@ -398,6 +400,7 @@ ui_print("***********************************************");
 ui_print("Target: $TARGET_FP");
 ui_print("Source: $SOURCE_FP");
 ui_print("***********************************************");
+ui_print("Build date: $DATE");
 
 ui_print("Patching super image unconditionally...");
 show_progress(0.100000, 0);
