@@ -198,12 +198,12 @@ LOGINFO "Replacing OnePlus overlays"
 rm -rf workdir/source/vendor/overlay/*
 cp -a workdir/target/vendor/overlay/* workdir/source/vendor/overlay/
 
-LOGINFO "Adding debug lines"
+LOGINFO "Adding debug props"
 sed -i \
 -e 's/^ro\.debuggable=0$/ro.debuggable=1/' \
 -e 's/^ro\.force\.debuggable=0$/ro.force.debuggable=1/' \
 -e 's/^ro\.adb\.secure=1$/ro.adb.secure=0/' \
-workdir/target/system/build.prop
+workdir/target/system/system/build.prop
 
 LOGINFO "Removing encryption in fstab"
 # todo: add removing
