@@ -1,4 +1,5 @@
 #!/bin/bash
+# buildROM.sh
 
 set -euo pipefail
 
@@ -287,6 +288,38 @@ copy_builts() {
         cp_file "$F" "lib64/camera/components/$F"
     done
 }
+
+DEBLOAT=(
+    workdir/target/product/data-app/BaiduIME
+    workdir/target/product/data-app/iFlytekIME
+    workdir/target/product/data-app/MIService
+    workdir/target/product/data-app/MIUICalculator
+    workdir/target/product/data-app/MIUICalendar
+    workdir/target/product/data-app/MIUICleanMaster
+    workdir/target/product/data-app/MIUICompass
+    workdir/target/product/data-app/MIUIDeskClock
+    workdir/target/product/data-app/MIUIHuanji
+    workdir/target/product/data-app/MIUIMiDrive
+    workdir/target/product/data-app/MIUINotes
+    workdir/target/product/data-app/MIUISecurityManager
+    workdir/target/product/data-app/MIUIWeather
+    workdir/target/product/data-app/MIUIScanner
+    workdir/target/product/app/MIUIFileExplorer
+    workdir/target/product/app/MIUIReporter
+    workdir/target/product/app/Music
+    workdir/target/product/app/SogouIME
+    workdir/target/product/app/Updater
+    workdir/target/product/app/WebViewGoogle64
+    workdir/target/product/priv-app/MIShare
+    workdir/target/product/priv-app/MIUIBrowser
+    workdir/target/product/priv-app/MiuiBarrage
+    workdir/target/product/priv-app/MiuiCamera
+    workdir/target/product/priv-app/MiuiExtraPhoto
+)
+
+for D in "${DEBLOAT[@]}"; do
+    rm -rf "$D"
+done
 
 patch_build_prop
 patch_odm_build_prop
