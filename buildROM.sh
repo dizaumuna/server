@@ -309,12 +309,15 @@ DEBLOAT=(
     workdir/target/product/app/Music
     workdir/target/product/app/SogouIME
     workdir/target/product/app/Updater
+    workdir/target/product/app/MiSound
     workdir/target/product/app/WebViewGoogle64
     workdir/target/product/priv-app/MIShare
     workdir/target/product/priv-app/MIUIBrowser
     workdir/target/product/priv-app/MiuiBarrage
     workdir/target/product/priv-app/MiuiCamera
     workdir/target/product/priv-app/MiuiExtraPhoto
+    workdir/target/product/priv-app/NewCall
+    workdir/target/product/priv-app/MiuiBarrage
 )
 
 for D in "${DEBLOAT[@]}"; do
