@@ -25,7 +25,7 @@ sudo mv payload-dumper-go /usr/local/bin
 pip3 install brotli
 rm pdg.tar.gz LICENSE README.md
 
-URL1="https://bn.d.miui.com/OS2.0.212.0.VOBCNXM/haotian-ota_full-OS2.0.212.0.VOBCNXM-user-15.0-ebd7ade4e1.zip"
+URL1="https://gauss-componentotacostmanual-sg.allawnofs.com/remove-321c974e5931c5438d3cf3b7104102ac/component-ota/24/10/09/c6654c8a15d7487bb5a5c87708ad46af.zip"
 URL2="https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMIXM_df17e3fabf_12.0.zip"
 
 if [ ! -f "firmwaretarget.zip" ] || [ ! -f "firmwaresource.zip" ]; then
@@ -49,35 +49,102 @@ unzip firmwaresource.zip vendor.* -d workdir/source/ > /dev/null
 
 LOGINFO "Extracting target firmware"
 payload-dumper-go -o workdir/target/ \
-    -p system,system_ext,product,vendor \
+    -p system,system_ext,product,vendor,my_manifest,my_heytap,my_company,my_engineering,my_bigball,my_carrier,my_stock,my_preload,my_region,my_product \
     workdir/target/payload.bin > /dev/null
 
 python bin/sdat2img_brotli.py -d workdir/source/vendor.new.dat.br -t workdir/source/vendor.transfer.list -o workdir/source/vendor.img
 
-./bin/extract.erofs -i workdir/target/system.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/system_ext.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target_ext.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/vendor.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/product.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_manifest.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_preload.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_region.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_stock.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_product.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_heytap.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_bigball.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_carrier.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_engineering.img -o workdir/target -x > /dev/null
+./bin/extract.erofs -i workdir/target/my_company.img -o workdir/target -x > /dev/null
 
 rm -rf firmwaretarget.zip firmwaresource.zip workdir/target/payload.bin
-rm -rf workdir/target/system.img workdir/target/system_ext.img workdir/target/vendor.img workdir/target/product.img
+rm -rf workdir/target/my_manifest.img workdir/target/my_preload.img workdir/target/my_region.img
+rm -rf workdir/target/my_stock.img workdir/target/my_product.img workdir/target/my_heytap.img
+rm -rf workdir/target/my_bigball.img workdir/target/my_carrier.img workdir/target/my_engineering.img
+rm -rf workdir/target/my_company.img workdir/target.img workdir/target_ext.img workdir/target/vendor.img
 
 LOGINFO "Extracting source firmware"
 mkdir -p workdir/source/vendor workdir/source/config
 python3 bin/extractor.py workdir/source/vendor.img workdir/source/vendor
 rm -rf workdir/source/vendor.img
 
+LOGINFO "Moving OnePlus partitions"
+mv workdir/target/my_bigball workdir/target/
+mv workdir/target/my_carrier workdir/target/
+mv workdir/target/my_company workdir/target/
+mv workdir/target/my_engineering workdir/target/
+mv workdir/target/my_heytap workdir/target/
+mv workdir/target/my_manifest workdir/target/
+mv workdir/target/my_preload workdir/target/
+mv workdir/target/my_product workdir/target/
+mv workdir/target/my_region workdir/target/
+mv workdir/target/my_stock workdir/target/
+
+LOGINFO "Debloating system"
+rm -rf workdir/target/system/my_bigball/del-app-pre/*
+rm -rf workdir/target/system/my_bigball/del-app/*
+rm -rf workdir/target/system/my_bigball/priv-app/Google_Files
+rm -rf workdir/target/system/my_bigball/priv-app/GoogleDialer
+rm -rf workdir/target/system/my_bigball/priv-app/Messages
+rm -rf workdir/target/system/my_bigball/priv-app/GlobalSearch
+rm -rf workdir/target/system/my_bigball/app/Drive
+rm -rf workdir/target/system/my_bigball/app/CalendarGoogle
+rm -rf workdir/target/system/my_bigball/app/Google_Lens
+rm -rf workdir/target/system/my_bigball/app/Google_Wallet
+rm -rf workdir/target/system/my_bigball/app/GoogleContacts
+rm -rf workdir/target/system/my_bigball/app/Meet
+rm -rf workdir/target/system/my_bigball/app/YTMusic
+rm -rf workdir/target/system/my_bigball/app/Photos
+rm -rf workdir/target/system/my_bigball/app/Videos
+rm -rf workdir/target/system/my_product/priv-app/OnePlusCamera
+rm -rf workdir/target/system/my_stock/app/RomUpdate
+rm -rf workdir/target/system/my_stock/app/ChildrenSpace
+rm -rf workdir/target/system/my_stock/app/OppoWeather2
+rm -rf workdir/target/system/my_stock/app/OplusOperationManual
+rm -rf workdir/target/system/my_stock/app/Calculator2
+rm -rf workdir/target/system/my_stock/app/Clock
+rm -rf workdir/target/system/my_stock/app/FileManager
+rm -rf workdir/target/system/my_stock/app/SceneMode
+rm -rf workdir/target/system/my_stock/app/SmartSideBar
+rm -rf workdir/target/system/my_stock/del-app/OppoRelax
+rm -rf workdir/target/system/my_stock/del-app/OPForum
+rm -rf workdir/target/system/my_stock/priv-app/Games
+rm -rf workdir/target/system/my_stock/priv-app/LinktoWindows
+
 LOGINFO "Copying group and passwd"
 rm -rf workdir/source/vendor/etc/group workdir/source/vendor/etc/passwd
 cp -a workdir/target/vendor/etc/group workdir/source/vendor/etc/
 cp -a workdir/target/vendor/etc/passwd workdir/source/vendor/etc/
+
+LOGINFO "Patching my_manifest build.prop"
+sed -i '/^ro\.product\.first_api_level=30$/d' workdir/target/my_manifest/build.prop
+
+LOGINFO "Adding import props to vendor/build.prop"
+for PART in my_bigball my_carrier my_company my_engineering my_heytap my_manifest my_preload my_product my_region my_stock; do
+    echo "import /${PART}/build.prop" >> workdir/source/vendor/build.prop
+done
+
+LOGINFO "Replacing OnePlus overlays"
+rm -rf workdir/source/vendor/overlay/*
+cp -a workdir/target/vendor/overlay/* workdir/source/vendor/overlay/
 
 LOGINFO "Adding debug props"
 sed -i \
     -e 's/^ro\.debuggable=0$/ro.debuggable=1/' \
     -e 's/^ro\.force\.debuggable=0$/ro.force.debuggable=1/' \
     -e 's/^ro\.adb\.secure=1$/ro.adb.secure=0/' \
-    workdir/target/system/system/build.prop
+    workdir/target/system/build.prop
 
 LOGINFO "Applying vendor port patches"
 
@@ -248,10 +315,12 @@ copy_builts() {
 
     cp_file() {
         local FILENAME="$1" DST_REL="$2"
-        local SRC DST="$VENDOR/$DST_REL"
+        local DST="$VENDOR/$DST_REL"
+        local SUBDIR SRC
+        SUBDIR="$(dirname "$DST_REL")"
         case "$DST_REL" in
-            lib64/*) SRC="$BUILTS/lib64/$FILENAME" ;;
-            lib/*)   SRC="$BUILTS/lib/$FILENAME" ;;
+            lib64/*) SRC="$BUILTS/lib64/${SUBDIR#lib64/}/$FILENAME" ;;
+            lib/*)   SRC="$BUILTS/lib/${SUBDIR#lib/}/$FILENAME" ;;
             *)       SRC="$BUILTS/$FILENAME" ;;
         esac
         [ -f "$SRC" ] || { echo "Warn: $SRC not found, skipping"; return; }
@@ -298,8 +367,8 @@ LOGINFO "Building images"
 PADDING=3
 
 python3 bin/fspatch.py workdir/source/vendor workdir/source/config/vendor_fsconfig.txt > /dev/null
-python3 bin/fspatch.py workdir/target workdir/target/config/system_fs_config > /dev/null
-python3 bin/fspatch.py workdir/target_ext workdir/target/config/system_ext_fs_config > /dev/null
+python3 bin/fspatch.py workdir/target/system workdir/target/config/system_fs_config > /dev/null
+python3 bin/fspatch.py workdir/target/system_ext workdir/target/config/system_ext_fs_config > /dev/null
 
 mv workdir/source/config/vendor_fsconfig.txt workdir/source/config/vendor_fs_config
 mv workdir/source/config/vendor_contexts.txt workdir/source/config/vendor_file_contexts
@@ -320,12 +389,10 @@ build_image() {
     echo "$PAD_SIZE" > "${NAME}.size"
 }
 
-build_image "system"     "workdir/target"        "workdir/target/config" > /dev/null
-build_image "system_ext" "workdir/target_ext"    "workdir/target/config" > /dev/null
-build_image "vendor"     "workdir/source/vendor" "workdir/source/config" > /dev/null
-build_image "port"     "workdir/target/product" "workdir/target/config" > /dev/null
-
-mv workdir/target/product.img .
+build_image "system"     "workdir/target/system"        "workdir/target/config" > /dev/null
+build_image "system_ext" "workdir/target/system_ext"    "workdir/target/config" > /dev/null
+build_image "product"    "workdir/target/product"       "workdir/target/config" > /dev/null
+build_image "vendor"     "workdir/source/vendor"        "workdir/source/config" > /dev/null
 
 LOGINFO "Building super image"
 ./bin/lpmake \
@@ -370,10 +437,10 @@ EOF
 cd out/
 LOGINFO "Downloading LineageOS boot for miatoll"
 curl -# -L -o boot.img https://mirrorbits.lineageos.org/full/miatoll/20260323/boot.img
-zip -8 -r "MIATOLL-ota_full-global-HyperOS-OS2.0.212.0.VOBCNXM-userdebug.zip" *
+zip -8 -r "MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip" *
 cd ..
-mv out/MIATOLL-ota_full-global-HyperOS-OS2.0.212.0.VOBCNXM-userdebug.zip .
+mv out/MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip .
 rm -rf out/*
-mv MIATOLL-ota_full-global-HyperOS-OS2.0.212.0.VOBCNXM-userdebug.zip out/
+mv MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip out/
 
 LOGINFO "Build finished. Out ZIP is in out/ folder."
