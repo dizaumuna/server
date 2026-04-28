@@ -304,6 +304,10 @@ DEBLOAT=(
     workdir/target/product/data-app/MIUISecurityManager
     workdir/target/product/data-app/MIUIWeather
     workdir/target/product/data-app/MIUIScanner
+    workdir/target/product/data-app/MIUIGallery # tmp
+    workdir/target/product/data-app/MIUISoundRecorderTargetSdk30
+    workdir/target/product/data-app/MIUIEmail
+    workdir/target/product/data-app/wps-lite
     workdir/target/product/app/MIUIFileExplorer
     workdir/target/product/app/MIUIReporter
     workdir/target/product/app/Music
