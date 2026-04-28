@@ -209,7 +209,7 @@ patch_fstab() {
 patch_selinux_file_contexts() {
     local F="$VENDOR/etc/selinux/vendor_file_contexts"
     [ -f "$F" ] || return
-    sed -i 's|(vendor|sustem/vendor)|(vendor|system/vendor)|g' "$F"
+    sed -i 's#(vendor|sustem/vendor)#(vendor|system/vendor)#g' "$F"
 }
 
 patch_wifi_cfg() {
