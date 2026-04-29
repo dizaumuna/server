@@ -1,4 +1,8 @@
 #!/bin/bash
+# buildROM.sh
+
+# TODO: add image compression to dat, and make upd-script compatible with that, currently we are only building super.img ZIP
+# TODO2: add submodules to external_img2sdat
 
 set -euo pipefail
 
@@ -21,11 +25,16 @@ die() { LOGERROR "$1"; exit 1; }
 chmod +x bin/*
 chmod +x ./*.sh
 
-wget https://github.com/ssut/payload-dumper-go/releases/download/1.3.0/payload-dumper-go_1.3.0_linux_amd64.tar.gz -O pdg.tar.gz > /dev/null
-tar -xvzf pdg.tar.gz > /dev/null
-sudo mv payload-dumper-go /usr/local/bin
-pip3 install brotli
-rm pdg.tar.gz LICENSE README.md
+build_deps() {
+   wget https://github.com/ssut/payload-dumper-go/releases/download/1.3.0/payload-dumper-go_1.3.0_linux_amd64.tar.gz -O pdg.tar.gz > /dev/null
+   tar -xvzf pdg.tar.gz > /dev/null
+   sudo mv payload-dumper-go /usr/local/bin
+   pip3 install brotli
+   rm pdg.tar.gz LICENSE README.md
+   git clone https://github.com/UN1CA/external_img2sdat
+   mv external_img2sdat/* .
+   chmod +x *
+}
 
 URL1="https://bn.d.miui.com/OS2.0.212.0.VOBCNXM/haotian-ota_full-OS2.0.212.0.VOBCNXM-user-15.0-ebd7ade4e1.zip"
 URL2="https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMIXM_df17e3fabf_12.0.zip"
@@ -64,6 +73,7 @@ python bin/sdat2img_brotli.py -d workdir/source/vendor.new.dat.br -t workdir/sou
 rm -rf firmwaretarget.zip firmwaresource.zip workdir/target/payload.bin
 rm -rf workdir/target/system.img workdir/target/system_ext.img
 rm -rf workdir/target/product.img workdir/target/vendor.img
+build_deps
 
 LOGINFO "Extracting source firmware"
 mkdir -p workdir/source/vendor workdir/source/config
