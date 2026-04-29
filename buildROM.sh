@@ -69,6 +69,37 @@ python bin/sdat2img_brotli.py -d workdir/source/vendor.new.dat.br -t workdir/sou
 ./bin/extract.erofs -i workdir/target/system_ext.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/product.img -o workdir/target -x > /dev/null
 ./bin/extract.erofs -i workdir/target/vendor.img -o workdir/target -x > /dev/null
+generate_fs_metadata() {
+    local IMG="$1"
+    local NAME="$2"
+    local OUTDIR="$3"
+
+    mkdir -p "$OUTDIR"
+
+    TMP_MNT=$(mktemp -d)
+
+    sudo mount -o loop,ro "$IMG" "$TMP_MNT"
+
+    # fs_config
+    sudo find "$TMP_MNT" | sudo xargs -I "{}" -P "$(nproc)" \
+        stat -c "%n %u %g %a capabilities=0x0" "{}" \
+        > "$OUTDIR/${NAME}_fs_config"
+
+    # file_contexts
+    sudo find "$TMP_MNT" | sudo xargs -I "{}" -P "$(nproc)" \
+        sh -c 'echo "$1 $(getfattr -n security.selinux --only-values -h --absolute-names "$1" 2>/dev/null)"' sh "{}" \
+        > "$OUTDIR/${NAME}_file_contexts"
+
+    # path fix
+    sed -i "s|$TMP_MNT|/$NAME|g" "$OUTDIR/${NAME}_file_contexts"
+    sed -i -e "s|$TMP_MNT | |g" -e "s|$TMP_MNT|$NAME|g" "$OUTDIR/${NAME}_fs_config"
+
+    sort -o "$OUTDIR/${NAME}_fs_config" "$OUTDIR/${NAME}_fs_config"
+    sort -o "$OUTDIR/${NAME}_file_contexts" "$OUTDIR/${NAME}_file_contexts"
+
+    sudo umount "$TMP_MNT"
+    rmdir "$TMP_MNT"
+}
 
 rm -rf firmwaretarget.zip firmwaresource.zip workdir/target/payload.bin
 rm -rf workdir/target/system.img workdir/target/system_ext.img
@@ -408,15 +439,13 @@ patch_init_target_rc
 patch_ueventd
 copy_builts
 
+generate_fs_metadata workdir/target/system.img system workdir/target/config
+generate_fs_metadata workdir/target/system_ext.img system_ext workdir/target/config
+generate_fs_metadata workdir/target/product.img product workdir/target/config
+generate_fs_metadata workdir/target/vendor.img vendor workdir/source/config
+
 LOGINFO "Building images"
 PADDING=3
-
-python3 bin/fspatch.py workdir/source/vendor workdir/source/config/vendor_fsconfig.txt > /dev/null
-python3 bin/fspatch.py workdir/target/system workdir/target/config/system_fs_config > /dev/null
-python3 bin/fspatch.py workdir/target/system_ext workdir/target/config/system_ext_fs_config > /dev/null
-
-mv workdir/source/config/vendor_fsconfig.txt workdir/source/config/vendor_fs_config
-mv workdir/source/config/vendor_contexts.txt workdir/source/config/vendor_file_contexts
 
 build_image() {
     local NAME="$1" ROOTFS="$2" CONFIG_DIR="$3"
