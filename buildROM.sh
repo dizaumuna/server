@@ -411,6 +411,7 @@ patch_camera_settings
 patch_perf_config
 patch_init_target_rc
 patch_ueventd
+down_apex
 copy_builts
 
 LOGINFO "Building images"
