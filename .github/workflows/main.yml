@@ -68,5 +68,4 @@ jobs:
 
       - name: Upload to PixelDrain
         run: |
-          curl -u:${{ secrets.PD_API_KEY }} -T MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip
-      
+          curl -u:${{ secrets.PD_API_KEY }} -T MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip https://pixeldrain.com/api/file/MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip 
