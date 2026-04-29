@@ -38,6 +38,7 @@ build_deps() {
 
 URL1="https://bn.d.miui.com/OS2.0.212.0.VOBCNXM/haotian-ota_full-OS2.0.212.0.VOBCNXM-user-15.0-ebd7ade4e1.zip"
 URL2="https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMIXM_df17e3fabf_12.0.zip"
+build_deps
 
 if [ ! -f "firmwaretarget.zip" ] || [ ! -f "firmwaresource.zip" ]; then
     LOGINFO "Downloading target firmware"
@@ -73,7 +74,6 @@ python bin/sdat2img_brotli.py -d workdir/source/vendor.new.dat.br -t workdir/sou
 rm -rf firmwaretarget.zip firmwaresource.zip workdir/target/payload.bin
 rm -rf workdir/target/system.img workdir/target/system_ext.img
 rm -rf workdir/target/product.img workdir/target/vendor.img
-build_deps
 
 LOGINFO "Extracting source firmware"
 mkdir -p workdir/source/vendor workdir/source/config
