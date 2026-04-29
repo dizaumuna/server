@@ -1,5 +1,4 @@
 #!/bin/bash
-# buildROM.sh
 
 set -euo pipefail
 
@@ -10,6 +9,7 @@ AUTHOR="diza u muna"
 DATE="%Y-%m-%d"
 
 VENDOR="workdir/source/vendor"
+PRODUCT="workdir/target/product"
 BUILTS="builts"
 
 LOGINFO()  { echo "$(date '+%Y-%m-%d-%H') - INFO - $1"; }
@@ -62,10 +62,8 @@ python bin/sdat2img_brotli.py -d workdir/source/vendor.new.dat.br -t workdir/sou
 ./bin/extract.erofs -i workdir/target/vendor.img -o workdir/target -x > /dev/null
 
 rm -rf firmwaretarget.zip firmwaresource.zip workdir/target/payload.bin
-rm -rf workdir/target/my_manifest.img workdir/target/my_preload.img workdir/target/my_region.img
-rm -rf workdir/target/my_stock.img workdir/target/my_product.img workdir/target/my_heytap.img
-rm -rf workdir/target/my_bigball.img workdir/target/my_carrier.img workdir/target/my_engineering.img
-rm -rf workdir/target/my_company.img workdir/target.img workdir/target_ext.img workdir/target/vendor.img
+rm -rf workdir/target/system.img workdir/target/system_ext.img
+rm -rf workdir/target/product.img workdir/target/vendor.img
 
 LOGINFO "Extracting source firmware"
 mkdir -p workdir/source/vendor workdir/source/config
@@ -84,8 +82,6 @@ sed -i \
     -e 's/^ro\.adb\.secure=1$/ro.adb.secure=0/' \
     workdir/target/system/system/build.prop
 
-LOGINFO "Applying vendor port patches"
-
 sed_prop() {
     local FILE="$1" KEY="$2" VAL="$3"
     if grep -q "^${KEY}=" "$FILE"; then
@@ -94,6 +90,8 @@ sed_prop() {
         echo "${KEY}=${VAL}" >> "$FILE"
     fi
 }
+
+LOGINFO "Applying vendor port patches"
 
 patch_build_prop() {
     local F="$VENDOR/build.prop"
@@ -201,6 +199,47 @@ patch_odm_build_prop() {
     done
 }
 
+patch_product_build_prop() {
+    local F="$PRODUCT/etc/build.prop"
+    [ -f "$F" ] || { LOGWARN "product/etc/build.prop not found, skipping"; return; }
+    sed_prop "$F" "ro.product.product.name"          "joyeuse"
+    sed_prop "$F" "ro.product.mod_device"            "joyeuse"
+    sed_prop "$F" "ro.sf.lcd_density"                "440"
+    sed_prop "$F" "persist.miui.density_v2"          "440"
+    sed_prop "$F" "ro.vendor.radio.5g"               "0"
+    sed_prop "$F" "ro.product.build.fingerprint"     "Xiaomi/joyeuse/miproduct:15/AQ3A.240812.002/OS2.0.212.0.VOBCNXM:user/release-keys"
+    sed_prop "$F" "ro.product.build.date.utc"        "26061989"
+    sed_prop "$F" "ro.product.build.date"            "Wed Jul  2 19:05:00 CST 2025"
+    sed_prop "$F" "ro.product.build.version.incremental" "OS2.0.212.0.VOBCNXM"
+    sed_prop "$F" "ro.mi.os.version.incremental"     "OS2.0.212.0.VOBCNXM"
+    sed_prop "$F" "ro.build.version.smr_baseversion" "OS2.0.211.0.VOBCNXM"
+    sed_prop "$F" "persist.sys.background_blur_status_default" "false"
+    sed_prop "$F" "persist.sys.preload.enable"       "false"
+    sed_prop "$F" "persist.sys.prestart.proc"        "false"
+    sed_prop "$F" "persist.sys.prestart.feedback.enable" "false"
+    sed_prop "$F" "persist.sys.dynamic_usap_enabled" "false"
+    sed_prop "$F" "persist.sys.usap_pool_enabled"    "false"
+    sed_prop "$F" "persist.sys.app_dexfile_preload.enable" "false"
+    sed_prop "$F" "persist.sys.art_startup_class_preload.enable" "false"
+    sed_prop "$F" "persist.sys.precache.enable"      "false"
+    sed_prop "$F" "persist.sys.precache.number"      "2"
+    sed_prop "$F" "persist.sys.precache.appstrs1"    "com.miui.weather2,com.miui.home,com.android.systemui,com.miui.personalassistant"
+    sed_prop "$F" "persist.sys.precache.appstrs2"    "com.android.settings,com.android.provision,com.android.deskclock"
+    sed_prop "$F" "persist.sys.expend_min_ram_limit" "2"
+    sed_prop "$F" "persist.sys.spc.proc_restart_enable" "false"
+    sed_prop "$F" "persist.sys.stability.gcImproveEnable.808" "false"
+    sed_prop "$F" "persist.vendor.display.miui.composer_boost" "4-7"
+    sed_prop "$F" "ro.miui.build.region"             "cn"
+    sed_prop "$F" "ro.mi.os.flavor"                  "phone"
+    sed_prop "$F" "ro.mi.os.version.code"            "2"
+    sed_prop "$F" "ro.mi.os.version.name"            "OS2.0"
+    sed_prop "$F" "ro.mi.os.version.publish"         "true"
+    sed_prop "$F" "ro.thermal.iec.enable"            "true"
+    sed_prop "$F" "ro.miui.support.system.app.uninstall.v2" "true"
+    grep -q "^ro.com.google.clientidbase=" "$F" || echo "ro.com.google.clientidbase=android-xiaomi" >> "$F"
+    grep -q "^ro.com.google.clientidbase.ms=" "$F" || echo "ro.com.google.clientidbase.ms=android-xiaomi" >> "$F"
+}
+
 patch_fstab() {
     for FSTAB in "$VENDOR/etc/fstab.default" "$VENDOR/etc/fstab.emmc"; do
         [ -f "$FSTAB" ] || continue
@@ -291,49 +330,65 @@ copy_builts() {
 }
 
 DEBLOAT=(
-    workdir/target/product/data-app/BaiduIME
-    workdir/target/product/data-app/iFlytekIME
-    workdir/target/product/data-app/MIService
-    workdir/target/product/data-app/MIUICalculator
-    workdir/target/product/data-app/MIUICalendar
-    workdir/target/product/data-app/MIUICleanMaster
-    workdir/target/product/data-app/MIUICompass
-    workdir/target/product/data-app/MIUIDeskClock
-    workdir/target/product/data-app/MIUIHuanji
-    workdir/target/product/data-app/MIUIMiDrive
-    workdir/target/product/data-app/MIUINotes
-    workdir/target/product/data-app/MIUISecurityManager
-    workdir/target/product/data-app/MIUIWeather
-    workdir/target/product/data-app/MIUIScanner
-    workdir/target/product/data-app/MIUIGallery # tmp
-    workdir/target/product/data-app/MIUISoundRecorderTargetSdk30
-    workdir/target/product/data-app/MIUIEmail
-    workdir/target/product/data-app/wps-lite
-    workdir/target/product/app/MIUIFileExplorer
+    workdir/target/product/app/AiasstVision
+    workdir/target/product/app/AnalyticsCore
+    workdir/target/product/app/CameraTools_beta
+    workdir/target/product/app/CarWith
+    workdir/target/product/app/CatchLog
+    workdir/target/product/app/HybridPlatform
+    workdir/target/product/app/MIS
+    workdir/target/product/app/MITSMClient
+    workdir/target/product/app/MIUIAccessibility
+    workdir/target/product/app/MIUIAiasstService
     workdir/target/product/app/MIUIReporter
+    workdir/target/product/app/MIUISecurityInputMethod
+    workdir/target/product/app/MIUISuperMarket
+    workdir/target/product/app/MiAONServiceV
+    workdir/target/product/app/MiBugReportOS2
+    workdir/target/product/app/MiTrustService
     workdir/target/product/app/Music
+    workdir/target/product/app/OTrPBroker
+    workdir/target/product/app/PaymentService
+    workdir/target/product/app/SecurityOnetrackService
     workdir/target/product/app/SogouIME
+    workdir/target/product/app/SwitchAccess
+    workdir/target/product/app/ThirdAppAssistant
+    workdir/target/product/app/UPTsmService
     workdir/target/product/app/Updater
-    workdir/target/product/app/MiSound
-    workdir/target/product/app/TrichromeLibrary64
     workdir/target/product/app/VoiceAssistAndroidT
-    workdir/target/product/app/WebViewGoogle64
-    workdir/target/product/priv-app/MIShare
-    workdir/target/product/priv-app/MIUIBrowser
-    workdir/target/product/priv-app/MiuiBarrage
-    workdir/target/product/priv-app/MiuiCamera
+    workdir/target/product/app/VoiceTrigger
+    workdir/target/product/app/XiaoaiRecommendation
+    workdir/target/product/app/system
+    workdir/target/product/app/talkback
+    workdir/target/product/priv-app/MiGameCenterSDKService
+    workdir/target/product/priv-app/MirrorOS2
     workdir/target/product/priv-app/MiuiExtraPhoto
     workdir/target/product/priv-app/NewCall
-    workdir/target/product/priv-app/MiuiBarrage
-    workdir/target/product/priv-app/GmsCore # tmp
+    workdir/target/product/priv-app/RegService
+    workdir/target/product/priv-app/SettingsIntelligence
+    workdir/target/product/priv-app/GooglePlayServicesUpdater
+    workdir/target/product/etc/precust_theme
+    workdir/target/product/etc/preferred-apps
+    workdir/target/product/etc/shader_cache
+    workdir/target/product/etc/auto-install.json
+    workdir/target/product/firmware
+    workdir/target/product/usr
+    workdir/target/product/vm-system
+    workdir/target/product/pangu
+    workdir/target/product/prebuilts
+    workdir/target/product/opcust
+    workdir/target/product/data-app
+    workdir/target/product/app/split-XiaomiServiceFrameworkCN
 )
 
+LOGINFO "Debloating product"
 for D in "${DEBLOAT[@]}"; do
     rm -rf "$D"
 done
 
 patch_build_prop
 patch_odm_build_prop
+patch_product_build_prop
 patch_fstab
 patch_selinux_file_contexts
 patch_wifi_cfg
@@ -355,12 +410,13 @@ mv workdir/source/config/vendor_contexts.txt workdir/source/config/vendor_file_c
 
 build_image() {
     local NAME="$1" ROOTFS="$2" CONFIG_DIR="$3"
-    local SIZE PAD_SIZE FS_CONFIG CONTEXTS ARGS=""
+    local SIZE PAD_SIZE ARGS=""
 
     SIZE=$(du -sb "$ROOTFS" | cut -f1)
     PAD_SIZE=$((SIZE + SIZE * PADDING / 100))
-    FS_CONFIG="$CONFIG_DIR/${NAME}_fs_config"
-    CONTEXTS="$CONFIG_DIR/${NAME}_file_contexts"
+
+    local FS_CONFIG="$CONFIG_DIR/${NAME}_fs_config"
+    local CONTEXTS="$CONFIG_DIR/${NAME}_file_contexts"
 
     [ -f "$FS_CONFIG" ] && ARGS="$ARGS -C $FS_CONFIG"
     [ -f "$CONTEXTS" ] && ARGS="$ARGS -S $CONTEXTS"
@@ -369,10 +425,10 @@ build_image() {
     echo "$PAD_SIZE" > "${NAME}.size"
 }
 
-build_image "system"     "workdir/target/system"        "workdir/target/config" > /dev/null
-build_image "system_ext" "workdir/target/system_ext"    "workdir/target/config" > /dev/null
-build_image "product"    "workdir/target/product"       "workdir/target/config" > /dev/null
-build_image "vendor"     "workdir/source/vendor"        "workdir/source/config" > /dev/null
+build_image "system"     "workdir/target/system"     "workdir/target/config" > /dev/null
+build_image "system_ext" "workdir/target/system_ext" "workdir/target/config" > /dev/null
+build_image "product"    "workdir/target/product"    "workdir/target/config" > /dev/null
+build_image "vendor"     "workdir/source/vendor"     "workdir/source/config" > /dev/null
 
 LOGINFO "Building super image"
 ./bin/lpmake \
@@ -384,7 +440,7 @@ LOGINFO "Building super image"
     --partition system:readonly:$(cat system.size):qti_dynamic_partitions \
     --partition system_ext:readonly:$(cat system_ext.size):qti_dynamic_partitions \
     --partition vendor:readonly:$(cat vendor.size):qti_dynamic_partitions \
-    --partition product:readonly:$(stat -c%s product.img):qti_dynamic_partitions \
+    --partition product:readonly:$(cat product.size):qti_dynamic_partitions \
     -i system=system.img \
     -i system_ext=system_ext.img \
     -i vendor=vendor.img \
