@@ -65,3 +65,8 @@ jobs:
       - name: Build ROM
         run: |
           ./buildROM.sh
+
+      - name: Upload to PixelDrain
+        run: |
+          curl -u:${{ secrets.PD_API_KEY }} -T MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip
+      
