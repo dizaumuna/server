@@ -298,7 +298,7 @@ patch_ueventd() {
 }
 
 down_apex() {
-    curl -# -L -o https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex
+    curl -# -L -o com.android.vndk.v30.apex https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex
     mv com.android.vndk.v30.apex workdir/target/system_ext/apex/
 }
     
