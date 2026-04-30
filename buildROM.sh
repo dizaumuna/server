@@ -491,6 +491,7 @@ EOF
 cd out/
 LOGINFO "Downloading LineageOS boot for miatoll"
 curl -# -L -o boot.img https://mirrorbits.lineageos.org/full/miatoll/20260323/boot.img
+mv ../super.img .
 zip -8 -r "MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip" *
 cd ..
 mv out/MIATOLL-ota_full-global-HyperOS-2.0.212.0.VOBCNXM-userdebug.zip .
