@@ -65,3 +65,7 @@ jobs:
       - name: Build ROM
         run: |
           ./buildROM.sh
+
+      - name: Upload to PixelDrain
+        run: |
+          curl -u:${{ secrets.PD_API_KEY }} -T ./out/MIATOLL-ota_full-global-OxygenOS_14.0-userdebug.zip https://pixeldrain.com/api/file/MIATOLL-ota_full-global-OxygenOS_14.0-userdebug.zip 

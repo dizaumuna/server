@@ -3,6 +3,7 @@
 
 SOURCE_FP="Redmi/miatoll_global/miatoll:12/RKQ1.211019.001/V14.0.3.0.SJZMIXM:user/release-keys"
 TARGET_FP="OnePlus/OnePlus8T/OnePlus8T:14/RP1A.201005.001/2111291807:user/release-keys"
+BUILD_DATE="%Y-%M-%d"
 ANDROID="14"
 OXYGENOS="14"
 AUTHOR="diza u muna"
@@ -26,12 +27,9 @@ chmod +x *
 
 # install pdg system-wide
 wget https://github.com/ssut/payload-dumper-go/releases/download/1.3.0/payload-dumper-go_1.3.0_linux_amd64.tar.gz -O pdg.tar.gz > /dev/null
-tar -xvzf pdg.tar.gz > /dev/null
-sudo mv payload-dumper-go /usr/local/bin
+tar -xvzf pdg.tar.gz > /dev/null && sudo mv payload-dumper-go /usr/local/bin
 pip3 install brotli
-rm pdg.tar.gz
-rm LICENSE
-rm README.md
+rm pdg.tar.gz LICENSE README.md
 
 
 # Change URL1 with your Port ROM url
@@ -41,9 +39,9 @@ URL2="https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMI
 
 if [ ! -f "firmwaretarget.zip" ] || [ ! -f "firmwaresource.zip" ]; then
     LOGINFO "Downloading target firmware"
-    curl -# -L -o firmwaretarget.zip "$URL1" > /dev/null
+    curl -sSL -o firmwaretarget.zip "$URL1"
     LOGINFO "Downloading source firmware"
-    curl -# -L -o firmwaresource.zip "$URL2" > /dev/null
+    curl -sSL -o firmwaretarget.zip "$URL2"
 else
     LOGWARN "Firmware already exists, skipping download"
 fi
@@ -57,14 +55,8 @@ else
     LOGWARN "Workdir already exists, skipping mkdir"
 fi
 
-# target firmware should have payload.bin btw else it's gonna fail lmao
 unzip firmwaretarget.zip payload.bin -d workdir/target/ > /dev/null
-
-# same as target one
 unzip firmwaresource.zip vendor.* -d workdir/source/ > /dev/null
-
-
-# use pdg to dump partitions from payload.bin
 LOGINFO "Extracting target firmware"
 payload-dumper-go -o workdir/target/ \
 -p system,system_ext,product,vendor,my_manifest,my_heytap,my_company,my_engineering,my_bigball,my_carrier,my_stock,my_preload,my_region,my_product workdir/target/payload.bin > /dev/null
@@ -72,39 +64,53 @@ payload-dumper-go -o workdir/target/ \
 # use python script to convert dat.br to img
 python bin/sdat2img_brotli.py -d workdir/source/vendor.new.dat.br -t workdir/source/vendor.transfer.list -o workdir/source/vendor.img
 
-# extract erofs images
-./bin/extract.erofs -i workdir/target/system.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/system_ext.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/vendor.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_manifest.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_preload.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_region.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_stock.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_product.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_heytap.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_bigball.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_carrier.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_engineering.img -o workdir/target -x > /dev/null
-./bin/extract.erofs -i workdir/target/my_company.img -o workdir/target -x > /dev/null
+imgs=(
+  system
+  system_ext
+  vendor
+  my_manifest
+  my_preload
+  my_region
+  my_stock
+  my_product
+  my_heytap
+  my_bigball
+  my_carrier
+  my_engineering
+  my_company
+)
+
+for img in "${imgs[@]}"; do
+  ./bin/extract.erofs -i "workdir/target/${img}.img" -o workdir/target -x > /dev/null
+  LOGINFO "Extracted target ${img}.img"
+done
+
 rm -rf firmwaretarget.zip
 rm -rf firmwaresource.zip
 rm -rf workdir/target/payload.bin
 
-# Clean-up
-rm -rf workdir/target/my_manifest.img
-rm -rf workdir/target/my_preload.img
-rm -rf workdir/target/my_region.img
-rm -rf workdir/target/my_stock.img
-rm -rf workdir/target/my_product.img
-rm -rf workdir/target/my_heytap.img
-rm -rf workdir/target/my_bigball.img
-rm -rf workdir/target/my_carrier.img
-rm -rf workdir/target/my_engineering.img
-rm -rf workdir/target/my_company.img
-rm -rf workdir/target/system.img
-rm -rf workdir/target/system_ext.img
-rm -rf workdir/target/vendor.img
+LOGINFO "Cleaning up target firmware"
 
+clean=(
+  my_manifest
+  my_preload
+  my_region
+  my_stock
+  my_product
+  my_heytap
+  my_bigball
+  my_carrier
+  my_engineering
+  my_company
+  system
+  system_ext
+  vendor
+)
+
+for img in "${clean[@]}"; do
+  rm -rf "workdir/target/${img}.img"
+  LOGINFO "Removed ${img}.img"
+done
 # extract ext image
 LOGINFO "Extracting source firmware"
 mkdir -p workdir/source/vendor
@@ -115,64 +121,100 @@ python3 bin/extractor.py workdir/source/vendor.img workdir/source/vendor
 rm -rf workdir/source/vendor.img
 
 LOGINFO "Moving OnePlus partitions to system/"
-mv workdir/target/my_bigball workdir/target/
-mv workdir/target/my_carrier workdir/target/
-mv workdir/target/my_company workdir/target/
-mv workdir/target/my_engineering workdir/target/
-mv workdir/target/my_heytap workdir/target/
-mv workdir/target/my_manifest workdir/target/
-mv workdir/target/my_preload workdir/target/
-mv workdir/target/my_product workdir/target/
-mv workdir/target/my_region workdir/target/
-mv workdir/target/my_stock workdir/target/
 
-####################################################
-#                 Debloating                       #
-LOGINFO "Debloating system"
-rm -rf workdir/target/system/my_bigball/del-app-pre/*
-rm -rf workdir/target/system/my_bigball/del-app/*
+parts=(
+  my_bigball
+  my_carrier
+  my_company
+  my_engineering
+  my_heytap
+  my_manifest
+  my_preload
+  my_product
+  my_region
+  my_stock
+)
+
+for part in "${parts[@]}"; do
+  mv "workdir/target/$part" workdir/target/system/
+  LOGINFO "Moved $part to target firmware"
+done
+
+BASE="workdir/target/system"
+
+delete() {
+  local target="$1"
+
+  if [[ -e "$target" ]]; then
+    LOGINFO "Deleting $target"
+    rm -rf "$target"
+  else
+    LOGINFO "Skipping app $target"
+  fi
+}
+
+delete_list() {
+  local base_path="$1"
+  shift
+
+  for item in "$@"; do
+    delete "$base_path/$item"
+  done
+}
+
+for f in "$BASE/my_bigball/del-app-pre/"*; do
+  delete "$f"
+done
+
+for f in "$BASE/my_bigball/del-app/"*; do
+  delete "$f"
+done
 
 # my_bigball/priv-app
-rm -rf workdir/target/system/my_bigball/priv-app/Google_Files
-rm -rf workdir/target/system/my_bigball/priv-app/GoogleDialer
-rm -rf workdir/target/system/my_bigball/priv-app/Messages
-rm -rf workdir/target/system/my_bigball/priv-app/GlobalSearch
+delete_list "$BASE/my_bigball/priv-app" \
+  Google_Files \
+  GoogleDialer \
+  Messages \
+  GlobalSearch
 
 # my_bigball/app
-rm -rf workdir/target/system/my_bigball/app/Drive
-rm -rf workdir/target/system/my_bigball/app/CalendarGoogle
-rm -rf workdir/target/system/my_bigball/app/Google_Lens
-rm -rf workdir/target/system/my_bigball/app/Google_Wallet
-rm -rf workdir/target/system/my_bigball/app/GoogleContacts
-rm -rf workdir/target/system/my_bigball/app/Meet
-rm -rf workdir/target/system/my_bigball/app/YTMusic
-rm -rf workdir/target/system/my_bigball/app/Photos
-rm -rf workdir/target/system/my_bigball/app/Videos
+delete_list "$BASE/my_bigball/app" \
+  Drive \
+  CalendarGoogle \
+  Google_Lens \
+  Google_Wallet \
+  GoogleContacts \
+  Meet \
+  YTMusic \
+  Photos \
+  Videos
 
 # my_product/priv-app
-rm -rf workdir/target/system/my_product/priv-app/OnePlusCamera
+delete_list "$BASE/my_product/priv-app" \
+  OnePlusCamera
 
 # my_stock/app
-rm -rf workdir/target/system/my_stock/app/RomUpdate
-rm -rf workdir/target/system/my_stock/app/ChildrenSpace
-rm -rf workdir/target/system/my_stock/app/OppoWeather2
-rm -rf workdir/target/system/my_stock/app/OplusOperationManual
-rm -rf workdir/target/system/my_stock/app/Calculator2
-rm -rf workdir/target/system/my_stock/app/Clock
-rm -rf workdir/target/system/my_stock/app/FileManager
-rm -rf workdir/target/system/my_stock/app/SceneMode
-rm -rf workdir/target/system/my_stock/app/SmartSideBar
+delete_list "$BASE/my_stock/app" \
+  RomUpdate \
+  ChildrenSpace \
+  OppoWeather2 \
+  OplusOperationManual \
+  Calculator2 \
+  Clock \
+  FileManager \
+  SceneMode \
+  SmartSideBar
 
 # my_stock/del-app
-rm -rf workdir/target/system/my_stock/del-app/OppoRelax
-rm -rf workdir/target/system/my_stock/del-app/OPForum
+delete_list "$BASE/my_stock/del-app" \
+  OppoRelax \
+  OPForum
 
 # my_stock/priv-app
-rm -rf workdir/target/system/my_stock/priv-app/Games
-rm -rf workdir/target/system/my_stock/priv-app/LinktoWindows
-########################################################
+delete_list "$BASE/my_stock/priv-app" \
+  Games \
+  LinktoWindows
 
-# port rom (real)
 LOGINFO "Copying group and passwd from target to source firmware"
 rm -rf workdir/source/vendor/etc/group
 rm -rf workdir/source/vendor/etc/passwd
@@ -182,17 +224,23 @@ cp -a workdir/target/vendor/etc/passwd workdir/source/vendor/etc/
 LOGINFO "Deleting prop ro.product.first_api_level in my_manifest"
 sed -i '/^ro\.product\.first_api_level=30$/d' workdir/target/my_manifest/build.prop
 
-LOGINFO "Adding import props to vendor/build.prop"
-echo "import /my_bigball/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_carrier/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_company/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_engineering/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_heytap/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_manifest/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_preload/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_product/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_region/build.prop" >> workdir/source/vendor/build.prop
-echo "import /my_stock/build.prop" >> workdir/source/vendor/build.prop
+prop=(
+  /my_bigball/build.prop
+  /my_carrier/build.prop
+  /my_company/build.prop
+  /my_engineering/build.prop
+  /my_heytap/build.prop
+  /my_manifest/build.prop
+  /my_preload/build.prop
+  /my_product/build.prop
+  /my_region/build.prop
+  /my_stock/build.prop
+)
+
+for path in "${prop[@]}"; do
+  echo "import $path" >> workdir/source/vendor/build.prop
+  LOGINFO "Adding import prop with $path on workdir/source/vendor/build.prop"
+done
 
 LOGINFO "Replacing OnePlus overlays"
 rm -rf workdir/source/vendor/overlay/*
@@ -205,7 +253,7 @@ sed -i \
 -e 's/^ro\.adb\.secure=1$/ro.adb.secure=0/' \
 workdir/target/system/system/build.prop
 
-LOGINFO "Removing encryption in fstab"
+#LOGINFO "Removing encryption in fstab"
 # todo: add removing
 
 LOGINFO "Building images"
@@ -251,6 +299,8 @@ build_image() {
   echo
 }
 
+LOGINFO "Building OS images"
+
 build_image \
   "system" \
   "workdir/target/system" \
@@ -269,9 +319,7 @@ build_image \
 # product is a ext4 image so it does not requires a extraction or build.
 mv workdir/target/product.img .
 
-
-# build super.img
-LOGINFO "Building super image"
+LOGINFO "Building OS super image"
 ./bin/lpmake --metadata-size=67108864 \
 --metadata-slots=2 \
 --device-size=8589934592 \
@@ -287,7 +335,6 @@ LOGINFO "Building super image"
 -i product=product.img \
 -o super.img
 
-# Create flashable zip
 LOGINFO "Creating flashable ZIP"
 mkdir -p out
 mkdir -p out/META-INF
@@ -300,6 +347,8 @@ ui_print("***********************************************");
 ui_print("Target: $TARGET_FP");
 ui_print("Source: $SOURCE_FP");
 ui_print("***********************************************");
+ui_print("Build Date: $BUILD_DATE")
+ui_print("Builded on PortMation!")
 
 ui_print("Patching super image unconditionally...");
 show_progress(0.100000, 0);
@@ -317,7 +366,7 @@ EOF
 cd out/
 LOGINFO "Downloading LineageOS boot for miatoll"
 curl -# -L -o boot.img https://mirrorbits.lineageos.org/full/miatoll/20260323/boot.img
-
+mv ../super.img .
 zip -8 -r "MIATOLL-ota_full-global-OxygenOS_14.0-userdebug.zip" *
 cd ..
 mv out/MIATOLL-ota_full-global-OxygenOS_14.0-userdebug.zip .
@@ -325,4 +374,3 @@ rm -rf out/*
 mv MIATOLL-ota_full-global-OxygenOS_14.0-userdebug.zip out/
 
 LOGINFO "Build finished. Out ZIP is in out/ folder."
-LOGINFO "Thanks for using my script."
