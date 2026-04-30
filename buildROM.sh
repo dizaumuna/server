@@ -300,7 +300,7 @@ patch_ueventd() {
 down_apex() {
     curl -# -L -o com.android.vndk.v30.apex https://github.com/dizaumuna/server/releases/download/resources/com.android.vndk.v30.apex
     mv com.android.vndk.v30.apex workdir/target/system_ext/apex/
-    sed -i '\|/system_ext/apex/com.android.vndk.v30.apex|!a /system_ext/apex/com.android.vndk.v30.apex    u:object_r:system_file:s0' workdir/target/config/system_ext_file_contexts
+    #sed -i '\|/system_ext/apex/com.android.vndk.v30.apex|!a /system_ext/apex/com.android.vndk.v30.apex    u:object_r:system_file:s0' workdir/target/config/system_ext_file_contexts
 }
     
 copy_builts() {
