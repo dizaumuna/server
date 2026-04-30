@@ -421,7 +421,7 @@ PADDING=3
 python3 bin/fspatch.py workdir/source/vendor workdir/source/config/vendor_fsconfig.txt > /dev/null
 python3 bin/fspatch.py workdir/target/system workdir/target/config/system_fs_config > /dev/null
 python3 bin/fspatch.py workdir/target/system_ext workdir/target/config/system_ext_fs_config > /dev/null
-
+echo '/system_ext/apex(/.*)?    u:object_r:system_file:s0' >> workdir/target/config/system_ext_file_contexts
 mv workdir/source/config/vendor_fsconfig.txt workdir/source/config/vendor_fs_config
 mv workdir/source/config/vendor_contexts.txt workdir/source/config/vendor_file_contexts
 
