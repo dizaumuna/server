@@ -31,7 +31,6 @@ tar -xvzf pdg.tar.gz > /dev/null && sudo mv payload-dumper-go /usr/local/bin
 pip3 install brotli
 rm pdg.tar.gz LICENSE README.md
 
-
 # Change URL1 with your Port ROM url
 # Change URL2 with your Stock ROM url
 URL1="https://gauss-componentotacostmanual-sg.allawnofs.com/remove-321c974e5931c5438d3cf3b7104102ac/component-ota/24/10/09/c6654c8a15d7487bb5a5c87708ad46af.zip"
@@ -39,9 +38,9 @@ URL2="https://bn.d.miui.com/V14.0.3.0.SJZMIXM/miui_JOYEUSEGlobal_V14.0.3.0.SJZMI
 
 if [ ! -f "firmwaretarget.zip" ] || [ ! -f "firmwaresource.zip" ]; then
     LOGINFO "Downloading target firmware"
-    curl -sSL -o firmwaretarget.zip "$URL1"
+    curl -# -L -o firmwaretarget.zip "$URL1"
     LOGINFO "Downloading source firmware"
-    curl -sSL -o firmwaretarget.zip "$URL2"
+    curl -# -L -o firmwaretarget.zip "$URL2"
 else
     LOGWARN "Firmware already exists, skipping download"
 fi
